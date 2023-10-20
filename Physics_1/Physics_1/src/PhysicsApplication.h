@@ -10,10 +10,15 @@ private:
 	PhysicsEngine physicsEngine;
 
 	Model dirLightModel;
+
 	Model sphere;
+	Model sphere2;
+
 	Model plane;
+	Model cube;
 
 	PhysicsObject spherePhyObject;
+	PhysicsObject sphere2PhyObject;
 	PhysicsObject planePhyObject;
 
 	Light dirLight;

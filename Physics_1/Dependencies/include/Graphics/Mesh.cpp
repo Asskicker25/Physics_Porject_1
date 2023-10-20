@@ -70,6 +70,8 @@ void Mesh::DrawMesh(Shader& shader, bool loadMaterials, bool isWireframe)
 
 void Mesh::SetupMesh()
 {
+	CalculateTriangles();
+
 	VAO.Bind();
 	VBO.Setup(vertices.size() * sizeof(Vertex), &vertices[0]);
 	IBO.Setup(indices.size(), &indices[0]);
@@ -86,6 +88,19 @@ void Mesh::SetupMesh()
 	VAO.AddBuffer(VBO, layout);
 
 	VAO.UnBind();
+}
+
+void Mesh::CalculateTriangles()
+{
+	for (size_t i = 0; i < indices.size(); i += 3) 
+	{
+		Triangles triangle;
+		triangle.v1 = vertices[indices[i]].positions;
+		triangle.v2 = vertices[indices[i + 1]].positions;
+		triangle.v3 = vertices[indices[i + 2]].positions;
+		triangles.push_back(triangle);
+	}
+
 }
 
 

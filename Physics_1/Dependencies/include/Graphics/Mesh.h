@@ -8,7 +8,7 @@
 #include "IndexBuffer.h"
 #include "TextureData.h"
 #include "Material.h"
-
+#include "Triangle.h"
 
 #pragma once
 class Mesh
@@ -16,6 +16,7 @@ class Mesh
 public:
 	std::vector<Vertex> vertices;
 	std::vector< unsigned int> indices;
+	std::vector< Triangles > triangles;
 	std::vector< Texture*> textures;
 	Material material;
 
@@ -32,5 +33,6 @@ private:
 	//unsigned int VAO, VBO, EBO;
 
 	void SetupMesh();
+	void CalculateTriangles();
 };
 

@@ -12,7 +12,11 @@ private:
 	Model* model = nullptr;
 
 	Aabb cachedAABB;
+	Aabb aabb;
 	glm::mat4 cachedMatrix;
+
+	std::vector < std::vector < Triangle > > triangles;
+	std::vector < std::vector<Sphere*> > triangleSpheres;
 
 public:
 	PhysicsMode mode = PhysicsMode::STATIC;
@@ -26,8 +30,8 @@ public:
 	glm::vec3 velocity = glm::vec3(0.0f);
 	glm::vec3 acceleration = glm::vec3(0.0f);
 
-	Aabb aabb;
 	iShape* physicsShape;
+	iShape* transformedPhysicsShape;
 
 	PhysicsObject();
 	~PhysicsObject();
@@ -37,10 +41,12 @@ public:
 	Aabb CalculateModelAABB();
 	Aabb GetModelAABB();
 
-	Sphere* CalculateModelSphere();
+	void CalculatePhysicsShape();
+	iShape* GetTransformedPhysicsShape();
+
+	void CalculateTriangleSpheres();
 
 	bool CheckCollision(PhysicsObject* other, glm::vec3& collisionPoint);
-	
 	
 	// Inherited via iPhysicsTransformable
 	glm::vec3 GetPosition() override;
@@ -49,6 +55,12 @@ public:
 	void SetDrawOrientation(const glm::vec3& newOrientation) override; 
 
 	
+
+
+	// Inherited via iPhysicsTransformable
+	void SetVisible(bool activeSelf) override;
+
+	bool GetVisible() override;
 
 };
 

@@ -23,9 +23,10 @@ enum PhysicsMode
 struct iShape
 {
     virtual ~iShape() {}
+    
 };
 
-struct Aabb : iShape
+struct Aabb : public iShape
 {
     Aabb() {}
     Aabb(glm::vec3 min,glm::vec3 max)
@@ -48,6 +49,21 @@ struct Sphere : public iShape
 
     glm::vec3 position;
     float radius;
+};
+
+struct Triangle : public iShape
+{
+    Triangle() {}
+    Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3)
+    {
+        this->v1 = v1;
+        this->v2 = v2;
+        this->v3 = v3;
+    }
+
+    glm::vec3 v1;
+    glm::vec3 v2;
+    glm::vec3 v3;
 };
 
 static Aabb CalculateAABB(const std::vector<Vertex>& vertices)
@@ -74,6 +90,27 @@ static Aabb CalculateAABB(const std::vector<Vertex>& vertices)
     return Aabb{ min, max };
 }
 
+//static Sphere CalculateSphere(const std::vector<Vertex>& vertices)
+//{
+//    if (vertices.empty()) {
+//        return Sphere{ glm::vec3(0.0f), -1.0f };
+//    }
+//
+//    // Initialize the min and max points.
+//    glm::vec3 minPoint = vertices[0].positions;
+//    glm::vec3 maxPoint = vertices[0].positions;
+//
+//    for (const Vertex& vertex : vertices) {
+//        minPoint = glm::min(minPoint, vertex.positions);
+//        maxPoint = glm::max(maxPoint, vertex.positions);
+//    }
+//
+//    glm::vec3 center = 0.5f * (minPoint + maxPoint);
+//
+//    float radius = glm::length(maxPoint - center);
+//
+//    return Sphere{ center, radius };
+//}
 
 static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b)
 {
@@ -81,30 +118,40 @@ static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b)
     if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;
     if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
     if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
+
+    std::cout << "AABB VS AABBBBBBB" << std::endl;
     // Overlapping on all axes means AABBs are intersecting
     return true;
 }
 
-static Sphere CalculateSphere(const std::vector<Vertex>& vertices)
+// Computes the square distance between a point p and an AABB b
+static float SqDistPointAABB(glm::vec3 p, Aabb b)
 {
-    if (vertices.empty()) {
-        return Sphere{ glm::vec3(0.0f), -1.0f };
+    float sqDist = 0.0f;
+    for (int i = 0; i < 3; i++) 
+    {
+        // For each axis count any excess distance outside box extents
+        float v = p[i];
+        if (v < b.min[i])
+            sqDist += (b.min[i] - v) * (b.min[i] - v);
+        if (v > b.max[i]) 
+            sqDist += (v - b.max[i]) * (v - b.max[i]);
     }
+    return sqDist;
+}
 
-    // Initialize the min and max points.
-    glm::vec3 minPoint = vertices[0].positions;
-    glm::vec3 maxPoint = vertices[0].positions;
+static bool CollisionSpherevsAABB(Sphere* sphere, const Aabb& aabb)
+{
+    // Compute squared distance between sphere center and AABB
+    float sqDist = SqDistPointAABB(sphere->position, aabb);
 
-    for (const Vertex& vertex : vertices) {
-        minPoint = glm::min(minPoint, vertex.positions);
-        maxPoint = glm::max(maxPoint, vertex.positions);
-    }
+   /* std::cout << "Square Position : " << sphere->position.y << std::endl;
+    std::cout << "Square Distance : " << sqDist << std::endl;
+    std::cout << "Square Radius : " << sphere->radius * sphere->radius << std::endl;*/
 
-    glm::vec3 center = 0.5f * (minPoint + maxPoint);
-
-    float radius = glm::length(maxPoint - center);
-
-    return Sphere{ center, radius };
+    // Sphere and AABB intersect if the (squared) distance
+    // between them is less than the (squared) sphere radius
+    return sqDist <= sphere->radius * sphere->radius;
 }
 
 //static bool CollisionSpherevsTriangle(Sphere* sphere, )

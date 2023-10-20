@@ -8,7 +8,6 @@ struct LayoutElement
 	unsigned int size;
 	GLenum type;
 	unsigned int offset;
-
 };
 
 class VertexLayout

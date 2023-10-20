@@ -79,7 +79,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 					glm::vec3 collisionPoint = glm::vec3(0.0);
 
 					std::cout << "AABB TRUE" << std::endl;
-
+					//iteratorObject->SetVisible(false);
 					if (HandleCollision(iteratorObject, otherObject, collisionPoint))
 					{
 						collisionPoints.push_back(collisionPoint);
@@ -106,7 +106,12 @@ bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
 {
 	if (first->CheckCollision(second, collisionPoint))
 	{
-		std::cout << "COLLLLLLIIISSSSION" << std::endl;
+		first->SetVisible(false);
+		//std::cout << "COLLLLLLIIISSSSION" << std::endl;
+	}
+	else
+	{
+		//std::cout << "Sphere VS AABB False" << std::endl;
 	}
 	return false;
 }
