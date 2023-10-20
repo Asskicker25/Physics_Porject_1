@@ -1,13 +1,20 @@
 #pragma once
 
 #include <Graphics/ApplicationWindow.h>
+#include <PhysicsEngine.h>
 
 class PhysicsApplication : public ApplicationWindow
 {
 
 private:
-	Model sphere;
+	PhysicsEngine physicsEngine;
+
 	Model dirLightModel;
+	Model sphere;
+	Model plane;
+
+	PhysicsObject spherePhyObject;
+	PhysicsObject planePhyObject;
 
 	Light dirLight;
 

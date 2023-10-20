@@ -24,7 +24,7 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, st
 	SetupMesh();
 }
 
-void Mesh::DrawMesh(Shader& shader, bool loadMaterials)
+void Mesh::DrawMesh(Shader& shader, bool loadMaterials, bool isWireframe)
 {
 	//VAO.Bind();
 
@@ -52,8 +52,18 @@ void Mesh::DrawMesh(Shader& shader, bool loadMaterials)
 	
 
 	VAO.Bind();
-	//std::cout << count << std:: endl;
+	
+	if (isWireframe)
+	{
+		GLCALL(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+	}
+	else
+	{
+		GLCALL(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+	}
+
 	GLCALL(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
+
 	VAO.UnBind();
 	count++;
 }

@@ -30,6 +30,9 @@
   <ItemGroup>
     <None Include="Assets\Models\SpecSphere\Sphere 1.fbx" />
     <None Include="Assets\Models\DefaultSphere.fbx" />
+    <None Include="res\Shader\LightShader.shader" />
+    <None Include="res\Shader\Shader.shader" />
+    <None Include="Assets\Models\Plane.fbx" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Models\SpecSphere\Sphere 1_Sphere__Diffuse.png">

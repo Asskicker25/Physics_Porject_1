@@ -16,6 +16,7 @@ public:
 
 	std::string modelId;
 	bool isActive = true;
+	bool isWireframe = false;
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<Texture*> texturesLoaded;

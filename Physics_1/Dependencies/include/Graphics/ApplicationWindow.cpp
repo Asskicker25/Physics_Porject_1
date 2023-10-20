@@ -84,6 +84,8 @@ void ApplicationWindow::Render()
 {
 	SetUp();
 
+	lastFrameTime = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */

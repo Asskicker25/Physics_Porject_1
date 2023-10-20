@@ -59,7 +59,7 @@ void Model::Draw(Shader& shader)
 		{
 			shader.SetUniformMat("inverseModel", transform.GetInverseMatrix());
 		}
-		meshes[i]->DrawMesh(shader, loadMatProperties);
+		meshes[i]->DrawMesh(shader, loadMatProperties, isWireframe);
 	}
 }
 

@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Graphics;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Physics\src;$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Graphics;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Graphics;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Physics\src;$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Graphics;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;assimp-vc143-mtd.lib;glfw3.lib;Graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;assimp-vc143-mtd.lib;glfw3.lib;Graphics.lib;Physics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,7 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;assimp-vc143-mtd.lib;glfw3.lib;Graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;assimp-vc143-mtd.lib;glfw3.lib;Graphics.lib;Physics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -145,7 +145,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Models\DefaultSphere.fbx" />
+    <None Include="Assets\Models\Plane.fbx" />
     <None Include="Assets\Models\SpecSphere\Sphere 1.fbx" />
+    <None Include="res\Shader\LightShader.shader" />
+    <None Include="res\Shader\Shader.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Models\SpecSphere\Sphere 1_Sphere__Diffuse.png" />
