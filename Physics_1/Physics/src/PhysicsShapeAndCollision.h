@@ -162,63 +162,6 @@ static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2)
     return dist2 <= radiusSum * radiusSum;
 }
 
-static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
-{
-    collisionPoint = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
-
-    glm::vec3 v = collisionPoint - sphere->position;
-    float squaredDistance = glm::dot(v, v);
-
-    return squaredDistance <= (sphere->radius * sphere->radius);
-}
-
-static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
-    const glm::mat4& transformMatrix,
-    const std::vector <std::vector <Triangle>>& triangles,
-    const std::vector<std::vector<Sphere*>>& triangleSpheres,
-    std::vector<glm::vec3>& collisionPoints)
-{
-
-    float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
-
-    collisionPoints.clear();
-    for (size_t i = 0; i < triangles.size(); i++) 
-    {
-        const std::vector<Triangle>& triangleList = triangles[i];
-        const std::vector<Sphere*>& sphereList = triangleSpheres[i];
-
-        for (size_t j = 0; j < triangleList.size(); j++) 
-        {
-            const Triangle& triangle = triangleList[j];
-            Sphere* sphereTriangle = new Sphere();
-
-            // Transform the sphere's position using the transformMatrix
-            glm::vec4 transformedCenter = transformMatrix * glm::vec4(sphereList[j]->position, 1.0f);
-            sphereTriangle->position = glm::vec3(transformedCenter);
-
-            // Transform the sphere's radius based on scaling
-            sphereTriangle->radius = sphereList[j]->radius * maxScale;
-
-            // Now you can check for collision between the transformed sphere and sphereTriangle
-            if (CollisionSphereVSSphere(sphere, sphereTriangle)) 
-            {
-               /* glm::vec3 point = glm::vec3(0.0f);
-                if(CollisionSphereVsTriangle(sphere,triangle,))
-                collisionPoints.push_back(glm::vec3(1.0f));*/
-            }
-
-            delete sphereTriangle;
-        }
-    }
-
-    if (collisionPoints.size() > 0)
-        return true;
-    //std::cout << "Size : " << collisionPoints.size()<<std::endl;
-
-    return false;
-}
-
-
 static glm::vec3 ClosestPtPointTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
     glm::vec3 ab = b - a;
@@ -272,8 +215,64 @@ static glm::vec3 ClosestPtPointTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, g
     return u * a + v * b + w * c;
 }
 
+static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
+{
+    collisionPoint = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
 
-//static bool CollisionSpherevsTriangle(Sphere* sphere, )
-//{
-//
-//}
+    glm::vec3 v = collisionPoint - sphere->position;
+    float squaredDistance = glm::dot(v, v);
+
+    return squaredDistance <= (sphere->radius * sphere->radius);
+}
+
+static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
+    const glm::mat4& transformMatrix,
+    const std::vector <std::vector <Triangle>>& triangles,
+    const std::vector<std::vector<Sphere*>>& triangleSpheres,
+    std::vector<glm::vec3>& collisionPoints)
+{
+
+    float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
+
+    collisionPoints.clear();
+    Sphere* sphereTriangle = new Sphere();
+
+    for (size_t i = 0; i < triangles.size(); i++) 
+    {
+        const std::vector<Triangle>& triangleList = triangles[i];
+        const std::vector<Sphere*>& sphereList = triangleSpheres[i];
+
+        for (size_t j = 0; j < triangleList.size(); j++) 
+        {
+            const Triangle& triangle = triangleList[j];
+
+            // Transform the sphere's position using the transformMatrix
+            glm::vec4 transformedCenter = transformMatrix * glm::vec4(sphereList[j]->position, 1.0f);
+            sphereTriangle->position = glm::vec3(transformedCenter);
+
+            // Transform the sphere's radius based on scaling
+            sphereTriangle->radius = sphereList[j]->radius * maxScale;
+
+            // Now you can check for collision between the transformed sphere and sphereTriangle
+            if (CollisionSphereVSSphere(sphere, sphereTriangle)) 
+            {
+                glm::vec3 point = glm::vec3(0.0f);
+
+                if (CollisionSphereVsTriangle(sphere, triangle, point))
+                {
+                    collisionPoints.push_back(point);
+                }
+            }
+        }
+    }
+
+    delete sphereTriangle;
+
+
+    if (collisionPoints.size() > 0)
+        return true;
+    //std::cout << "Size : " << collisionPoints.size()<<std::endl;
+
+    return false;
+}
+
