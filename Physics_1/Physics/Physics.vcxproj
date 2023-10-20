@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PhysicsSphere.h" />
     <ClInclude Include="src\PhysicsEngine.h" />
     <ClInclude Include="src\PhysicsObject.h" />
-    <ClInclude Include="src\PhysicsShape.h" />
+    <ClInclude Include="src\PhysicsShapeAndCollision.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PhysicsSphere.cpp" />
     <ClCompile Include="src\PhysicsEngine.cpp" />
     <ClCompile Include="src\iPhysicsTransformable.h" />
     <ClCompile Include="src\PhysicsObject.cpp" />

@@ -71,15 +71,19 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 				if (iteratorObject == otherObject)
 					continue;
 
+				if (iteratorObject->mode == PhysicsMode::STATIC)
+					continue;
+
 				if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
 				{
 					glm::vec3 collisionPoint = glm::vec3(0.0);
+
+					std::cout << "AABB TRUE" << std::endl;
 
 					if (HandleCollision(iteratorObject, otherObject, collisionPoint))
 					{
 						collisionPoints.push_back(collisionPoint);
 					}
-
 				}
 
 			}
@@ -100,7 +104,9 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second, glm::vec3& collisionPoint)
 {
-
-	std::cout << "COLLLLLLIIISSSSION" << std::endl;
+	if (first->CheckCollision(second, collisionPoint))
+	{
+		std::cout << "COLLLLLLIIISSSSION" << std::endl;
+	}
 	return false;
 }

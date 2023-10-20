@@ -36,11 +36,11 @@ void PhysicsApplication::SetUp()
 
 	physicsEngine.fixedStepTime = 0.01f;
 
-	spherePhyObject.Initialize(&sphere);
+	spherePhyObject.Initialize(&sphere,SPHERE,DYNAMIC);
 	spherePhyObject.velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 	spherePhyObject.acceleration.y = (-9.8f / 5.0f);
 
-	planePhyObject.Initialize(&plane);
+	planePhyObject.Initialize(&plane,TRIANGLE);
 
 	physicsEngine.AddPhysicsObject(&spherePhyObject);
 	physicsEngine.AddPhysicsObject(&planePhyObject);

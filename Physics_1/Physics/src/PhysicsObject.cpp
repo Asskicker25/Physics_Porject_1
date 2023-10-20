@@ -34,27 +34,51 @@ void PhysicsObject::SetDrawOrientation(const glm::vec3& newOrientation)
 	model->transform.rotation = newOrientation;
 }
 
-void PhysicsObject::Initialize(Model* model)
+void PhysicsObject::Initialize(Model* model, PhysicsShape shape, PhysicsMode mode)
 {
 	this->model = model;
+	this->shape = shape;
+	this->mode = mode;
+
 	aabb = CalculateModelAABB();
+	switch (shape)
+	{
+	case SPHERE:
+		physicsShape = CalculateModelSphere();
+		break;
+	case AABB:
+		break;
+	case TRIANGLE:
+		break;
+	}
 }
 
 Aabb PhysicsObject::CalculateModelAABB()
 {
 	if (model->meshes.empty())
 	{
-		return Aabb{ glm::vec3(0.0f), glm::vec3(0.0f) };
+		return Aabb { glm::vec3(0.0f), glm::vec3(0.0f) };
 	}
 
-	std::vector<Aabb> meshAABBs;
+	Aabb minMax;
+
+	minMax.min = model->meshes[0]->vertices[0].positions;
+	minMax.max = model->meshes[0]->vertices[0].positions;
 
 	for (std::shared_ptr<Mesh> mesh : model->meshes)
 	{
-		meshAABBs.push_back(CalculateAABB(mesh->vertices));
+		Aabb temp = CalculateAABB(mesh->vertices);
+
+		minMax.min.x = std::min(temp.min.x, minMax.min.x);
+		minMax.min.y = std::min(temp.min.y, minMax.min.y);
+		minMax.min.z = std::min(temp.min.z, minMax.min.z);
+
+		minMax.max.x = std::max(temp.max.x, minMax.max.x);
+		minMax.max.y = std::max(temp.max.y, minMax.max.y);
+		minMax.max.z = std::max(temp.max.z, minMax.max.z);
 	}
 
-	return CombineAABBs(meshAABBs);
+	return Aabb{minMax.min, minMax.max };
 }
 
 //AABB PhysicsObject::GetModelAABB()
@@ -118,4 +142,63 @@ Aabb PhysicsObject::GetModelAABB()
 	cachedAABB = b;
 	return b;
 }
+
+Sphere* PhysicsObject::CalculateModelSphere()
+{
+	Aabb minMax = CalculateModelAABB();
+
+	glm::vec3 position = (minMax.min + minMax.max) * 0.5f;
+	float radius = glm::length(minMax.max - position);
+
+	return new Sphere(position, radius);
+}
+
+bool PhysicsObject::CheckCollision(PhysicsObject* other, glm::vec3& collisionPoint)
+{
+	switch (shape)
+	{
+#pragma region SphereVs
+		switch (other->shape)
+		{
+		case AABB:
+			break;
+		case SPHERE:
+			break;
+		case TRIANGLE:
+			break;
+		case PLANE:
+			break;
+		case CAPSULE:
+			break;
+		case MESH_OF_TRIANGLES_INDIRECT:
+			break;
+		case MESH_OF_TRIANGLES_LOCAL_VERTICES:
+			break;
+		}
+#pragma endregion
+
+#pragma region AABBVs
+		switch (other->shape)
+		{
+		case AABB:
+			break;
+		case SPHERE:
+			break;
+		case TRIANGLE:
+			break;
+		case PLANE:
+			break;
+		case CAPSULE:
+			break;
+		case MESH_OF_TRIANGLES_INDIRECT:
+			break;
+		case MESH_OF_TRIANGLES_LOCAL_VERTICES:
+			break;
+		}
+#pragma endregion
+	}
+
+	return false;
+}
+
 
