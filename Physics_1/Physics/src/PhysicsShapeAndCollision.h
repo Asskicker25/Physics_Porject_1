@@ -9,8 +9,7 @@ enum PhysicsShape
     TRIANGLE,
     AABB,
     CAPSULE,
-    MESH_OF_TRIANGLES_INDIRECT,
-    MESH_OF_TRIANGLES_LOCAL_VERTICES,
+    MESH_OF_TRIANGLES,
 };
 
 enum PhysicsMode
@@ -119,7 +118,6 @@ static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b)
     if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
     if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
 
-    std::cout << "AABB VS AABBBBBBB" << std::endl;
     // Overlapping on all axes means AABBs are intersecting
     return true;
 }
@@ -153,6 +151,127 @@ static bool CollisionSpherevsAABB(Sphere* sphere, const Aabb& aabb)
     // between them is less than the (squared) sphere radius
     return sqDist <= sphere->radius * sphere->radius;
 }
+
+static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2)
+{
+    glm::vec3 d = sphere1->position - sphere2->position;
+    float dist2 = glm::dot(d, d);
+
+    float radiusSum = sphere1->radius + sphere2->radius;
+   
+    return dist2 <= radiusSum * radiusSum;
+}
+
+static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
+{
+    collisionPoint = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
+
+    glm::vec3 v = collisionPoint - sphere->position;
+    float squaredDistance = glm::dot(v, v);
+
+    return squaredDistance <= (sphere->radius * sphere->radius);
+}
+
+static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
+    const glm::mat4& transformMatrix,
+    const std::vector <std::vector <Triangle>>& triangles,
+    const std::vector<std::vector<Sphere*>>& triangleSpheres,
+    std::vector<glm::vec3>& collisionPoints)
+{
+
+    float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
+
+    collisionPoints.clear();
+    for (size_t i = 0; i < triangles.size(); i++) 
+    {
+        const std::vector<Triangle>& triangleList = triangles[i];
+        const std::vector<Sphere*>& sphereList = triangleSpheres[i];
+
+        for (size_t j = 0; j < triangleList.size(); j++) 
+        {
+            const Triangle& triangle = triangleList[j];
+            Sphere* sphereTriangle = new Sphere();
+
+            // Transform the sphere's position using the transformMatrix
+            glm::vec4 transformedCenter = transformMatrix * glm::vec4(sphereList[j]->position, 1.0f);
+            sphereTriangle->position = glm::vec3(transformedCenter);
+
+            // Transform the sphere's radius based on scaling
+            sphereTriangle->radius = sphereList[j]->radius * maxScale;
+
+            // Now you can check for collision between the transformed sphere and sphereTriangle
+            if (CollisionSphereVSSphere(sphere, sphereTriangle)) 
+            {
+               /* glm::vec3 point = glm::vec3(0.0f);
+                if(CollisionSphereVsTriangle(sphere,triangle,))
+                collisionPoints.push_back(glm::vec3(1.0f));*/
+            }
+
+            delete sphereTriangle;
+        }
+    }
+
+    if (collisionPoints.size() > 0)
+        return true;
+    //std::cout << "Size : " << collisionPoints.size()<<std::endl;
+
+    return false;
+}
+
+
+static glm::vec3 ClosestPtPointTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c)
+{
+    glm::vec3 ab = b - a;
+    glm::vec3 ac = c - a;
+    glm::vec3 bc = c - b;
+
+    // Compute parametric position s for projection P' of P on AB,
+    // P' = A + s*AB, s = snom/(snom+sdenom)
+    float snom = glm::dot(p - a, ab), sdenom = glm::dot(p - b, a - b);
+
+    // Compute parametric position t for projection P' of P on AC,
+    // P' = A + t*AC, s = tnom/(tnom+tdenom)
+    float tnom = glm::dot(p - a, ac), tdenom = glm::dot(p - c, a - c);
+
+    if (snom <= 0.0f && tnom <= 0.0f) return a; // Vertex region early out
+
+    // Compute parametric position u for projection P' of P on BC,
+    // P' = B + u*BC, u = unom/(unom+udenom)
+    float unom = glm::dot(p - b, bc), udenom = glm::dot(p - c, b - c);
+
+    if (sdenom <= 0.0f && unom <= 0.0f) return b; // Vertex region early out
+    if (tdenom <= 0.0f && udenom <= 0.0f) return c; // Vertex region early out
+
+
+    // P is outside (or on) AB if the triple scalar product [N PA PB] <= 0
+    glm::vec3 n = glm::cross(b - a, c - a);
+    float vc = glm::dot(n, glm::cross(a - p, b - p));
+    // If P outside AB and within feature region of AB,
+    // return projection of P onto AB
+    if (vc <= 0.0f && snom >= 0.0f && sdenom >= 0.0f)
+        return a + snom / (snom + sdenom) * ab;
+
+    // P is outside (or on) BC if the triple scalar product [N PB PC] <= 0
+    float va = glm::dot(n, glm::cross(b - p, c - p));
+    // If P outside BC and within feature region of BC,
+    // return projection of P onto BC
+    if (va <= 0.0f && unom >= 0.0f && udenom >= 0.0f)
+        return b + unom / (unom + udenom) * bc;
+
+    // P is outside (or on) CA if the triple scalar product [N PC PA] <= 0
+    float vb = glm::dot(n, glm::cross(c - p, a - p));
+    // If P outside CA and within feature region of CA,
+    // return projection of P onto CA
+    if (vb <= 0.0f && tnom >= 0.0f && tdenom >= 0.0f)
+        return a + tnom / (tnom + tdenom) * ac;
+
+    // P must project inside face region. Compute Q using barycentric coordinates
+    float u = va / (va + vb + vc);
+    float v = vb / (va + vb + vc);
+    float w = 1.0f - u - v; // = vc / (va + vb + vc)
+    return u * a + v * b + w * c;
+}
+
 
 //static bool CollisionSpherevsTriangle(Sphere* sphere, )
 //{

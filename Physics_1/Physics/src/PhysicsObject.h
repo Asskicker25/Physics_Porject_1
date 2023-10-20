@@ -46,7 +46,7 @@ public:
 
 	void CalculateTriangleSpheres();
 
-	bool CheckCollision(PhysicsObject* other, glm::vec3& collisionPoint);
+	bool CheckCollision(PhysicsObject* other, std::vector<glm::vec3>& collisionPoints);
 	
 	// Inherited via iPhysicsTransformable
 	glm::vec3 GetPosition() override;
@@ -54,6 +54,8 @@ public:
 	void SetPosition(const glm::vec3& newPosition) override;
 	void SetDrawOrientation(const glm::vec3& newOrientation) override; 
 
+	const std::vector < std::vector < Triangle > >& GetTriangleList();
+	const std::vector < std::vector<Sphere*> >& GetSphereList();
 	
 
 
@@ -64,7 +66,3 @@ public:
 
 };
 
-//class PhysicsSphere : public PhysicsObject
-//{
-//
-//};

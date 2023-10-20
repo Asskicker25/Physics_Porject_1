@@ -52,8 +52,12 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 {
 	for (PhysicsObject* iteratorObject : physicsObjects)
 	{
-		if (iteratorObject->inverse_mass >= 0)
-		{
+		if (iteratorObject->mode == PhysicsMode::STATIC)
+			continue;
+
+		if (iteratorObject->inverse_mass < 0)
+			continue;
+
 			//Accel change in this frame
 			glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime;
 
@@ -65,24 +69,22 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 			glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
 
-			collisionPoints.clear();
 			for (PhysicsObject* otherObject : physicsObjects)
 			{
 				if (iteratorObject == otherObject)
 					continue;
 
-				if (iteratorObject->mode == PhysicsMode::STATIC)
-					continue;
+				collisionPoints.clear();
 
 				if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
 				{
-					glm::vec3 collisionPoint = glm::vec3(0.0);
+					std::vector<glm::vec3> perObjectCollisions;
 
-					std::cout << "AABB TRUE" << std::endl;
+					//std::cout << "AABB TRUE" << std::endl;
 					//iteratorObject->SetVisible(false);
-					if (HandleCollision(iteratorObject, otherObject, collisionPoint))
+					if (HandleCollision(iteratorObject, otherObject, perObjectCollisions))
 					{
-						collisionPoints.push_back(collisionPoint);
+						collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
 					}
 				}
 
@@ -92,7 +94,6 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 			iteratorObject->SetPosition(iteratorObject->position);
 
-		}
 
 		/*std::cout << iteratorObject->GetPosition().x << " , "
 			<< iteratorObject->GetPosition().y << " , "
@@ -102,11 +103,12 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 	//Debugger::Print("Physics Update");
 }
 
-bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second, glm::vec3& collisionPoint)
+bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second, std::vector<glm::vec3>& collisionPoints)
 {
-	if (first->CheckCollision(second, collisionPoint))
+	if (first->CheckCollision(second, collisionPoints))
 	{
 		first->SetVisible(false);
+		std::cout << collisionPoints.size() << std::endl;
 		//std::cout << "COLLLLLLIIISSSSION" << std::endl;
 	}
 	else

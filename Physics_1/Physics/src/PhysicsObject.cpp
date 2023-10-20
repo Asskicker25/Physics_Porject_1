@@ -35,6 +35,16 @@ void PhysicsObject::SetDrawOrientation(const glm::vec3& newOrientation)
 	model->transform.rotation = newOrientation;
 }
 
+const std::vector<std::vector<Triangle>>& PhysicsObject::GetTriangleList()
+{
+	return triangles;
+}
+
+const std::vector<std::vector<Sphere*>>& PhysicsObject::GetSphereList()
+{
+	return triangleSpheres;
+}
+
 void PhysicsObject::SetVisible(bool activeSelf)
 {
 	model->isActive = activeSelf;
@@ -111,17 +121,19 @@ Aabb PhysicsObject::GetModelAABB()
 void PhysicsObject::CalculatePhysicsShape()
 {
 	aabb = CalculateModelAABB();
-	Aabb minMax = aabb;
+	
 
 	if (shape == SPHERE)
 	{
-		glm::vec3 position = (minMax.min + minMax.max) * 0.5f;
-		float radius = glm::length(minMax.max - position);
+		glm::vec3 position = (aabb.min + aabb.max) * 0.5f;
+		glm::vec3 sideLengths = aabb.max - aabb.min;
+		float radius = 0.5f * glm::max(sideLengths.x, glm::max(sideLengths.y, sideLengths.z));
 		physicsShape = new Sphere(position, radius);
 		transformedPhysicsShape = new Sphere();
 	}
-	else if (shape == TRIANGLE)
+	else if (shape == MESH_OF_TRIANGLES)
 	{
+		CalculateTriangleSpheres();
 		transformedPhysicsShape = new Triangle();
 	}
 }
@@ -133,9 +145,15 @@ iShape* PhysicsObject::GetTransformedPhysicsShape()
 		Sphere* sphere = dynamic_cast<Sphere*>(physicsShape);
 
 		Sphere* temp = dynamic_cast<Sphere*> (transformedPhysicsShape);
-		temp->position = model->transform.GetTransformMatrix() * glm::vec4(sphere->position, 1.0f);
-		temp->radius = sphere->radius * model->transform.scale.length();
+		temp->position = model->transform.GetTransformMatrix() * glm::vec4(sphere->position,1.0f);
 
+		/*temp->radius = sphere->radius * glm::length(model->transform.scale);*/
+
+		temp->radius = sphere->radius * 
+			glm::max(
+			glm::max(model->transform.scale.x,model->transform.scale.y),
+			model->transform.scale.z);
+		
 		return transformedPhysicsShape;
 	}
 	else if (shape == TRIANGLE)
@@ -147,13 +165,25 @@ iShape* PhysicsObject::GetTransformedPhysicsShape()
 
 void PhysicsObject::CalculateTriangleSpheres()
 {
+	for (std::vector<Sphere*>& sphereList : triangleSpheres)
+	{
+		for (Sphere* sphere : sphereList) 
+		{
+			delete sphere;  
+		}
+		sphereList.clear();
+	}
+
 	triangles.clear();  
+	triangleSpheres.clear();
 
 	for (const std::shared_ptr<Mesh>& mesh : model->meshes)
 	{
 		std::vector<Triangle> meshTriangles;
+		std::vector<Sphere*> meshSphers;
 
 		meshTriangles.reserve(mesh->triangles.size()); 
+		meshSphers.reserve(mesh->triangles.size());
 
 		for (const Triangles& triangle : mesh->triangles)
 		{
@@ -164,13 +194,15 @@ void PhysicsObject::CalculateTriangleSpheres()
 			temp.v3 = triangle.v3;
 
 			glm::vec3 sphereCenter = (temp.v1 + temp.v2 + temp.v3) / 3.0f;
+			float radius = glm::max(glm::distance(sphereCenter, temp.v1),
+				glm::max(glm::distance(sphereCenter, temp.v2), glm::distance(sphereCenter, temp.v3)));
 
 			meshTriangles.push_back(std::move(temp));  
-
-
+			meshSphers.push_back(new Sphere (sphereCenter, radius));
 		}
 
 		triangles.push_back(std::move(meshTriangles)); 
+		triangleSpheres.push_back(std::move(meshSphers));
 	}
 }
 
@@ -213,8 +245,7 @@ void PhysicsObject::CalculateTriangleSpheres()
 //	return b;
 //}
 
-
-bool PhysicsObject::CheckCollision(PhysicsObject* other, glm::vec3& collisionPoint)
+bool PhysicsObject::CheckCollision(PhysicsObject* other, std::vector<glm::vec3>& collisionPoints)
 {
 	switch (shape)
 	{
@@ -224,19 +255,20 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other, glm::vec3& collisionPoi
 		{
 		case AABB:
 			return CollisionSpherevsAABB(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()), other->GetModelAABB());
-			break;
 		case SPHERE:
-			break;
+			return CollisionSphereVSSphere(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
+				dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()));
 		case TRIANGLE:
 			break;
 		case PLANE:
 			break;
 		case CAPSULE:
 			break;
-		case MESH_OF_TRIANGLES_INDIRECT:
-			break;
-		case MESH_OF_TRIANGLES_LOCAL_VERTICES:
-			break;
+		case MESH_OF_TRIANGLES:
+			return CollisionSphereVsMeshOfTriangles(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
+				other->model->transform.GetTransformMatrix(),
+				other->GetTriangleList(), other->GetSphereList(),
+				collisionPoints);
 		}
 	break;
 #pragma endregion
@@ -247,18 +279,15 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other, glm::vec3& collisionPoi
 		{
 		case AABB:
 			return CollisionAABBvsAABB(GetModelAABB(), other->GetModelAABB());
-			break;
 		case SPHERE:
-			break;
+			return CollisionSpherevsAABB(dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()), GetModelAABB());
 		case TRIANGLE:
 			break;
 		case PLANE:
 			break;
 		case CAPSULE:
 			break;
-		case MESH_OF_TRIANGLES_INDIRECT:
-			break;
-		case MESH_OF_TRIANGLES_LOCAL_VERTICES:
+		case MESH_OF_TRIANGLES:
 			break;
 		}
 	break;
