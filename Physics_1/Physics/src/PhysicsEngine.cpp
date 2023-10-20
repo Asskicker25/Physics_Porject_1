@@ -17,6 +17,7 @@ bool PhysicsEngine::PhysicsObjectExists(PhysicsObject* physicsObject)
 	return exists;
 }
 
+
 void PhysicsEngine::AddPhysicsObject(PhysicsObject* physicsObject)
 {
 	if (!PhysicsObjectExists(physicsObject))
@@ -64,6 +65,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 			glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
 
+			collisionPoints.clear();
 			for (PhysicsObject* otherObject : physicsObjects)
 			{
 				if (iteratorObject == otherObject)
@@ -71,11 +73,16 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 				if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
 				{
-					std::cout << "COLLLLLLIIISSSSION" << std::endl;
+					glm::vec3 collisionPoint = glm::vec3(0.0);
+
+					if (HandleCollision(iteratorObject, otherObject, collisionPoint))
+					{
+						collisionPoints.push_back(collisionPoint);
+					}
+
 				}
 
 			}
-
 
 			iteratorObject->position = predictedPos;
 
@@ -89,4 +96,11 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		
 	}
 	//Debugger::Print("Physics Update");
+}
+
+bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second, glm::vec3& collisionPoint)
+{
+
+	std::cout << "COLLLLLLIIISSSSION" << std::endl;
+	return false;
 }

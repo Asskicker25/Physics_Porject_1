@@ -2,17 +2,28 @@
 
 #include <glm/glm.hpp>
 
-struct AABB
+enum PhysicsShape
+{
+    SPHERE,
+    PLANE,
+    TRIANGLE,
+    AABB,
+    CAPSULE,
+    MESH_OF_TRIANGLES_INDIRECT,
+    MESH_OF_TRIANGLES_LOCAL_VERTICES,
+};
+
+struct Aabb
 {
 	glm::vec3 min; 
 	glm::vec3 max;
 };
 
-static AABB CalculateAABB(const std::vector<Vertex>& vertices)
+static Aabb CalculateAABB(const std::vector<Vertex>& vertices)
 {
     if (vertices.size() == 0)
     {
-	    return AABB{ glm::vec3(0.0f), glm::vec3(0.0f) };
+	    return Aabb{ glm::vec3(0.0f), glm::vec3(0.0f) };
     }
 
     glm::vec3 min = vertices[0].positions;
@@ -29,21 +40,21 @@ static AABB CalculateAABB(const std::vector<Vertex>& vertices)
         max.z = std::max(max.z, vertex.positions.z);
     }
 
-    return AABB{ min, max };
+    return Aabb{ min, max };
 
 }
 
-static AABB CombineAABBs(const std::vector<AABB>& aabbs) 
+static Aabb CombineAABBs(const std::vector<Aabb>& aabbs)
 {
     if (aabbs.empty()) 
     {
-        return AABB{ glm::vec3(0.0f), glm::vec3(0.0f) };
+        return Aabb{ glm::vec3(0.0f), glm::vec3(0.0f) };
     }
 
     glm::vec3 min = aabbs[0].min;
     glm::vec3 max = aabbs[0].max;
 
-    for (const AABB& aabb : aabbs) {
+    for (const Aabb& aabb : aabbs) {
         min.x = std::min(min.x, aabb.min.x);
         min.y = std::min(min.y, aabb.min.y);
         min.z = std::min(min.z, aabb.min.z);
@@ -53,10 +64,10 @@ static AABB CombineAABBs(const std::vector<AABB>& aabbs)
         max.z = std::max(max.z, aabb.max.z);
     }
 
-    return AABB{ min, max };
+    return Aabb{ min, max };
 }
 
-static bool CollisionAABBvsAABB(AABB a, AABB b)
+static bool CollisionAABBvsAABB(Aabb a, Aabb b)
 {
     // Exit with no intersection if separated along an axis
     if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;

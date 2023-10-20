@@ -38,17 +38,16 @@ void PhysicsObject::Initialize(Model* model)
 {
 	this->model = model;
 	aabb = CalculateModelAABB();
-	AABB temp = GetModelAABB();
 }
 
-AABB PhysicsObject::CalculateModelAABB()
+Aabb PhysicsObject::CalculateModelAABB()
 {
-	if (model->meshes.empty()) 
+	if (model->meshes.empty())
 	{
-		return AABB{ glm::vec3(0.0f), glm::vec3(0.0f) };
+		return Aabb{ glm::vec3(0.0f), glm::vec3(0.0f) };
 	}
 
-	std::vector<AABB> meshAABBs;
+	std::vector<Aabb> meshAABBs;
 
 	for (std::shared_ptr<Mesh> mesh : model->meshes)
 	{
@@ -58,27 +57,65 @@ AABB PhysicsObject::CalculateModelAABB()
 	return CombineAABBs(meshAABBs);
 }
 
-AABB PhysicsObject::GetModelAABB()
-{
-	glm::mat4 transformMatrix = model->transform.GetTransformMatrix();
+//AABB PhysicsObject::GetModelAABB()
+//{
+//	glm::mat4 transformMatrix = model->transform.GetTransformMatrix();
+//
+//	if (cachedMatrix == transformMatrix)
+//	{
+//		return cachedAABB;
+//	}
+//
+//	cachedMatrix = transformMatrix;
+//
+//	AABB localAABB;
+//	glm::vec3 minPoint = glm::vec3(transformMatrix * glm::vec4(aabb.min, 1.0f));
+//	glm::vec3 maxPoint = glm::vec3(transformMatrix * glm::vec4(aabb.max, 1.0f));
+//
+//	localAABB.min = glm::min(minPoint, maxPoint);
+//	localAABB.max = glm::max(minPoint, maxPoint);
+//
+//	cachedAABB = localAABB;
+//
+//	return localAABB;
+//}
 
-	if (cachedMatrix == transformMatrix)
+Aabb PhysicsObject::GetModelAABB()
+{
+
+	glm::mat4 m = model->transform.GetTransformMatrix();
+
+	if (cachedMatrix == m)
 	{
 		return cachedAABB;
 	}
 
-	cachedMatrix = transformMatrix;
+	cachedMatrix = m;
 
-	AABB localAABB;
-	glm::vec3 minPoint = glm::vec3(transformMatrix * glm::vec4(aabb.min, 1.0f));
-	glm::vec3 maxPoint = glm::vec3(transformMatrix * glm::vec4(aabb.max, 1.0f));
+	glm::vec3 t = model->transform.position;
 
-	localAABB.min = glm::min(minPoint, maxPoint);
-	localAABB.max = glm::max(minPoint, maxPoint);
+	Aabb b;
 
-	cachedAABB = localAABB;
+	// For all three axes
+	for (int i = 0; i < 3; i++) {
+		// Start by adding in translation
+		b.min[i] = b.max[i] = t[i];
+		// Form extent by summing smaller and larger terms respectively
+		for (int j = 0; j < 3; j++) {
+			float e = m[i][j] * aabb.min[j];
+			float f = m[i][j] * aabb.max[j];
+			if (e < f) {
+				b.min[i] += e;
+				b.max[i] += f;
+			}
+			else {
+				b.min[i] += f;
+				b.max[i] += e;
+			}
+		}
+	}
 
-	return localAABB;
+	cachedAABB = b;
+	return b;
 }
-
 
