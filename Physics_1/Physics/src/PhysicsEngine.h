@@ -18,7 +18,9 @@ public:
 	void AddPhysicsObject(PhysicsObject* physicsObject);
 	void RemovePhysicsObject(PhysicsObject* physicsObject);
 	bool PhysicsObjectExists(PhysicsObject* physicsObject);
-	bool HandleCollision(PhysicsObject* first, PhysicsObject* second, std::vector<glm::vec3>& collisionPoint);
+	bool HandleCollision(PhysicsObject* first, PhysicsObject* second,
+		std::vector<glm::vec3>& collisionPoint,
+		std::vector<glm::vec3>& collisionNormal);
 
 	void Update(float deltaTime);
 };

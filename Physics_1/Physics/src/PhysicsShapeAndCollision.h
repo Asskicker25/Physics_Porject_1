@@ -110,7 +110,6 @@ static Aabb CalculateAABB(const std::vector<Vertex>& vertices)
 //
 //    return Sphere{ center, radius };
 //}
-
 static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b)
 {
     // Exit with no intersection if separated along an axis
@@ -121,6 +120,32 @@ static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b)
     // Overlapping on all axes means AABBs are intersecting
     return true;
 }
+static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b,
+    std::vector<glm::vec3>& collisionPoint,
+    std::vector<glm::vec3>& collisionNormal)
+{
+    // Exit with no intersection if separated along an axis
+    if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;
+    if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
+    if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
+
+    // Overlapping on all axes means AABBs are intersecting
+
+    Aabb intersectionAABB;
+    intersectionAABB.min = glm::max(a.min, b.min);
+    intersectionAABB.max = glm::min(a.max, b.max);
+
+    glm::vec3 collisionpt = (intersectionAABB.min + intersectionAABB.max) * 0.5f;
+    collisionPoint.push_back(collisionpt);
+
+    glm::vec3 collisionNr = collisionpt - (a.min + a.max) * 0.5f;
+    collisionNr = glm::normalize(collisionNr);
+
+    collisionNormal.push_back(collisionNr);
+
+    return true;
+}
+
 
 // Computes the square distance between a point p and an AABB b
 static float SqDistPointAABB(glm::vec3 p, Aabb b)
@@ -137,29 +162,84 @@ static float SqDistPointAABB(glm::vec3 p, Aabb b)
     }
     return sqDist;
 }
+static const glm::vec3& ClosestPtPointAABB(glm::vec3 p, Aabb b)
+{
+    glm::vec3 q;
+    for (int i = 0; i < 3; i++) {
+        float v = p[i];
+        if (v < b.min[i]) v = b.min[i]; // v = max(v, b.min[i])
+        if (v > b.max[i]) v = b.max[i]; // v = min(v, b.max[i])
+        q[i] = v;
+    }
+    return q;
+}
 
-static bool CollisionSpherevsAABB(Sphere* sphere, const Aabb& aabb)
+static bool CollisionSpherevsAABB(Sphere* sphere, const Aabb& aabb, bool isSphere,
+    std::vector<glm::vec3>& collisionPoint,
+    std::vector<glm::vec3>& collisionNormal)
 {
     // Compute squared distance between sphere center and AABB
     float sqDist = SqDistPointAABB(sphere->position, aabb);
+    float sqRadius = sphere->radius * sphere->radius;
 
-   /* std::cout << "Square Position : " << sphere->position.y << std::endl;
-    std::cout << "Square Distance : " << sqDist << std::endl;
-    std::cout << "Square Radius : " << sphere->radius * sphere->radius << std::endl;*/
+    if (sqDist <= sqRadius)
+    {
+        glm::vec3 collisionPt = ClosestPtPointAABB(sphere->position, aabb);
 
-    // Sphere and AABB intersect if the (squared) distance
-    // between them is less than the (squared) sphere radius
-    return sqDist <= sphere->radius * sphere->radius;
+        glm::vec3 collisonNr = glm::vec3(0.0f);
+
+        if (isSphere)
+        {
+            collisonNr = collisionPt - sphere->position;
+        }
+        else
+        {
+            collisonNr = collisionPt - ((aabb.min + aabb.max) * 0.5f);
+            collisonNr = glm::normalize(collisonNr);
+        }
+
+        collisionPoint.push_back(collisionPt);
+        collisionNormal.push_back(collisonNr);
+
+        return true;
+    }
+ 
+    return false;
 }
 
-static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2)
+static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2,
+    std::vector<glm::vec3>& collisionPoint,
+    std::vector<glm::vec3>& collisionNormal)
 {
-    glm::vec3 d = sphere1->position - sphere2->position;
+
+    glm::vec3 collisionPt = glm::vec3(1.0f);
+    glm::vec3 collisionNr = glm::vec3(1.0f);
+
+    glm::vec3 d = sphere2->position - sphere1->position;
     float dist2 = glm::dot(d, d);
 
     float radiusSum = sphere1->radius + sphere2->radius;
+    float radius2 = radiusSum * radiusSum;
+
+    if (dist2 <= radius2)
+    {
+        if (dist2 != 0)
+        {
+            collisionNr = glm::normalize(d);
+        }
+        else
+        {
+            collisionNr = glm::normalize(glm::vec3(1.0f));
+        }
+
+        collisionPt = sphere1->position + sphere1->radius * collisionNr;
+
+        collisionPoint.push_back(collisionPt);
+        collisionNormal.push_back(collisionNr);
+        return true;
+    }
    
-    return dist2 <= radiusSum * radiusSum;
+    return false;
 }
 
 static glm::vec3 ClosestPtPointTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c)
@@ -254,7 +334,9 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
             sphereTriangle->radius = sphereList[j]->radius * maxScale;
 
             // Now you can check for collision between the transformed sphere and sphereTriangle
-            if (CollisionSphereVSSphere(sphere, sphereTriangle)) 
+            std::vector<glm::vec3> collisionPoint;
+            std::vector<glm::vec3> collisionNormal;
+            if (CollisionSphereVSSphere(sphere, sphereTriangle, collisionPoint, collisionNormal))
             {
                 glm::vec3 point = glm::vec3(0.0f);
 

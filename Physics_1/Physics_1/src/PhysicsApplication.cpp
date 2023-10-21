@@ -27,7 +27,7 @@ void PhysicsApplication::SetUp()
 	sphere.isWireframe = true;
 
 	sphere2 = sphere;
-	sphere2.transform.SetPosition(glm::vec3(3.0f, 10.0f, 0.0f));
+	sphere2.transform.SetPosition(glm::vec3(0.5f, 2.0f, 0.0f));
 	sphere2.transform.SetScale(glm::vec3(1.0f));
 	sphere2.isWireframe = true;
 
@@ -35,7 +35,7 @@ void PhysicsApplication::SetUp()
 	plane.modelId = "Plane";
 	plane.transform.SetScale(glm::vec3(1.0f));
 	plane.transform.SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-	plane.transform.SetRotation(glm::vec3(90.0f, 40.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(90.0f, 00.0f, 0.0f));
 	plane.isWireframe = true;
 
 
@@ -48,15 +48,17 @@ void PhysicsApplication::SetUp()
 
 	physicsEngine.fixedStepTime = 0.01f;
 
-	spherePhyObject.Initialize(&sphere, SPHERE,STATIC);
+	spherePhyObject.Initialize(&sphere, SPHERE,DYNAMIC);
 	spherePhyObject.velocity = glm::vec3(0.0f, -1.0f, 0.0f);
 	spherePhyObject.acceleration.y = (-9.8f / 5.0f);
+	spherePhyObject.SetMass(0.75f);
 
-	sphere2PhyObject.Initialize(&sphere2, SPHERE, DYNAMIC);
-	sphere2PhyObject.velocity = glm::vec3(0.0f, -1.0f, 0.0f);
+	sphere2PhyObject.Initialize(&sphere2, AABB, DYNAMIC);
+	sphere2PhyObject.velocity = glm::vec3(0.0f, 5.0f, 0.0f);
 	sphere2PhyObject.acceleration.y = (-9.8f / 5.0f);
+	sphere2PhyObject.SetMass(1.0f);
 
-	planePhyObject.Initialize(&plane,MESH_OF_TRIANGLES,STATIC);
+	planePhyObject.Initialize(&plane, AABB,STATIC);
 
 	physicsEngine.AddPhysicsObject(&spherePhyObject);
 	physicsEngine.AddPhysicsObject(&sphere2PhyObject);
@@ -81,9 +83,9 @@ void PhysicsApplication::SetUp()
 
 void PhysicsApplication::PreRender()
 {
-	Sphere* sphereBod = dynamic_cast<Sphere*> (sphere2PhyObject.GetTransformedPhysicsShape());
+	/*Sphere* sphereBod = dynamic_cast<Sphere*> (sphere2PhyObject.GetTransformedPhysicsShape());
 	glm::vec3 newPos = glm::vec3(sphereBod->position.x + sphereBod->radius, sphereBod->position.y, sphereBod->position.z);
-	cube.transform.SetPosition(newPos);
+	cube.transform.SetPosition(newPos);*/
 
 	//cube.transform.SetPosition(sphere2PhyObject.GetModelAABB().max);
 	//std::cout << planePhyObject.GetModelAABB().max.x << ",";

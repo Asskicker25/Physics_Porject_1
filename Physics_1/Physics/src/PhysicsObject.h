@@ -11,12 +11,15 @@ class PhysicsObject : public iPhysicsTransformable
 private:
 	Model* model = nullptr;
 
+	float mass = 1.0f;
+
 	Aabb cachedAABB;
 	Aabb aabb;
 	glm::mat4 cachedMatrix;
 
 	std::vector < std::vector < Triangle > > triangles;
 	std::vector < std::vector<Sphere*> > triangleSpheres;
+	std::vector <glm::vec3> collisionPoints;
 
 public:
 	PhysicsMode mode = PhysicsMode::STATIC;
@@ -46,20 +49,23 @@ public:
 
 	void CalculateTriangleSpheres();
 
-	bool CheckCollision(PhysicsObject* other, std::vector<glm::vec3>& collisionPoints);
+	void SetMass(float mass);
+	float GetMass();
+
+	bool CheckCollision(PhysicsObject* other,
+		std::vector<glm::vec3>& collisionPoints,
+		std::vector<glm::vec3>& collisionNormals);
 	
+	const std::vector < std::vector < Triangle > >& GetTriangleList();
+	const std::vector < std::vector<Sphere*> >& GetSphereList();
+	const std::vector <glm::vec3>& GetCollisionPoints();
+	void SetCollisionPoints(const std::vector <glm::vec3>& collisionPoints);
+
 	// Inherited via iPhysicsTransformable
 	glm::vec3 GetPosition() override;
 	glm::vec3 GetRotation() override;
 	void SetPosition(const glm::vec3& newPosition) override;
-	void SetDrawOrientation(const glm::vec3& newOrientation) override; 
-
-	const std::vector < std::vector < Triangle > >& GetTriangleList();
-	const std::vector < std::vector<Sphere*> >& GetSphereList();
-	
-
-
-	// Inherited via iPhysicsTransformable
+	void SetDrawOrientation(const glm::vec3& newOrientation) override;
 	void SetVisible(bool activeSelf) override;
 
 	bool GetVisible() override;

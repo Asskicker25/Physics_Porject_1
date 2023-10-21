@@ -3,7 +3,7 @@
 
 PhysicsObject::PhysicsObject()
 {
-	float inverse_mass = 1.0f;
+	SetMass(1.0f);
 
 	glm::vec3 position = glm::vec3(0.0f);
 	//glm::vec3 oldPosition = glm::vec3(0.0f);
@@ -43,6 +43,16 @@ const std::vector<std::vector<Triangle>>& PhysicsObject::GetTriangleList()
 const std::vector<std::vector<Sphere*>>& PhysicsObject::GetSphereList()
 {
 	return triangleSpheres;
+}
+
+const std::vector<glm::vec3>& PhysicsObject::GetCollisionPoints()
+{
+	return collisionPoints;
+}
+
+void PhysicsObject::SetCollisionPoints(const std::vector<glm::vec3>& collisionPoints)
+{
+	this->collisionPoints = collisionPoints;
 }
 
 void PhysicsObject::SetVisible(bool activeSelf)
@@ -206,6 +216,18 @@ void PhysicsObject::CalculateTriangleSpheres()
 	}
 }
 
+void PhysicsObject::SetMass(float mass)
+{
+	this->mass = mass;
+	inverse_mass = 1.0f / mass;
+}
+
+float PhysicsObject::GetMass()
+{
+	return mass;
+}
+
+
 //Aabb PhysicsObject::GetModelAABB()
 //{
 //
@@ -245,7 +267,9 @@ void PhysicsObject::CalculateTriangleSpheres()
 //	return b;
 //}
 
-bool PhysicsObject::CheckCollision(PhysicsObject* other, std::vector<glm::vec3>& collisionPoints)
+bool PhysicsObject::CheckCollision(PhysicsObject* other, 
+	std::vector<glm::vec3>& collisionPoints,
+	std::vector<glm::vec3>& collisionNormals)
 {
 	switch (shape)
 	{
@@ -254,10 +278,12 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other, std::vector<glm::vec3>&
 		switch (other->shape)
 		{
 		case AABB:
-			return CollisionSpherevsAABB(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()), other->GetModelAABB());
+			return CollisionSpherevsAABB(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()), other->GetModelAABB(),
+				true, collisionPoints, collisionNormals);
 		case SPHERE:
 			return CollisionSphereVSSphere(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
-				dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()));
+				dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()),
+				collisionPoints, collisionNormals);
 		case TRIANGLE:
 			break;
 		case PLANE:
@@ -278,9 +304,10 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other, std::vector<glm::vec3>&
 		switch (other->shape)
 		{
 		case AABB:
-			return CollisionAABBvsAABB(GetModelAABB(), other->GetModelAABB());
+			return CollisionAABBvsAABB(GetModelAABB(), other->GetModelAABB(), collisionPoints, collisionNormals);
 		case SPHERE:
-			return CollisionSpherevsAABB(dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()), GetModelAABB());
+			return CollisionSpherevsAABB(dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()), GetModelAABB(),
+				false, collisionPoints, collisionNormals);
 		case TRIANGLE:
 			break;
 		case PLANE:

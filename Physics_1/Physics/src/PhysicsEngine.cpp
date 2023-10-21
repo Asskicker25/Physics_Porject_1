@@ -39,7 +39,7 @@ void PhysicsEngine::RemovePhysicsObject(PhysicsObject* physicsObject)
 void PhysicsEngine::Update(float deltaTime)
 {
 	timer += deltaTime;
-	
+
 	if (timer >= fixedStepTime)
 	{
 		UpdatePhysics(deltaTime);
@@ -58,62 +58,96 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		if (iteratorObject->inverse_mass < 0)
 			continue;
 
-			//Accel change in this frame
-			glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime;
+		collisionPoints.clear();
 
-			//Rate of velocity change
-			iteratorObject->velocity += deltaAcceleration;
+		std::vector<glm::vec3> collisionNormals;
 
-			//Rate of velocity change in this frame
-			glm::vec3 deltaVelocity = iteratorObject->velocity * deltaTime;
+#pragma region CheckingCollision
 
-			glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
+		for (PhysicsObject* otherObject : physicsObjects)
+		{
+			if (iteratorObject == otherObject)
+				continue;
 
-			for (PhysicsObject* otherObject : physicsObjects)
+			if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
 			{
-				if (iteratorObject == otherObject)
-					continue;
+				std::vector<glm::vec3> perObjectCollisions;
+				std::vector<glm::vec3> perObjectNormals;
 
-				collisionPoints.clear();
-
-				if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
+				//std::cout << "AABB TRUE" << std::endl;
+				//iteratorObject->SetVisible(false);
+				if (HandleCollision(iteratorObject, otherObject, perObjectCollisions, perObjectNormals))
 				{
-					std::vector<glm::vec3> perObjectCollisions;
-
-					//std::cout << "AABB TRUE" << std::endl;
-					//iteratorObject->SetVisible(false);
-					if (HandleCollision(iteratorObject, otherObject, perObjectCollisions))
-					{
-						collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
-					}
+					collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
+					collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
 				}
-
 			}
 
-			iteratorObject->position = predictedPos;
+		}
+#pragma endregion
 
-			iteratorObject->SetPosition(iteratorObject->position);
+#pragma region UpdatingPosition
 
+		iteratorObject->SetCollisionPoints(collisionPoints);
+
+		//Accel change in this frame
+		glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime * iteratorObject->inverse_mass;
+
+		if (collisionPoints.size() != 0)
+		{
+
+			for (size_t i = 0; i < collisionNormals.size(); i++) 
+			{
+				glm::vec3 normal = glm::normalize(collisionNormals[i]);
+
+				// Calculate the dot product of the current velocity and the collision normal
+				float dotProduct = glm::dot(iteratorObject->velocity, normal);
+
+				// If the dot product is positive, it means the object is moving away from the collision.
+				if (dotProduct > 0.0f) 
+				{
+					// Adjust the velocity to reflect the collision by subtracting the portion along the normal
+					iteratorObject->velocity -= dotProduct * normal * iteratorObject->inverse_mass;
+				}
+			}
+			
+		}
+		else
+		{
+			//Rate of velocity change
+			iteratorObject->velocity += deltaAcceleration;
+		}
+
+		//Rate of velocity change in this frame
+		glm::vec3 deltaVelocity = iteratorObject->velocity * deltaTime;
+
+		glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
+
+		iteratorObject->position = predictedPos;
+
+		iteratorObject->SetPosition(iteratorObject->position);
+
+#pragma endregion
 
 		/*std::cout << iteratorObject->GetPosition().x << " , "
 			<< iteratorObject->GetPosition().y << " , "
 			<< iteratorObject->GetPosition().z << std::endl;*/
-		
+
 	}
 	//Debugger::Print("Physics Update");
 }
 
-bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second, std::vector<glm::vec3>& collisionPoints)
+bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
+	std::vector<glm::vec3>& collisionPoints,
+	std::vector<glm::vec3>& collisionNormal)
 {
-	if (first->CheckCollision(second, collisionPoints))
+	if (first->CheckCollision(second, collisionPoints, collisionNormal))
 	{
-		first->SetVisible(false);
-		std::cout << collisionPoints.size() << std::endl;
+		//first->SetVisible(false);
+		std::cout << collisionNormal.size() << std::endl;
+		return true;
 		//std::cout << "COLLLLLLIIISSSSION" << std::endl;
 	}
-	else
-	{
-		//std::cout << "Sphere VS AABB False" << std::endl;
-	}
+
 	return false;
 }
