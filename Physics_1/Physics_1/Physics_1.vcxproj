@@ -148,6 +148,7 @@
     <None Include="Assets\Models\DefaultSphere.fbx" />
     <None Include="Assets\Models\Plane.fbx" />
     <None Include="Assets\Models\SpecSphere\Sphere 1.fbx" />
+    <None Include="Assets\Models\Terrain.ply" />
     <None Include="res\Shader\LightShader.shader" />
     <None Include="res\Shader\Shader.shader" />
   </ItemGroup>

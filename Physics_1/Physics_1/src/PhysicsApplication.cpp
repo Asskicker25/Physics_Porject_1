@@ -4,7 +4,7 @@ void PhysicsApplication::SetUp()
 {
 	//physicsEngine.fixedStepTime = 1.0f;
 
-	cameraPos.y = 10.0f;
+	cameraPos.y = 5.0f;
 
 #pragma region Light
 
@@ -27,7 +27,7 @@ void PhysicsApplication::SetUp()
 	sphere.LoadModel("Assets/Models/SpecSphere/Sphere 1.fbx");
 	sphere.modelId = "Sphere";
 	sphere.transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
-	sphere.transform.SetPosition(glm::vec3(0.5f, 10.0f, 0.0f));
+	sphere.transform.SetPosition(glm::vec3(3.0f, 10.0f, 0.0f));
 	sphere.isWireframe = true;
 
 	sphere2 = sphere;
@@ -35,12 +35,13 @@ void PhysicsApplication::SetUp()
 	sphere2.transform.SetScale(glm::vec3(1.0f));
 	sphere2.isWireframe = true;
 
-	plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
-	plane.modelId = "Plane";
+	//plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
+	plane.LoadModel("Assets/Models/Terrain.ply");
+	plane.modelId = "Terrain";
 	plane.transform.SetScale(glm::vec3(1.0f));
-	plane.transform.SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-	plane.transform.SetRotation(glm::vec3(90.0f, 30.0f, 0.0f));
-	plane.isWireframe = true;
+	plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	plane.isWireframe = false;
 
 
 	/*cube.LoadModel("Assets/Models/DefaultCube.fbx");
@@ -58,11 +59,11 @@ void PhysicsApplication::SetUp()
 	spherePhyObject.SetMass(0.65f);
 
 	sphere2PhyObject.Initialize(&sphere2, SPHERE, DYNAMIC);
-	sphere2PhyObject.velocity = glm::vec3(0.0f, 5.0f, 0.0f);
-	sphere2PhyObject.acceleration.y = (-9.8f / 5.0f);
+	sphere2PhyObject.velocity = glm::vec3(0.0f, -1.0f, 0.0f);
+	sphere2PhyObject.acceleration.y = (-9.8f / 2.0f);
 	sphere2PhyObject.SetMass(1.75f);
 
-	planePhyObject.Initialize(&plane, AABB,STATIC);
+	planePhyObject.Initialize(&plane, MESH_OF_TRIANGLES,STATIC);
 
 	physicsEngine.AddPhysicsObject(&spherePhyObject);
 	physicsEngine.AddPhysicsObject(&sphere2PhyObject);

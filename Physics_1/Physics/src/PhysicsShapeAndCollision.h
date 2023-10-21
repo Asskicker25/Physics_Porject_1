@@ -154,6 +154,10 @@ static bool CollisionAABBvsAABB(const Aabb& a, const Aabb& b,
 	glm::vec3 collisionNr = collisionpt - (a.min + a.max) * 0.5f;
 	collisionNr = glm::normalize(collisionNr);
 
+	/*std::cout << "Normal :" << collisionNr.x <<",";
+	std::cout << "Normal :" << collisionNr.y <<",";
+	std::cout << "Normal :" << collisionNr.z << std::endl;*/
+
 	collisionNormal.push_back(collisionNr);
 
 	return true;
@@ -425,7 +429,7 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 		for (size_t j = 0; j < triangleList.size(); j++)
 		{
-			const Triangle& triangle = triangleList[j];
+			Triangle triangle = triangleList[j];
 
 			// Transform the sphere's position using the transformMatrix
 			glm::vec4 transformedCenter = transformMatrix * glm::vec4(sphereList[j]->position, 1.0f);
@@ -441,11 +445,26 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 			{
 				glm::vec3 point = glm::vec3(0.0f);
 
+				triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+				triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+				triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
+
 				if (CollisionSphereVsTriangle(sphere, triangle, point))
 				{
 					//glm::vec3 normal = point - sphere->position;
+
+					glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
+
+					/*normal.x = 0;
+					normal.y = 1;
+					normal.z = 0;*/
+					//normal = glm::normalize(normal);
+					/*std::cout << "Normal : " << normal.x << ",";
+					std::cout << "Normal : " << normal.y << ",";
+					std::cout << "Normal : " << normal.z << std::endl;*/
+
 					collisionPoints.push_back(point);
-					collisionNormals.push_back(glm::normalize(triangle.normal));
+					collisionNormals.push_back(normal);
 				}
 			}
 		}

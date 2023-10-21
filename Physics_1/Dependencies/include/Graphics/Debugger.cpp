@@ -35,4 +35,11 @@ void Debugger::Print(const int& message)
 	std::cout << message << std::endl;
 }
 
+void Debugger::Print(const glm::vec3& message)
+{
+	std::cout << message.x << ",";
+	std::cout << message.y << ",";
+	std::cout << message.z << std::endl;
+}
+
 

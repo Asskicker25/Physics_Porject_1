@@ -34,5 +34,6 @@ public:
 	static void Print(const char* message);
 	static void Print(const std::string& message);
 	static void Print(const int& message);
+	static void Print(const glm::vec3& message);
 };
 

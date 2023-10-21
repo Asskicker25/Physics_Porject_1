@@ -51,7 +51,7 @@ void PhysicsEngine::Update(float deltaTime)
 void PhysicsEngine::SetDebugSpheres(Model* model, int count)
 {
 	debugSpheres.clear();
-	for (int i = 0; i < count; i++) 
+	for (int i = 0; i < count; i++)
 	{
 		debugSpheres.push_back(&model[i]);
 	}
@@ -61,6 +61,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 {
 	for (PhysicsObject* iteratorObject : physicsObjects)
 	{
+
 		if (iteratorObject->mode == PhysicsMode::STATIC)
 			continue;
 
@@ -70,6 +71,20 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		collisionPoints.clear();
 
 		std::vector<glm::vec3> collisionNormals;
+
+		glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime * iteratorObject->inverse_mass;
+
+		iteratorObject->velocity += deltaAcceleration;
+
+		glm::vec3 deltaVelocity = iteratorObject->velocity * deltaTime;
+
+		glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
+
+		iteratorObject->oldPosition = iteratorObject->position;
+
+		iteratorObject->position = predictedPos;
+
+		iteratorObject->SetPosition(iteratorObject->position);
 
 #pragma region CheckingCollision
 
@@ -100,40 +115,32 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		iteratorObject->SetCollisionPoints(collisionPoints);
 
 		//Accel change in this frame
-		glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime * iteratorObject->inverse_mass;
 
 		if (collisionPoints.size() != 0)
 		{
-			for (size_t i = 0; i < collisionNormals.size(); i++) 
+			glm::vec3 normal = glm::vec3(0.0f);
+
+			for (size_t i = 0; i < collisionNormals.size(); i++)
 			{
-				glm::vec3 normal = glm::normalize(collisionNormals[i]);
+				normal += glm::normalize(collisionNormals[i]);
 
-				// Calculate the dot product of the current velocity and the collision normal
-				float dotProduct = glm::dot(iteratorObject->velocity, normal);
-				//glm::vec3 reflected = glm::reflect(normal, glm::normalize(iteratorObject->velocity));
-
-				// If the dot product is positive, it means the object is moving away from the collision.
-				if (dotProduct > 0.0f) 
-				{
-					// Adjust the velocity to reflect the collision by subtracting the portion along the normal
-					iteratorObject->velocity -= dotProduct * normal * iteratorObject->inverse_mass;
-				}
+				/*Debugger::Print("CollisionNormal:");
+				Debugger::Print(collisionNormals[i]);*/
 			}
+
+			normal = normal /(float) collisionNormals.size();
+
+			glm::vec3 reflected = glm::reflect(glm::normalize(iteratorObject->velocity), normal);
+
+			/*Debugger::Print("Reflected:");
+			Debugger::Print(reflected);*/
+
+			iteratorObject->velocity = reflected * glm::length(iteratorObject->velocity);
 		}
-		else
-		{
-			//Rate of velocity change
-			iteratorObject->velocity += deltaAcceleration;
-		}
 
-		//Rate of velocity change in this frame
-		glm::vec3 deltaVelocity = iteratorObject->velocity * deltaTime;
+		//iteratorObject->position = iteratorObject->oldPosition;
 
-		glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
-
-		iteratorObject->position = predictedPos;
-
-		iteratorObject->SetPosition(iteratorObject->position);
+		//iteratorObject->SetPosition(iteratorObject->position);
 
 #pragma endregion
 
