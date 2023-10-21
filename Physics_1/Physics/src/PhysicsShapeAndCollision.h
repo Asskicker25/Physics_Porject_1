@@ -354,13 +354,37 @@ static glm::vec3 ClosestPtTriangleToAABB(const Aabb& aabb, const Triangle& trian
 
 static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
 {
-	collisionPoint = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
+	glm::vec3 v1ToSphere = sphere->position - triangle.v1;
 
-	glm::vec3 v = collisionPoint - sphere->position;
-	float squaredDistance = glm::dot(v, v);
+	float distanceToPlane = glm::dot(v1ToSphere, triangle.normal);
 
-	return squaredDistance <= (sphere->radius * sphere->radius);
+	if (distanceToPlane < -sphere->radius) 
+	{
+		return false; 
+	}
+
+	glm::vec3 closestPointOnTriangle = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
+
+	glm::vec3 closestPointToSphere = closestPointOnTriangle - sphere->position;
+	float distanceToClosest = glm::length(closestPointToSphere);
+
+	if (distanceToClosest <= sphere->radius)
+	{
+		collisionPoint = closestPointOnTriangle;
+		return true;  
+	}
+	return false; 
 }
+
+//static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
+//{
+//	collisionPoint = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
+//
+//	glm::vec3 v = collisionPoint - sphere->position;
+//	float squaredDistance = glm::dot(v, v);
+//
+//	return squaredDistance <= (sphere->radius * sphere->radius);
+//}
 static bool CollisionAABBVsPlane(const Plane& plane, const Aabb& aabb, glm::vec3& collisionPoint)
 {
 
@@ -514,14 +538,6 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 					//glm::vec3 normal = point - sphere->position;
 
 					glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
-
-					/*normal.x = 0;
-					normal.y = 1;
-					normal.z = 0;*/
-					//normal = glm::normalize(normal);
-					/*std::cout << "Normal : " << normal.x << ",";
-					std::cout << "Normal : " << normal.y << ",";
-					std::cout << "Normal : " << normal.z << std::endl;*/
 
 					collisionPoints.push_back(point);
 					collisionNormals.push_back(normal);

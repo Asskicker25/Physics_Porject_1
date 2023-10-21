@@ -4,13 +4,14 @@
 
 #include "PhysicsShapeAndCollision.h"
 #include "iPhysicsTransformable.h"
+#include "PhysicsProperties.h"
+
 
 class PhysicsObject : public iPhysicsTransformable
 {
 private:
 	Model* model = nullptr;
 
-	float mass = 1.0f;
 
 	Aabb cachedAABB;
 	Aabb aabb;
@@ -24,11 +25,10 @@ public:
 	PhysicsMode mode = PhysicsMode::STATIC;
 	PhysicsShape shape = PhysicsShape::SPHERE;
 
-	//Since division is slow
-	float inverse_mass = 1.0f;
+	PhysicsProperties properties;
 
 	glm::vec3 position = glm::vec3(0.0f); 
-	glm::vec3 oldPosition = glm::vec3(0.0f);
+	//glm::vec3 oldPosition = glm::vec3(0.0f);
 
 	glm::vec3 velocity = glm::vec3(0.0f);
 	glm::vec3 acceleration = glm::vec3(0.0f);
@@ -48,9 +48,6 @@ public:
 	iShape* GetTransformedPhysicsShape();
 
 	void CalculateTriangleSpheres();
-
-	void SetMass(float mass);
-	float GetMass();
 
 	bool CheckCollision(PhysicsObject* other,
 		std::vector<glm::vec3>& collisionPoints,

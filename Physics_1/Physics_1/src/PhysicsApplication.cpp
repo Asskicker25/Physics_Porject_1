@@ -25,12 +25,12 @@ void PhysicsApplication::SetUp()
 
 	sphere.LoadModel("Assets/Models/SpecSphere/Sphere 1.fbx");
 	sphere.modelId = "Sphere";
+	sphere.transform.SetPosition(glm::vec3(5.0f, 5.0f, 0.0f)); 
 	sphere.transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
-	sphere.transform.SetPosition(glm::vec3(3.0f, 10.0f, 0.0f));
 	sphere.isWireframe = true;
 
 	sphere2 = sphere;
-	sphere2.transform.SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+	sphere2.transform.SetPosition(glm::vec3(3.0f, 5.0f, 0.0f));
 	sphere2.transform.SetScale(glm::vec3(1.0f));
 	sphere2.isWireframe = true;
 
@@ -41,7 +41,7 @@ void PhysicsApplication::SetUp()
 	//plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
 	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	//plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-	plane.transform.SetRotation(glm::vec3(90.0f, 4.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(90.0f, 10.0f, 0.0f));
 	plane.isWireframe = false;
 
 
@@ -54,15 +54,17 @@ void PhysicsApplication::SetUp()
 
 	physicsEngine.fixedStepTime = 0.01f;
 
-	spherePhyObject.Initialize(&sphere, SPHERE,DYNAMIC);
+	spherePhyObject.Initialize(&sphere, SPHERE, DYNAMIC);
 	spherePhyObject.velocity = glm::vec3(0.0f, -1.0f, 0.0f);
 	spherePhyObject.acceleration.y = (-9.8f / 5.0f);
-	spherePhyObject.SetMass(0.65f);
+	spherePhyObject.properties.SetMass(0.65f);
+	spherePhyObject.properties.bounciness = 0.9f;
 
 	sphere2PhyObject.Initialize(&sphere2, SPHERE, DYNAMIC);
 	sphere2PhyObject.velocity = glm::vec3(0.0f, -1.0f, 0.0f);
 	sphere2PhyObject.acceleration.y = (-9.8f / 2.0f);
-	sphere2PhyObject.SetMass(1.75f);
+	sphere2PhyObject.properties.SetMass(1.75f);
+	sphere2PhyObject.properties.bounciness = 0.9f;
 
 	planePhyObject.Initialize(&plane, MESH_OF_TRIANGLES,STATIC);
 	/*planePhyObject.velocity = glm::vec3(0.0f, 0.5f, 0.0f);

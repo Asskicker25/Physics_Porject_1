@@ -65,22 +65,20 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		if (iteratorObject->mode == PhysicsMode::STATIC)
 			continue;
 
-		if (iteratorObject->inverse_mass < 0)
+		if (iteratorObject->properties.inverse_mass < 0)
 			continue;
 
 		collisionPoints.clear();
 
 		std::vector<glm::vec3> collisionNormals;
 
-		glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime * iteratorObject->inverse_mass;
+		glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime * iteratorObject->properties.inverse_mass;
 
 		iteratorObject->velocity += deltaAcceleration;
 
 		glm::vec3 deltaVelocity = iteratorObject->velocity * deltaTime;
 
 		glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
-
-		iteratorObject->oldPosition = iteratorObject->position;
 
 		iteratorObject->position = predictedPos;
 
@@ -123,19 +121,14 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 			for (size_t i = 0; i < collisionNormals.size(); i++)
 			{
 				normal += glm::normalize(collisionNormals[i]);
-
-				/*Debugger::Print("CollisionNormal:");
-				Debugger::Print(collisionNormals[i]);*/
 			}
 
 			normal = normal /(float) collisionNormals.size();
 
 			glm::vec3 reflected = glm::reflect(glm::normalize(iteratorObject->velocity), normal);
 
-			/*Debugger::Print("Reflected:");
-			Debugger::Print(reflected);*/
-
-			iteratorObject->velocity = reflected * glm::length(iteratorObject->velocity);
+			iteratorObject->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(iteratorObject->velocity));
+			//Debugger::Print("Velocity", iteratorObject->velocity);
 		}
 
 		//iteratorObject->position = iteratorObject->oldPosition;

@@ -3,8 +3,6 @@
 
 PhysicsObject::PhysicsObject()
 {
-	SetMass(1.0f);
-
 	glm::vec3 position = glm::vec3(0.0f);
 	//glm::vec3 oldPosition = glm::vec3(0.0f);
 	glm::vec3 velocity = glm::vec3(0.0f);
@@ -215,17 +213,6 @@ void PhysicsObject::CalculateTriangleSpheres()
 		triangles.push_back(std::move(meshTriangles)); 
 		triangleSpheres.push_back(std::move(meshSphers));
 	}
-}
-
-void PhysicsObject::SetMass(float mass)
-{
-	this->mass = mass;
-	inverse_mass = 1.0f / mass;
-}
-
-float PhysicsObject::GetMass()
-{
-	return mass;
 }
 
 
