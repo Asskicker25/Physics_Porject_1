@@ -20,14 +20,18 @@ void PhysicsApplication::SetUp()
 
 #pragma region Model
 
+	defSphere.LoadModel("Assets/Models/DefaultSphere.fbx");
+	defSphere.transform.SetScale(glm::vec3(0.05f, 0.05f, 0.05f));
+	defSphere.isWireframe = false;
+
 	sphere.LoadModel("Assets/Models/SpecSphere/Sphere 1.fbx");
 	sphere.modelId = "Sphere";
 	sphere.transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
-	sphere.transform.SetPosition(glm::vec3(0.0f, 10.0f, 0.0f));
+	sphere.transform.SetPosition(glm::vec3(0.5f, 10.0f, 0.0f));
 	sphere.isWireframe = true;
 
 	sphere2 = sphere;
-	sphere2.transform.SetPosition(glm::vec3(0.5f, 2.0f, 0.0f));
+	sphere2.transform.SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 	sphere2.transform.SetScale(glm::vec3(1.0f));
 	sphere2.isWireframe = true;
 
@@ -35,12 +39,12 @@ void PhysicsApplication::SetUp()
 	plane.modelId = "Plane";
 	plane.transform.SetScale(glm::vec3(1.0f));
 	plane.transform.SetPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-	plane.transform.SetRotation(glm::vec3(90.0f, 00.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(90.0f, 30.0f, 0.0f));
 	plane.isWireframe = true;
 
 
-	cube.LoadModel("Assets/Models/DefaultCube.fbx");
-	cube.transform.SetScale(glm::vec3(0.05f));
+	/*cube.LoadModel("Assets/Models/DefaultCube.fbx");
+	cube.transform.SetScale(glm::vec3(0.05f));*/
 
 #pragma endregion
 
@@ -51,12 +55,12 @@ void PhysicsApplication::SetUp()
 	spherePhyObject.Initialize(&sphere, SPHERE,DYNAMIC);
 	spherePhyObject.velocity = glm::vec3(0.0f, -1.0f, 0.0f);
 	spherePhyObject.acceleration.y = (-9.8f / 5.0f);
-	spherePhyObject.SetMass(0.75f);
+	spherePhyObject.SetMass(0.65f);
 
-	sphere2PhyObject.Initialize(&sphere2, AABB, DYNAMIC);
+	sphere2PhyObject.Initialize(&sphere2, SPHERE, DYNAMIC);
 	sphere2PhyObject.velocity = glm::vec3(0.0f, 5.0f, 0.0f);
 	sphere2PhyObject.acceleration.y = (-9.8f / 5.0f);
-	sphere2PhyObject.SetMass(1.0f);
+	sphere2PhyObject.SetMass(1.75f);
 
 	planePhyObject.Initialize(&plane, AABB,STATIC);
 
@@ -66,13 +70,31 @@ void PhysicsApplication::SetUp()
 
 #pragma endregion
 
+#pragma region DebugSphere
+
+	//const std::vector<std::vector<Triangle>>& triangleList = planePhyObject.GetTriangleList();
+
+	for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
+	{
+		debugSpheres[i] = defSphere;
+	}
+	
+	physicsEngine.SetDebugSpheres(debugSpheres, NUM_OF_DEBUG_SPHERES);
+
+#pragma endregion
+
+
 #pragma region Renderers
 
 	renderer.AddModel(dirLightModel, lightShader);
 	renderer.AddModel(sphere, defShader);
 	renderer.AddModel(sphere2, defShader);
 	renderer.AddModel(plane, defShader);
-	renderer.AddModel(cube, defShader);
+	//renderer.AddModel(cube, defShader);
+	for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
+	{
+		renderer.AddModel(debugSpheres[i],defShader);
+	}
 
 	lightManager.AddLight(dirLight);
 	lightManager.AddShader(defShader);

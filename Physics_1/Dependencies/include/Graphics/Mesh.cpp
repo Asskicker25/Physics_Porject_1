@@ -98,6 +98,11 @@ void Mesh::CalculateTriangles()
 		triangle.v1 = vertices[indices[i]].positions;
 		triangle.v2 = vertices[indices[i + 1]].positions;
 		triangle.v3 = vertices[indices[i + 2]].positions;
+
+		triangle.normal = (vertices[indices[i]].normals +
+			vertices[indices[i + 1]].normals +
+			vertices[indices[i + 2]].normals) / 3.0f;
+
 		triangles.push_back(triangle);
 	}
 

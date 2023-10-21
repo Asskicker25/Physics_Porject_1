@@ -24,9 +24,6 @@
     <ClInclude Include="src\PhysicsShapeAndCollision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsSphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PhysicsObject.cpp">
@@ -36,9 +33,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PhysicsEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsSphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

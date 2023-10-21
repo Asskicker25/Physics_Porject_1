@@ -144,6 +144,7 @@
     <ClInclude Include="src\PhysicsApplication.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Models\DefaultCube.fbx" />
     <None Include="Assets\Models\DefaultSphere.fbx" />
     <None Include="Assets\Models\Plane.fbx" />
     <None Include="Assets\Models\SpecSphere\Sphere 1.fbx" />

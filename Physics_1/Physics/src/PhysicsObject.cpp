@@ -202,6 +202,7 @@ void PhysicsObject::CalculateTriangleSpheres()
 			temp.v1 = triangle.v1;
 			temp.v2 = triangle.v2;
 			temp.v3 = triangle.v3;
+			temp.normal = triangle.normal;
 
 			glm::vec3 sphereCenter = (temp.v1 + temp.v2 + temp.v3) / 3.0f;
 			float radius = glm::max(glm::distance(sphereCenter, temp.v1),
@@ -294,7 +295,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 			return CollisionSphereVsMeshOfTriangles(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
 				other->model->transform.GetTransformMatrix(),
 				other->GetTriangleList(), other->GetSphereList(),
-				collisionPoints);
+				collisionPoints, collisionNormals);
 		}
 	break;
 #pragma endregion
@@ -315,7 +316,10 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 		case CAPSULE:
 			break;
 		case MESH_OF_TRIANGLES:
-			break;
+			return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
+				other->model->transform.GetTransformMatrix(),
+				other->GetTriangleList(), other->GetSphereList(),
+				collisionPoints, collisionNormals);
 		}
 	break;
 #pragma endregion

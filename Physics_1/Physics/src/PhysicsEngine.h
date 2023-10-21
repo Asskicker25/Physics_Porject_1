@@ -9,7 +9,8 @@ private:
 	
 	std::vector<PhysicsObject*> physicsObjects;
 	std::vector<glm::vec3> collisionPoints;
-	
+	std::vector<Model*> debugSpheres;
+ 	
 	void UpdatePhysics(float deltaTime);
 
 public:
@@ -23,5 +24,6 @@ public:
 		std::vector<glm::vec3>& collisionNormal);
 
 	void Update(float deltaTime);
+	void SetDebugSpheres(Model* model, int count);
 };
 

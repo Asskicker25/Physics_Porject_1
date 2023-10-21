@@ -48,6 +48,15 @@ void PhysicsEngine::Update(float deltaTime)
 	}
 }
 
+void PhysicsEngine::SetDebugSpheres(Model* model, int count)
+{
+	debugSpheres.clear();
+	for (int i = 0; i < count; i++) 
+	{
+		debugSpheres.push_back(&model[i]);
+	}
+}
+
 void PhysicsEngine::UpdatePhysics(float deltaTime)
 {
 	for (PhysicsObject* iteratorObject : physicsObjects)
@@ -95,13 +104,13 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 		if (collisionPoints.size() != 0)
 		{
-
 			for (size_t i = 0; i < collisionNormals.size(); i++) 
 			{
 				glm::vec3 normal = glm::normalize(collisionNormals[i]);
 
 				// Calculate the dot product of the current velocity and the collision normal
 				float dotProduct = glm::dot(iteratorObject->velocity, normal);
+				//glm::vec3 reflected = glm::reflect(normal, glm::normalize(iteratorObject->velocity));
 
 				// If the dot product is positive, it means the object is moving away from the collision.
 				if (dotProduct > 0.0f) 
@@ -110,7 +119,6 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 					iteratorObject->velocity -= dotProduct * normal * iteratorObject->inverse_mass;
 				}
 			}
-			
 		}
 		else
 		{
