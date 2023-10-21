@@ -31,9 +31,16 @@ bool GetError(const char* function, const char* file, int line);
 class Debugger
 {
 public:
+    static bool print;
 	static void Print(const char* message);
 	static void Print(const std::string& message);
 	static void Print(const int& message);
+	static void Print(const unsigned int& message);
 	static void Print(const glm::vec3& message);
+	static void Print(const std::string& message, const std::string& message2);
+	static void Print(const std::string& message, const unsigned int& message2);
+	static void Print(const std::string& message, const int& message2);
+	static void Print(const std::string& message, const float& message2);
+	static void Print(const std::string& message, const glm::vec3& messag2);
 };
 

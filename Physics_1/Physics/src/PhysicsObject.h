@@ -5,7 +5,6 @@
 #include "PhysicsShapeAndCollision.h"
 #include "iPhysicsTransformable.h"
 
-
 class PhysicsObject : public iPhysicsTransformable
 {
 private:

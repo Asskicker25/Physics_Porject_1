@@ -3,7 +3,6 @@
 void PhysicsApplication::SetUp()
 {
 	//physicsEngine.fixedStepTime = 1.0f;
-
 	cameraPos.y = 5.0f;
 
 #pragma region Light
@@ -35,17 +34,19 @@ void PhysicsApplication::SetUp()
 	sphere2.transform.SetScale(glm::vec3(1.0f));
 	sphere2.isWireframe = true;
 
-	//plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
-	plane.LoadModel("Assets/Models/Terrain.ply");
+	plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
+	//plane.LoadModel("Assets/Models/Terrain.ply");
 	plane.modelId = "Terrain";
-	plane.transform.SetScale(glm::vec3(1.0f));
-	plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
-	plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	plane.transform.SetScale(glm::vec3(3.0f));
+	//plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
+	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	//plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(90.0f, 4.0f, 0.0f));
 	plane.isWireframe = false;
 
 
-	/*cube.LoadModel("Assets/Models/DefaultCube.fbx");
-	cube.transform.SetScale(glm::vec3(0.05f));*/
+	cube.LoadModel("Assets/Models/DefaultCube.fbx");
+	cube.transform.SetScale(glm::vec3(0.05f));
 
 #pragma endregion
 
@@ -64,6 +65,9 @@ void PhysicsApplication::SetUp()
 	sphere2PhyObject.SetMass(1.75f);
 
 	planePhyObject.Initialize(&plane, MESH_OF_TRIANGLES,STATIC);
+	/*planePhyObject.velocity = glm::vec3(0.0f, 0.5f, 0.0f);
+	planePhyObject.acceleration.y = (9.8f / 2.0f);
+	planePhyObject.SetMass(10.0f);*/
 
 	physicsEngine.AddPhysicsObject(&spherePhyObject);
 	physicsEngine.AddPhysicsObject(&sphere2PhyObject);
@@ -75,15 +79,14 @@ void PhysicsApplication::SetUp()
 
 	//const std::vector<std::vector<Triangle>>& triangleList = planePhyObject.GetTriangleList();
 
-	for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
+	/*for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
 	{
 		debugSpheres[i] = defSphere;
 	}
 	
-	physicsEngine.SetDebugSpheres(debugSpheres, NUM_OF_DEBUG_SPHERES);
+	physicsEngine.SetDebugSpheres(debugSpheres, NUM_OF_DEBUG_SPHERES);*/
 
 #pragma endregion
-
 
 #pragma region Renderers
 
@@ -91,7 +94,7 @@ void PhysicsApplication::SetUp()
 	renderer.AddModel(sphere, defShader);
 	renderer.AddModel(sphere2, defShader);
 	renderer.AddModel(plane, defShader);
-	//renderer.AddModel(cube, defShader);
+	renderer.AddModel(cube, defShader);
 	for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
 	{
 		renderer.AddModel(debugSpheres[i],defShader);
@@ -110,7 +113,7 @@ void PhysicsApplication::PreRender()
 	glm::vec3 newPos = glm::vec3(sphereBod->position.x + sphereBod->radius, sphereBod->position.y, sphereBod->position.z);
 	cube.transform.SetPosition(newPos);*/
 
-	//cube.transform.SetPosition(sphere2PhyObject.GetModelAABB().max);
+	//cube.transform.SetPosition(sphere2PhyObject.GetModelAABB().min);
 	//std::cout << planePhyObject.GetModelAABB().max.x << ",";
 	//std::cout << planePhyObject.GetModelAABB().max.y << ",";
 	//std::cout << planePhyObject.GetModelAABB().max.z << std::endl;

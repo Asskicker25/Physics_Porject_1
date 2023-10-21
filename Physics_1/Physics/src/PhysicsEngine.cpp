@@ -159,7 +159,7 @@ bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
 	if (first->CheckCollision(second, collisionPoints, collisionNormal))
 	{
 		//first->SetVisible(false);
-		std::cout << collisionNormal.size() << std::endl;
+		Debugger::Print("Collision Point Count : ",(int) collisionNormal.size());
 		return true;
 		//std::cout << "COLLLLLLIIISSSSION" << std::endl;
 	}

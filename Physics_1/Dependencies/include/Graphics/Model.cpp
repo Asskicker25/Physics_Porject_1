@@ -207,7 +207,9 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 {
 	//std::vector<Texture> textures;
 
-	std::cout << mat->GetTextureCount(type) << std::endl;
+	Debugger::Print(typeName + " count : ", mat->GetTextureCount(type));
+
+	//std::cout << mat->GetTextureCount(type) << std::endl;
 
 	if (mat->GetTextureCount(type) == 0)
 	{
@@ -221,8 +223,9 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 
 		mat->GetTexture(type, i, &texString);
 
-		std::cout << "Tex path " << texString.C_Str() << std::endl;
+		Debugger::Print("Tex path ", texString.C_Str());
 
+		//std::cout << "Tex path " << texString.C_Str() << std::endl;
 
 		for (unsigned int i = 0; i < texturesLoaded.size(); i++)
 		{

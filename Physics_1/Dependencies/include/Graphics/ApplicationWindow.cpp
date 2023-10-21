@@ -65,17 +65,18 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		Debugger::Print("Failed to initialize GLAD");
 	}
 	else
 	{
-		std::cout << "GLAD Initialized Successfully" << std::endl;
+		Debugger::Print("GLAD Initialized Successfully");
 	}
 
 	lightShader.LoadShader("res/Shader/LightShader.shader");
-	std::cout << "Light Shader Id : " << lightShader.GetShaderId() << std::endl;
+	Debugger::Print("Light Shader Id : ", lightShader.GetShaderId());
+
 	defShader.LoadShader("res/Shader/Shader.shader");
-	std::cout << "DefShader Shader Id : " << defShader.GetShaderId() << std::endl;
+	Debugger::Print("DefShader Shader Id : ", defShader.GetShaderId());
 
 	camera.InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 100.0f, 45.0f);
 }
