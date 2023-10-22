@@ -85,6 +85,8 @@ void ApplicationWindow::Render()
 {
 	SetUp();
 
+	CalculateCameraForward();
+
 	lastFrameTime = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window))
@@ -144,6 +146,17 @@ void ApplicationWindow::SetWindowIcon(const std::string& path)
 	glfwSetWindowIcon(window, 1, images);
 }
 
+void ApplicationWindow::CalculateCameraForward()
+{
+	glm::vec3 direction;
+
+	direction.x = glm::cos(glm::radians(cameraYaw)) * glm::cos(glm::radians(cameraPitch));
+	direction.y = glm::sin(glm::radians(cameraPitch));
+	direction.z = glm::sin(glm::radians(cameraYaw)) * glm::cos(glm::radians(cameraPitch));
+
+	cameraFront = glm::normalize(direction);
+}
+
 void ApplicationWindow::GetCursorCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (stopMouseCallback) return;
@@ -182,17 +195,7 @@ void ApplicationWindow::MoveMouse()
 	cameraYaw += mouseDeltaPos.x * mouseSens;
 	cameraPitch += mouseDeltaPos.y * mouseSens;
 
-	glm::vec3 direction;
-
-	direction.x = glm::cos(glm::radians(cameraYaw)) * glm::cos(glm::radians(cameraPitch));
-	direction.y = glm::sin(glm::radians(cameraPitch));
-	direction.z = glm::sin(glm::radians(cameraYaw)) * glm::cos(glm::radians(cameraPitch));
-
-	/*std::cout << "Direction x " << direction.x << std::endl;
-	std::cout << "Direction y " << direction.y << std::endl;
-	std::cout << "Direction z " << direction.z << std::endl;*/
-	cameraFront = glm::normalize(direction);
-
+	CalculateCameraForward();
 }
 
 void ApplicationWindow::MoveCameraKeyBoard(GLFWwindow* window)

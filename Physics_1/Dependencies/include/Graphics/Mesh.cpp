@@ -1,7 +1,5 @@
 #include "Mesh.h"
 
-int count = 0;
-
 Mesh::Mesh()
 {
 }
@@ -65,7 +63,9 @@ void Mesh::DrawMesh(Shader& shader, bool loadMaterials, bool isWireframe)
 	GLCALL(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
 
 	VAO.UnBind();
-	count++;
+	material.diffuseTexture->Unbind();
+	material.specularTexture->Unbind();
+
 }
 
 void Mesh::SetupMesh()
@@ -84,6 +84,8 @@ void Mesh::SetupMesh()
 
 	//Texture
 	layout.AddLayout<float>(2);
+
+	layout.AddLayout<float>(4);
 
 	VAO.AddBuffer(VBO, layout);
 

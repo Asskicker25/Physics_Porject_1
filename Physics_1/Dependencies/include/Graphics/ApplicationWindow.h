@@ -68,6 +68,7 @@ public:
 
 	void MouseHeldCallback(GLFWwindow* window, int& button, int& action, int& mods);
 	void SetWindowIcon(const std::string& path);
+	void CalculateCameraForward();
 };
 
 

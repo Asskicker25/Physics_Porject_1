@@ -35,6 +35,7 @@
     <None Include="Assets\Models\Plane.fbx" />
     <None Include="Assets\Models\DefaultCube.fbx" />
     <None Include="Assets\Models\Terrain.ply" />
+    <None Include="Assets\Models\PoolTable\pooltable.fbx" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Models\SpecSphere\Sphere 1_Sphere__Diffuse.png">

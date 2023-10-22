@@ -135,6 +135,17 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			vertex.normals = temp;
 		}
 
+		if (mesh->mColors[0])
+		{
+			aiColor4D color = mesh->mColors[0][i];
+			vertex.color = glm::vec4(color.r, color.g, color.b, color.a);
+		}
+		else
+		{
+			vertex.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+		
+
 		if (mesh->mTextureCoords[0])
 		{
 			glm::vec2 vec;

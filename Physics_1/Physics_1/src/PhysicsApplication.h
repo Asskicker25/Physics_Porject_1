@@ -21,6 +21,8 @@ private:
 	Model plane;
 	Model cube;
 
+	Model poolTable;
+
 	Model debugSpheres[NUM_OF_DEBUG_SPHERES];
 
 	PhysicsObject spherePhyObject;

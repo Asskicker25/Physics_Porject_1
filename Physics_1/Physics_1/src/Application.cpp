@@ -5,7 +5,7 @@ int main(int argc, char** argv)
 {
 	PhysicsApplication application;
 
-	Debugger::print = true;
+	Debugger::print = false;
 
 	application.InitializeWindow(800,600);
 

@@ -72,7 +72,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 		std::vector<glm::vec3> collisionNormals;
 
-		glm::vec3 deltaAcceleration = iteratorObject->acceleration * deltaTime * iteratorObject->properties.inverse_mass;
+		glm::vec3 deltaAcceleration = gravity * deltaTime * iteratorObject->properties.inverse_mass;
 
 		iteratorObject->velocity += deltaAcceleration;
 
@@ -81,6 +81,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
 
 		iteratorObject->position = predictedPos;
+
 
 		iteratorObject->SetPosition(iteratorObject->position);
 
@@ -152,7 +153,7 @@ bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
 	if (first->CheckCollision(second, collisionPoints, collisionNormal))
 	{
 		//first->SetVisible(false);
-		Debugger::Print("Collision Point Count : ",(int) collisionNormal.size());
+		//Debugger::Print("Collision Point Count : ",(int) collisionNormal.size());
 		return true;
 		//std::cout << "COLLLLLLIIISSSSION" << std::endl;
 	}
