@@ -44,5 +44,11 @@
     <Image Include="Assets\Models\SpecSphere\Sphere 1_Sphere__Specular.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\Textures\DefaultTextures\Diffuse_Default.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Textures\DefaultTextures\Specular_Default.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

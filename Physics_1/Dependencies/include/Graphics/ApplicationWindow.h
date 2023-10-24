@@ -57,6 +57,8 @@ public:
 	virtual ~ApplicationWindow() = 0;
 
 	void InitializeWindow(int windowWidth, int windowHeight);
+	void SetWindowIcon(const std::string& path);
+
 	void Render();
 	virtual void SetUp() = 0;
 	virtual void PreRender() = 0;
@@ -67,7 +69,6 @@ public:
 	virtual void MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods) = 0;
 
 	void MouseHeldCallback(GLFWwindow* window, int& button, int& action, int& mods);
-	void SetWindowIcon(const std::string& path);
 	void CalculateCameraForward();
 };
 

@@ -156,6 +156,8 @@
   <ItemGroup>
     <Image Include="Assets\Models\SpecSphere\Sphere 1_Sphere__Diffuse.png" />
     <Image Include="Assets\Models\SpecSphere\Sphere 1_Sphere__Specular.png" />
+    <Image Include="res\Textures\DefaultTextures\Diffuse_Default.png" />
+    <Image Include="res\Textures\DefaultTextures\Specular_Default.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -92,27 +92,20 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 			if (iteratorObject == otherObject)
 				continue;
 
-			std::vector<glm::vec3> perObjectCollisions;
-			std::vector<glm::vec3> perObjectNormals;
-			if (HandleCollision(iteratorObject, otherObject, perObjectCollisions, perObjectNormals))
+
+			if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
 			{
-				collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
-				collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
+				std::vector<glm::vec3> perObjectCollisions;
+				std::vector<glm::vec3> perObjectNormals;
+
+				//std::cout << "AABB TRUE" << std::endl;
+				//iteratorObject->SetVisible(false);
+				if (HandleCollision(iteratorObject, otherObject, perObjectCollisions, perObjectNormals))
+				{
+					collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
+					collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
+				}
 			}
-
-			//if (CollisionAABBvsAABB(iteratorObject->GetModelAABB(), otherObject->GetModelAABB()))
-			//{
-			//	std::vector<glm::vec3> perObjectCollisions;
-			//	std::vector<glm::vec3> perObjectNormals;
-
-			//	//std::cout << "AABB TRUE" << std::endl;
-			//	//iteratorObject->SetVisible(false);
-			//	if (HandleCollision(iteratorObject, otherObject, perObjectCollisions, perObjectNormals))
-			//	{
-			//		collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
-			//		collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
-			//	}
-			//}
 
 		}
 #pragma endregion

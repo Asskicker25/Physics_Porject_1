@@ -271,10 +271,10 @@ Texture* Model::LoadDefaultMaterialTextures(aiTextureType type, std::string type
 	switch (type)
 	{
 	case aiTextureType_DIFFUSE:
-		path = "Assets/Textures/DefualtTextures/Diffuse_Default.png";
+		path = "res/Textures/DefaultTextures/Diffuse_Default.png";
 		break;
 	case aiTextureType_SPECULAR:
-		path = "Assets/Textures/DefualtTextures/Specular_Default.jpg";
+		path = "res/Textures/DefaultTextures/Specular_Default.jpg";
 		break;
 	}
 	Texture* texture = new Texture(path);

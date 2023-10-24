@@ -5,12 +5,10 @@
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoord;
-layout(location = 3) in vec4 vertexColor;
 
 out vec2 TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
-out vec4 VertexColor;
 
 
 uniform mat4 projection;
@@ -28,7 +26,6 @@ void main()
 	//Normal = normal;
 	
 	FragPos = vec3(model * vec4(position, 1.0f));
-	VertexColor = vertexColor;
 };
 
 
@@ -63,7 +60,6 @@ out vec4 color;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
-in vec4 VertexColor;
 
 uniform Material material;
 
@@ -101,7 +97,7 @@ void main()
 	vec3 result = CalculateLightContrib(normalizedNormal,FragPos,viewDir);
 	
     //color = vec4(specular, 1.0);
-	color = vec4(result.xyz , 1.0);
+	color = vec4(result , 1.0);
 };
 
 
@@ -110,11 +106,6 @@ vec3 CalculateLightContrib(vec3 normal, vec3 fragPos, vec3 viewDir )
 
 	vec3 result = vec3(0.0);
 	
-	//Tex Color
-	vec3 diffuseColor = texture(texture_diffuse1, TexCoord).xyz;
-	
-	vec3 texColor = diffuseColor * VertexColor.xyz * material.baseColor;
-	
 	for(int i = 0; i < NUMBEROFLIGHTS; i++)
 	{
 		if(lights[i].param2.x == 0.0)
@@ -122,6 +113,10 @@ vec3 CalculateLightContrib(vec3 normal, vec3 fragPos, vec3 viewDir )
 			continue; 			//Light is off
 		}
 		
+		//Tex Color
+		vec3 diffuseColor = texture(texture_diffuse1, TexCoord).xyz;
+	
+		vec3 texColor = diffuseColor * material.baseColor;
 	
 		//Ambient
 		vec3 ambientColor = lights[i].ambientColor * material.ambientColor;

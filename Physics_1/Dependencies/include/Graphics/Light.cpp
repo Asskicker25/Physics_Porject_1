@@ -2,16 +2,16 @@
 
 Light::Light(Model& model, LightType newlightType) : lightType{ newlightType }, transform {nullptr}
 {
-	intensity = 0.5f;
-	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-	innerAngle = 30;
-	outerAngle = 50;
+	
 	InitializeLight(model, newlightType);
 }
 
 Light::Light()
 {
-
+	intensity = 0.5f;
+	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	innerAngle = 30;
+	outerAngle = 50;
 }
 
 Light::~Light()

@@ -16,7 +16,6 @@ void PhysicsApplication::SetUp()
 	dirLight.SetLightColor(glm::vec3(1.0f, 1.0f, 1.0f));
 	dirLight.intensity = 1.5f;
 
-
 #pragma endregion
 
 #pragma region Model
