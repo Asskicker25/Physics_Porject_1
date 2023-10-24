@@ -139,7 +139,6 @@ void PhysicsApplication::SetUp()
 	physicsEngine.AddPhysicsObject(poolBallPhy);
 	//physicsEngine.AddPhysicsObject(poolBall2Phy);
 
-
 	poolBalls.push_back(poolBallPhy);
 	//poolBalls.push_back(poolBall2Phy);
 

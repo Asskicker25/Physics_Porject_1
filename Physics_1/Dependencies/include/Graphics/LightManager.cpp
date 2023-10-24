@@ -13,6 +13,30 @@ void LightManager::SetLightShader(Shader& lightShader)
 	this->lightShader = &lightShader;
 }
 
+void LightManager::AddLight(Light* light)
+{
+	if (lights.size() >= NUMBER_OF_LIGHTS_IN_USE)
+	{
+		Debugger::Print("Number of lights exceeded");
+		return;
+	}
+
+	lights.push_back(light);
+}
+
+void LightManager::AddShader(Shader* shader)
+{
+	shaders.push_back(shader);
+}
+
+void LightManager::RemoveLight(Light* light)
+{
+	/*if (lights.size() != 0)
+	{
+		lights.erase(std::remove(lights.begin(), lights.end(), light),lights.end());
+	}*/
+}
+
 void LightManager::AddLight(Light& light)
 {
 	if (lights.size() >= NUMBER_OF_LIGHTS_IN_USE)
@@ -33,14 +57,12 @@ void LightManager::RemoveLight(Light& light)
 {
 	/*if (lights.size() != 0)
 	{
-		lights.erase(std::remove(lights.begin(), lights.end(), light),lights.end());
+		lights.erase(std::remove(lights.begin(), lights.end(), light), lights.end());
 	}*/
 }
 
 void LightManager::RenderLight()
 {
-	
-
 	for (int i = 0; i < shaders.size(); i++)
 	{
 		shaders[i]->Bind();

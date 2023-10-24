@@ -9,6 +9,12 @@ void Renderer::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Renderer::AddModel(Model* model, Shader* shader)
+{
+	models.push_back(model);
+	shaders.push_back(shader);
+}
+
 void Renderer::AddModel(Model& model, Shader& shader)
 {
 	models.push_back(&model);

@@ -19,6 +19,10 @@ public:
 	~LightManager();
 
 	void SetLightShader(Shader& lightShader);
+	void AddLight(Light* light);
+	void AddShader(Shader* shader);
+	void RemoveLight(Light* light);
+
 	void AddLight(Light& light);
 	void AddShader(Shader& shader);
 	void RemoveLight(Light& light);

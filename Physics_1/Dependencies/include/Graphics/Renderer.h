@@ -12,6 +12,7 @@ private :
 	std::vector<Shader*> shaders;
 public:
 	void Clear();
+	void AddModel(Model* model, Shader* shader);
 	void AddModel(Model& model, Shader& shader);
 	void Draw();
 };
