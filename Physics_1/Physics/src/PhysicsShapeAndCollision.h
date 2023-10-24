@@ -253,6 +253,9 @@ static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2,
 
 		collisionPoint.push_back(collisionPt);
 		collisionNormal.push_back(collisionNr);
+
+		Debugger::Print("Collision");
+
 		return true;
 	}
 
@@ -535,6 +538,7 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 				if (CollisionSphereVsTriangle(sphere, triangle, point))
 				{
+					Debugger::Print("Sphere vs Triangle");
 					//glm::vec3 normal = point - sphere->position;
 
 					glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
