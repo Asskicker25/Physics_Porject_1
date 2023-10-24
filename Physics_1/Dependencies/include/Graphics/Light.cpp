@@ -2,6 +2,10 @@
 
 Light::Light(Model& model, LightType newlightType) : lightType{ newlightType }, transform {nullptr}
 {
+	intensity = 0.5f;
+	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	innerAngle = 30;
+	outerAngle = 50;
 	InitializeLight(model, newlightType);
 }
 
@@ -18,11 +22,7 @@ void Light::InitializeLight(Model& model, LightType lightType)
 {
 	this->lightType = lightType;
 	lightModel = &model;
-	intensity = 0.5f;
 	transform = &(lightModel->transform);
-	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-	innerAngle = 30;
-	outerAngle = 50;
 }
 
 glm::vec3 Light::GetLightColor()

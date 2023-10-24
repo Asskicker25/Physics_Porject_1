@@ -62,9 +62,9 @@ void Mesh::DrawMesh(Shader& shader, bool loadMaterials, bool isWireframe)
 
 	GLCALL(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
 
-	VAO.UnBind();
 	material.diffuseTexture->Unbind();
 	material.specularTexture->Unbind();
+	VAO.UnBind();
 
 }
 

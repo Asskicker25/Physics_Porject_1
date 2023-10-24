@@ -2,7 +2,7 @@
 
 void PhysicsApplication::SetUp()
 {
-	physicsEngine.gravity.y = (-0.01f);
+	physicsEngine.gravity.y = (-9.8f/2.0f);
 	cameraPos.y = 5.0f;
 
 #pragma region Light
@@ -14,6 +14,8 @@ void PhysicsApplication::SetUp()
 
 	dirLight.InitializeLight(dirLightModel, LightType::Directional);
 	dirLight.SetLightColor(glm::vec3(1.0f, 1.0f, 1.0f));
+	dirLight.intensity = 1.5f;
+
 
 #pragma endregion
 
@@ -25,7 +27,7 @@ void PhysicsApplication::SetUp()
 
 	sphere.LoadModel("Assets/Models/SpecSphere/Sphere 1.fbx");
 	sphere.modelId = "Sphere";
-	sphere.transform.SetPosition(glm::vec3(-3.0f, 5.0f, 0.0f)); 
+	sphere.transform.SetPosition(glm::vec3(-3.0f, 10.0f, 0.0f)); 
 	sphere.transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
 	sphere.isWireframe = true;
 
@@ -34,15 +36,16 @@ void PhysicsApplication::SetUp()
 	sphere2.transform.SetScale(glm::vec3(1.0f));
 	sphere2.isWireframe = false;
 
-	//plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
-	////plane.LoadModel("Assets/Models/Terrain.ply");
-	//plane.modelId = "Terrain";
-	//plane.transform.SetScale(glm::vec3(3.0f));
-	////plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
-	//plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
-	////plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-	//plane.transform.SetRotation(glm::vec3(0.0f, 180.0f, 0.0f));
-	//plane.isWireframe = true;
+	/*plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
+	plane.transform.SetScale(glm::vec3(3.0f));
+	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
+	plane.transform.SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));*/
+
+	plane.modelId = "Terrain";
+	plane.LoadModel("Assets/Models/Terrain.ply",false, false);
+	plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(0.0f, 180.0f, 0.0f));
+	plane.isWireframe = true;
 
 	/*cube.LoadModel("Assets/Models/DefaultCube.fbx");
 	cube.transform.SetScale(glm::vec3(0.05f));*/
