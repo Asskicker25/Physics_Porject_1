@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 class PhysicsProperties
 {
 private:
@@ -11,5 +13,7 @@ public:
 
 	float inverse_mass = 1.0f;
 	float bounciness = 0.5f;
+
+	glm::vec3 gravityScale = glm::vec3(1.0f);
 };
 

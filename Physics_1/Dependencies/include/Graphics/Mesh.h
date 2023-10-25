@@ -18,10 +18,10 @@ public:
 	std::vector< unsigned int> indices;
 	std::vector< Triangles > triangles;
 	std::vector< Texture*> textures;
-	Material material;
+	Material* material = nullptr;
 
 	Mesh();
-	Mesh(std::vector<Vertex> &vertices, std::vector< unsigned int> &indices, std::vector< Texture*> textures);
+	Mesh(std::vector<Vertex>& vertices, std::vector< unsigned int>& indices, Material* mat);
 	void DrawMesh(Shader& shader, bool loadMaterials = true, bool isWireFrame = false);
 	VertexArray VAO;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Graphics/Model.h>
+#include <functional>
 
 #include "PhysicsShapeAndCollision.h"
 #include "iPhysicsTransformable.h"
@@ -12,7 +13,6 @@ class PhysicsObject : public iPhysicsTransformable
 private:
 	Model* model = nullptr;
 
-
 	Aabb cachedAABB;
 	Aabb aabb;
 	glm::mat4 cachedMatrix;
@@ -21,9 +21,15 @@ private:
 	std::vector < std::vector<Sphere*> > triangleSpheres;
 	std::vector <glm::vec3> collisionPoints;
 
+	std::function<void(PhysicsObject*)> collisionCallback = nullptr;
+
 public:
+
+	bool isCollisionInvoke = false;
+
 	PhysicsMode mode = PhysicsMode::STATIC;
 	PhysicsShape shape = PhysicsShape::SPHERE;
+	CollisionMode collisionMode = CollisionMode::SOLID;
 
 	PhysicsProperties properties;
 
@@ -35,11 +41,17 @@ public:
 
 	iShape* physicsShape;
 	iShape* transformedPhysicsShape;
+	void* userData;
 
 	PhysicsObject();
 	~PhysicsObject();
 	
-	void Initialize(Model* model,PhysicsShape shape, PhysicsMode mode = STATIC);
+	//void Initialize(Model* model,PhysicsShape shape, PhysicsMode mode = STATIC);
+	void Initialize(Model* model, PhysicsShape shape, PhysicsMode mode = STATIC,
+		CollisionMode collisionMode = SOLID, bool isCollisionInvoke = false);
+
+	void AssignCollisionCallback(const std::function<void(PhysicsObject*)>& collisionCallback);
+	const std::function<void(PhysicsObject*)>& GetCollisionCallback();
 
 	Aabb CalculateModelAABB();
 	Aabb GetModelAABB();
@@ -57,7 +69,7 @@ public:
 	const std::vector < std::vector<Sphere*> >& GetSphereList();
 	const std::vector <glm::vec3>& GetCollisionPoints();
 	void SetCollisionPoints(const std::vector <glm::vec3>& collisionPoints);
-
+	
 	// Inherited via iPhysicsTransformable
 	glm::vec3 GetPosition() override;
 	glm::vec3 GetRotation() override;

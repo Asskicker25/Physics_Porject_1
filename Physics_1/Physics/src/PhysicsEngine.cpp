@@ -72,7 +72,13 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 		std::vector<glm::vec3> collisionNormals;
 
-		glm::vec3 deltaAcceleration = gravity * deltaTime * iteratorObject->properties.inverse_mass;
+		glm::vec3 iteratorGravity = 
+			glm::vec3(gravity.x * iteratorObject->properties.gravityScale.x,
+			gravity.y * iteratorObject->properties.gravityScale.y,
+			gravity.z * iteratorObject->properties.gravityScale.z);
+		
+
+		glm::vec3 deltaAcceleration = iteratorGravity * deltaTime * iteratorObject->properties.inverse_mass;
 
 		iteratorObject->velocity += deltaAcceleration;
 
@@ -81,7 +87,6 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		glm::vec3 predictedPos = iteratorObject->GetPosition() + deltaVelocity;
 
 		iteratorObject->position = predictedPos;
-
 
 		iteratorObject->SetPosition(iteratorObject->position);
 
@@ -105,19 +110,34 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 					collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
 					collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
 				}
-			}
 
+#pragma region CollisionInvoke
+				if (collisionPoints.size() > 0)
+				{
+					if (iteratorObject->isCollisionInvoke)
+					{
+						if (iteratorObject->GetCollisionCallback() != nullptr)
+						{
+							iteratorObject->GetCollisionCallback()(otherObject);
+						}
+					}
+				}
+#pragma endregion
+
+			}
 		}
 #pragma endregion
 
 #pragma region UpdatingPosition
 
+
 		iteratorObject->SetCollisionPoints(collisionPoints);
 
-		//Accel change in this frame
+		if (iteratorObject->collisionMode == TRIGGER) continue;
 
 		if (collisionPoints.size() != 0)
 		{
+
 			glm::vec3 normal = glm::vec3(0.0f);
 
 			for (size_t i = 0; i < collisionNormals.size(); i++)
@@ -130,21 +150,10 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 			glm::vec3 reflected = glm::reflect(glm::normalize(iteratorObject->velocity), normal);
 
 			iteratorObject->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(iteratorObject->velocity));
-			//Debugger::Print("Velocity", iteratorObject->velocity);
 		}
 
-		//iteratorObject->position = iteratorObject->oldPosition;
-
-		//iteratorObject->SetPosition(iteratorObject->position);
-
 #pragma endregion
-
-		/*std::cout << iteratorObject->GetPosition().x << " , "
-			<< iteratorObject->GetPosition().y << " , "
-			<< iteratorObject->GetPosition().z << std::endl;*/
-
 	}
-	//Debugger::Print("Physics Update");
 }
 
 bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
@@ -161,3 +170,4 @@ bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
 
 	return false;
 }
+

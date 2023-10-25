@@ -4,18 +4,20 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture*> textures)
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, Material* material)
 {
 	VAO.Bind();
 
 	this->vertices = vertices;
 	this->indices = indices;
 
-	if (textures.size() != 0)
+	this->material = material;
+
+	/*if (textures.size() != 0)
 	{
 		material.diffuseTexture = textures[0];
 		material.specularTexture = textures[1];
-	}
+	}*/
 
 	//this->textures = textures;
 
@@ -28,23 +30,23 @@ void Mesh::DrawMesh(Shader& shader, bool loadMaterials, bool isWireframe)
 
 	if (loadMaterials)
 	{
-		shader.SetUniform3f("material.baseColor", material.GetBaseColor().x, material.GetBaseColor().y, material.GetBaseColor().z);
-		shader.SetUniform3f("material.ambientColor", material.GetAmbientColor().x, material.GetAmbientColor().y, material.GetAmbientColor().z);
-		shader.SetUniform1f("material.specularValue", material.GetSpecularValue());
-		shader.SetUniform1f("material.shininess", material.shininess);
+		shader.SetUniform3f("material.baseColor", material->GetBaseColor().x, material->GetBaseColor().y, material->GetBaseColor().z);
+		shader.SetUniform3f("material.ambientColor", material->GetAmbientColor().x, material->GetAmbientColor().y, material->GetAmbientColor().z);
+		shader.SetUniform1f("material.specularValue", material->GetSpecularValue());
+		shader.SetUniform1f("material.shininess", material->shininess);
 
-		if (material.diffuseTexture != nullptr)
+		if (material->diffuseTexture != nullptr)
 		{
-			material.diffuseTexture->SetTextureSlot(0);
+			material->diffuseTexture->SetTextureSlot(0);
 			shader.SetUniform1i("texture_diffuse1", 0);
-			material.diffuseTexture->Bind();
+			material->diffuseTexture->Bind();
 		}
 
-		if (material.specularTexture != nullptr)
+		if (material->specularTexture != nullptr)
 		{
-			material.specularTexture->SetTextureSlot(1);
+			material->specularTexture->SetTextureSlot(1);
 			shader.SetUniform1i("texture_specular1", 1);
-			material.specularTexture->Bind();
+			material->specularTexture->Bind();
 		}
 	}
 	
@@ -62,8 +64,8 @@ void Mesh::DrawMesh(Shader& shader, bool loadMaterials, bool isWireframe)
 
 	GLCALL(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
 
-	material.diffuseTexture->Unbind();
-	material.specularTexture->Unbind();
+	material->diffuseTexture->Unbind();
+	material->specularTexture->Unbind();
 	VAO.UnBind();
 
 }

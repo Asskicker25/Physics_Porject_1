@@ -2,6 +2,7 @@
 
 #include "PhysicsObject.h"
 
+
 class PhysicsEngine
 {
 private:
@@ -28,3 +29,20 @@ public:
 	void SetDebugSpheres(Model* model, int count);
 };
 
+
+
+static bool RayCast(const glm::vec3& rayOrigin, const glm::vec3& rayDir, PhysicsObject* phyObject,
+	float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal)
+{
+	switch (phyObject->shape)
+	{
+	case SPHERE:
+		return RayCastSphere(rayOrigin, rayDir, dynamic_cast<Sphere*>(phyObject->GetTransformedPhysicsShape()),
+			rayDistance, collisionPt, collisionNormal);
+	case AABB:
+		return RayCastAABB(rayOrigin, rayDir, phyObject->GetModelAABB(),
+			rayDistance, collisionPt, collisionNormal);
+	}
+
+	return false;
+}

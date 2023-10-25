@@ -135,7 +135,17 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			vertex.normals = temp;
 		}
 
-		if (mesh->mColors[0])
+		/*if (mesh->mColors[0])
+		{
+			aiColor4D color = mesh->mColors[0][i];
+			vertex.color = glm::vec4(color.r, color.g, color.b, color.a);
+		}
+		else
+		{
+			vertex.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		}*/
+
+		if (mesh->HasVertexColors(0))
 		{
 			aiColor4D color = mesh->mColors[0][i];
 			vertex.color = glm::vec4(color.r, color.g, color.b, color.a);
@@ -144,7 +154,7 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		{
 			vertex.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
-		
+
 
 		if (mesh->mTextureCoords[0])
 		{
@@ -183,34 +193,27 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
+	Material* meshMat = new Material();
+	aiColor4D baseColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		texturesToSend.clear();
-
+		//aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &baseColor);
+		
 		if (loadTextures)
 		{
-			texturesToSend.push_back( LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse") );
-			texturesToSend.push_back( LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular") );
+			meshMat->diffuseTexture = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+			meshMat->specularTexture = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 		}
-		/*LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-		LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");*/
-		//textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-		/*std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-		std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-		std::vector<Texture> heightMaps = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());*/
-
-		//texturesLoaded[0]->Bind();
-
 	}
 
+	meshMat->SetBaseColor(glm::vec3(baseColor.r, baseColor.g, baseColor.b));
 
-	return std::make_shared<Mesh>(vertices, indices, texturesToSend);
+
+	return std::make_shared<Mesh>(vertices, indices, meshMat);
 }
 
 

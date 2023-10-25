@@ -20,7 +20,6 @@ public:
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<Texture*> texturesLoaded;
-	std::vector<Texture*> texturesToSend;
 	std::string directory;
 
 	Transform transform;

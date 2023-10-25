@@ -32,10 +32,12 @@ public:
 	float outerAngle;
 
 	Light(Model& model, LightType lightType = LightType::Point);
+	Light(Model* model, LightType lightType = LightType::Point);
 	Light();
 	~Light();
 
 	void InitializeLight(Model& model, LightType lightType = LightType::Point);
+	void InitializeLight(Model* model, LightType lightType = LightType::Point);
 
 	glm::vec3 GetLightColor();
 	glm::vec3 GetAmbientColor();

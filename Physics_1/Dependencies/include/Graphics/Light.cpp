@@ -1,12 +1,24 @@
 #include "Light.h"
 
-Light::Light(Model& model, LightType newlightType) : lightType{ newlightType }, transform {nullptr}
+Light::Light(Model& model, LightType newLightType) : lightType{ newLightType }, transform {nullptr}, lightModel{ nullptr }
 {
-	
-	InitializeLight(model, newlightType);
+	intensity = 0.5f;
+	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	innerAngle = 30;
+	outerAngle = 50;
+	InitializeLight(model, newLightType);
 }
 
-Light::Light()
+Light::Light(Model* model, LightType newLightType) : lightType { newLightType }, transform{ nullptr }, lightModel{ nullptr }
+{
+	intensity = 0.5f;
+	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	innerAngle = 30;
+	outerAngle = 50;
+	InitializeLight(model, newLightType);
+}
+
+Light::Light() : lightType { Point }, transform { nullptr }, lightModel { nullptr }
 {
 	intensity = 0.5f;
 	attenuation = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -22,6 +34,13 @@ void Light::InitializeLight(Model& model, LightType lightType)
 {
 	this->lightType = lightType;
 	lightModel = &model;
+	transform = &(lightModel->transform);
+}
+
+void Light::InitializeLight(Model* model, LightType lightType)
+{
+	this->lightType = lightType;
+	lightModel = model;
 	transform = &(lightModel->transform);
 }
 

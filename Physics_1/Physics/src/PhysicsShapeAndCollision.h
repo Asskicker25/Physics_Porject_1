@@ -19,6 +19,12 @@ enum PhysicsMode
 	KINEMATIC,
 };
 
+enum CollisionMode
+{
+	TRIGGER,
+	SOLID
+};
+
 struct iShape
 {
 	virtual ~iShape() {}
@@ -254,7 +260,7 @@ static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2,
 		collisionPoint.push_back(collisionPt);
 		collisionNormal.push_back(collisionNr);
 
-		Debugger::Print("Collision");
+		//Debugger::Print("Collision");
 
 		return true;
 	}
@@ -538,7 +544,7 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 				if (CollisionSphereVsTriangle(sphere, triangle, point))
 				{
-					Debugger::Print("Sphere vs Triangle");
+					//Debugger::Print("Sphere vs Triangle");
 					//glm::vec3 normal = point - sphere->position;
 
 					glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
@@ -623,4 +629,78 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	//std::cout << "Size : " << collisionPoints.size()<<std::endl;
 
 	return false;
+}
+
+static bool RayCastAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
+	const Aabb& aabb, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal) 
+{
+	glm::vec3 invDir = 1.0f / rayDir;
+	glm::vec3 tMin = (aabb.min - rayOrigin) * invDir;
+	glm::vec3 tMax = (aabb.max - rayOrigin) * invDir;
+
+	float tNear = glm::max(glm::max(glm::min(tMin.x, tMax.x), glm::min(tMin.y, tMax.y)), glm::min(tMin.z, tMax.z));
+	float tFar = glm::min(glm::min(glm::max(tMin.x, tMax.x), glm::max(tMin.y, tMax.y)), glm::max(tMin.z, tMax.z));
+
+	if (tNear > tFar || tFar < 0.0f || tNear > rayDistance) {
+		return false; 
+	}
+
+	float t = tNear;
+	collisionPt = rayOrigin + rayDir * t;
+
+
+	if (tNear == tMin.y) {
+		collisionNormal = glm::vec3(0, -1, 0);  // Bottom face
+	}
+	else if (tNear == tMax.y) {
+		collisionNormal = glm::vec3(0, 1, 0);  // Top face
+	}
+	else {
+		collisionNormal = glm::normalize(tNear == tMin.x ? glm::vec3(-1, 0, 0) : tNear == tMin.z ? glm::vec3(0, 0, -1) : glm::vec3(1, 0, 0));
+	}
+
+	return true;
+}
+
+static bool RayCastSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, 
+	Sphere* sphere, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal) 
+{
+	glm::vec3 L = sphere->position - rayOrigin;
+	float tca = glm::dot(L, rayDir);
+	if (tca < 0.0f) 
+	{
+		return false;  
+	}
+
+	float d2 = glm::dot(L, L) - tca * tca;
+	if (d2 > sphere->radius * sphere->radius)
+	{
+		return false;  
+	}
+
+	float thc = sqrt(sphere->radius * sphere->radius - d2);
+	float t0 = tca - thc;
+	float t1 = tca + thc;
+
+	if (t0 > t1) 
+	{
+		std::swap(t0, t1);
+	}
+
+	if (t0 < 0.0f)
+	{
+		t0 = t1;  
+		if (t0 < 0.0f || t0 > rayDistance) 
+		{
+			return false;  
+		}
+	}
+	else if (t0 > rayDistance) {
+		return false;  
+	}
+
+	collisionPt = rayOrigin + rayDir * t0;
+	collisionNormal = glm::normalize(collisionPt - sphere->position);
+
+	return true;
 }

@@ -7,6 +7,8 @@ PhysicsObject::PhysicsObject()
 	//glm::vec3 oldPosition = glm::vec3(0.0f);
 	glm::vec3 velocity = glm::vec3(0.0f);
 	glm::vec3 acceleration = glm::vec3(0.0f);
+	isCollisionInvoke = false;
+	collisionCallback = nullptr;
 }
 
 PhysicsObject::~PhysicsObject()
@@ -63,13 +65,26 @@ bool PhysicsObject::GetVisible()
 	return model->isActive;
 }
 
-void PhysicsObject::Initialize(Model* model, PhysicsShape shape, PhysicsMode mode)
+void PhysicsObject::Initialize(Model* model, PhysicsShape shape, PhysicsMode mode,
+	CollisionMode collisionMode, bool isCollisionInvoke)
 {
 	this->model = model;
 	this->shape = shape;
 	this->mode = mode;
+	this->collisionMode = collisionMode;
+	this->isCollisionInvoke = isCollisionInvoke;
 
 	CalculatePhysicsShape();
+}
+
+void PhysicsObject::AssignCollisionCallback(const std::function<void(PhysicsObject*)>& collisionCallback)
+{
+	this->collisionCallback = collisionCallback;
+}
+
+const std::function<void(PhysicsObject*)>& PhysicsObject::GetCollisionCallback()
+{
+	return collisionCallback;
 }
 
 Aabb PhysicsObject::CalculateModelAABB()
