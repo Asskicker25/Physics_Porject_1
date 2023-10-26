@@ -38,7 +38,7 @@ void PhysicsApplication::SetUp()
 	plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane.transform.SetScale(glm::vec3(3.0f));
 	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
-	plane.transform.SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+	plane.transform.SetRotation(glm::vec3(90.0f, 30.0f, 0.0f));
 
 	/*plane.modelId = "Terrain";
 	plane.LoadModel("Assets/Models/Terrain.ply",false, false);
@@ -134,8 +134,21 @@ void PhysicsApplication::PreRender()
 	//	//Debugger::Print("Collision Normal", collNr);
 	//}
 
-	if (RayCast(glm::vec3(0.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), &sphere2PhyObject,
+	/*if (RayCast(glm::vec3(0.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), &sphere2PhyObject,
 		10.0f, collPt, collNr))
+	{
+		cube.transform.SetPosition(collPt);
+	}*/
+
+	//if (RayCastMesh(glm::vec3(0.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+	//	plane.transform.GetTransformMatrix(), planePhyObject.GetTriangleList(), collPt, collNr))
+	//{
+	//	//Debugger::Print("Ray Hit");
+	//	cube.transform.SetPosition(collPt);
+	//}
+
+	if (RayCast(glm::vec3(-4.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+		&planePhyObject, 30.0f, collPt, collNr))
 	{
 		cube.transform.SetPosition(collPt);
 	}

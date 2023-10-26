@@ -82,6 +82,11 @@ void PhysicsObject::AssignCollisionCallback(const std::function<void(PhysicsObje
 	this->collisionCallback = collisionCallback;
 }
 
+Model* PhysicsObject::GetModel()
+{
+	return model;
+}
+
 const std::function<void(PhysicsObject*)>& PhysicsObject::GetCollisionCallback()
 {
 	return collisionCallback;

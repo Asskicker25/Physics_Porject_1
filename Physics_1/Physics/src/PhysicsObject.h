@@ -51,6 +51,7 @@ public:
 		CollisionMode collisionMode = SOLID, bool isCollisionInvoke = false);
 
 	void AssignCollisionCallback(const std::function<void(PhysicsObject*)>& collisionCallback);
+	Model* GetModel();
 	const std::function<void(PhysicsObject*)>& GetCollisionCallback();
 
 	Aabb CalculateModelAABB();

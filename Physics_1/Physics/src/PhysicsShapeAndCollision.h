@@ -704,3 +704,75 @@ static bool RayCastSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
 
 	return true;
 }
+
+static bool RayCastTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, 
+	const float& maxDistance, const Triangle& triangle,
+	glm::vec3& collisionPt, glm::vec3& collisionNr) 
+{
+	const float EPSILON = 0.000001f;
+
+	glm::vec3 edge1, edge2, h, s, q;
+	float a, f, u, v, t;
+
+	edge1 = triangle.v2 - triangle.v1;
+	edge2 = triangle.v3 - triangle.v1;
+
+	h = glm::cross(rayDirection, edge2);
+	a = glm::dot(edge1, h);
+
+	if (a > -EPSILON && a < EPSILON) {
+		return false; // Ray is parallel to the triangle
+	}
+
+	f = 1.0f / a;
+	s = rayOrigin - triangle.v1;
+	u = f * glm::dot(s, h);
+
+	if (u < 0.0f || u > 1.0f) {
+		return false;
+	}
+
+	q = glm::cross(s, edge1);
+	v = f * glm::dot(rayDirection, q);
+
+	if (v < 0.0f || u + v > 1.0f) {
+		return false;
+	}
+
+	t = f * glm::dot(edge2, q);
+
+	if (t > EPSILON && t <= maxDistance) 
+	{
+		collisionPt = rayOrigin + rayDirection * t;
+		return true;
+	}
+
+	return false;
+}
+
+static bool RayCastMesh(const glm::vec3& rayOrigin, const glm::vec3& rayDirection,
+	const glm::mat4& transformMatrix, const float& maxDistance,
+	const std::vector <std::vector <Triangle>>& triangles,
+	glm::vec3& collisionPt, glm::vec3& collisionNr)
+{
+	for (size_t i = 0; i < triangles.size(); i++)
+	{
+		const std::vector<Triangle>& triangleList = triangles[i];
+
+		for (size_t j = 0; j < triangleList.size(); j++)
+		{
+			Triangle triangle = triangleList[j];
+			triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+			triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+			triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
+
+			if (RayCastTriangle(rayOrigin, rayDirection, maxDistance, triangle, collisionPt, collisionNr))
+			{
+				collisionNr = transformMatrix * glm::vec4(triangle.normal, 0.0f);
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

@@ -42,7 +42,9 @@ static bool RayCast(const glm::vec3& rayOrigin, const glm::vec3& rayDir, Physics
 	case AABB:
 		return RayCastAABB(rayOrigin, rayDir, phyObject->GetModelAABB(),
 			rayDistance, collisionPt, collisionNormal);
+	case MESH_OF_TRIANGLES:
+		return RayCastMesh(rayOrigin, rayDir, phyObject->GetModel()->transform.GetTransformMatrix(),
+			rayDistance, phyObject->GetTriangleList(), collisionPt, collisionNormal);
 	}
-
 	return false;
 }
