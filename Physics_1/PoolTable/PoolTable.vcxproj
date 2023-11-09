@@ -72,11 +72,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)Physics\src;$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\Graphics;$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(SolutionDir)Dependencies\lib\Graphics\Debug;$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)Physics\src;$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\Graphics;$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\Graphics\Release;$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -11,8 +11,10 @@ public:
 	Model();
 	Model(const Model& model);
 	~Model();
-	Model(std::string path, bool loadTextures = true, bool loadMatProperties = true);
-	void Draw(Shader& shader);
+	Model(const std::string& path, bool loadTextures = true, bool loadMatProperties = true);
+
+	void Draw(Shader* shader);
+	void CopyFromModel(const Model& model);
 
 	std::string modelId;
 	bool isActive = true;
@@ -25,7 +27,7 @@ public:
 	Transform transform;
 	//Material material;
 
-	void LoadModel(std::string path, bool loadTextures = true, bool loadMatProperties = true);
+	void LoadModel(const std::string& path, bool loadTextures = true, bool loadMatProperties = true);
 
 private:
 	bool loadTextures;

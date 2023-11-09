@@ -32,3 +32,10 @@ void VertexBuffer::Setup(unsigned int size, const void* data)
 	GLCALL(glBindBuffer(GL_ARRAY_BUFFER, rendererID));
 	GLCALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 }
+
+void VertexBuffer::UpdateVertexData(unsigned int size, const void* data)
+{
+	Bind();
+	GLCALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+}
+

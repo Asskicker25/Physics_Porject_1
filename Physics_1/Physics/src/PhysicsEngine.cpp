@@ -72,11 +72,11 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 		std::vector<glm::vec3> collisionNormals;
 
-		glm::vec3 iteratorGravity = 
+		glm::vec3 iteratorGravity =
 			glm::vec3(gravity.x * iteratorObject->properties.gravityScale.x,
-			gravity.y * iteratorObject->properties.gravityScale.y,
-			gravity.z * iteratorObject->properties.gravityScale.z);
-		
+				gravity.y * iteratorObject->properties.gravityScale.y,
+				gravity.z * iteratorObject->properties.gravityScale.z);
+
 
 		glm::vec3 deltaAcceleration = iteratorGravity * deltaTime * iteratorObject->properties.inverse_mass;
 
@@ -109,6 +109,8 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 				{
 					collisionPoints.insert(collisionPoints.end(), perObjectCollisions.begin(), perObjectCollisions.end());
 					collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
+
+					iteratorObject->SetCollisionPoints(collisionPoints);
 				}
 
 #pragma region CollisionInvoke
@@ -131,7 +133,6 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 #pragma region UpdatingPosition
 
 
-		iteratorObject->SetCollisionPoints(collisionPoints);
 
 		if (iteratorObject->collisionMode == TRIGGER) continue;
 
@@ -139,17 +140,36 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		{
 
 			glm::vec3 normal = glm::vec3(0.0f);
+			glm::vec3 collisionPt = glm::vec3(0.0f);
 
 			for (size_t i = 0; i < collisionNormals.size(); i++)
 			{
 				normal += glm::normalize(collisionNormals[i]);
 			}
 
-			normal = normal /(float) collisionNormals.size();
+			for (size_t i = 0; i < collisionPoints.size(); i++)
+			{
+				collisionPt += glm::normalize(collisionPoints[i]);
+			}
 
-			glm::vec3 reflected = glm::reflect(glm::normalize(iteratorObject->velocity), normal);
+			normal = normal / (float)collisionNormals.size();
+			collisionPt = collisionPt / (float)collisionPoints.size();
 
-			iteratorObject->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(iteratorObject->velocity));
+			if (iteratorObject->mode == KINEMATIC)
+			{
+				float length = glm::length(iteratorObject->position - collisionPt);
+				iteratorObject->position = collisionPt + (normal * length);
+				//iteratorObject->velocity = glm::vec3(0);
+			}
+			else
+			{
+				glm::vec3 reflected = glm::reflect(glm::normalize(iteratorObject->velocity), normal);
+				iteratorObject->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(iteratorObject->velocity));
+			}
+
+			//glm::vec3 reflected = glm::reflect(glm::normalize(iteratorObject->velocity), normal);
+
+			//iteratorObject->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(iteratorObject->velocity));
 		}
 
 #pragma endregion

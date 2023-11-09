@@ -15,5 +15,6 @@ public:
 	void UnBind() const;
 
 	void Setup(unsigned int size, const void* data);
+	void UpdateVertexData(unsigned int size, const void* data);
 };
 

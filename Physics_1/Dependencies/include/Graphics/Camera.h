@@ -28,7 +28,11 @@ public:
 	Camera(ECameraType _cameraType,float _cameraWidth,float _cameraHeight,float _nearPlane,float _farPlane);
 	void InitializeCamera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane, float _fov);
 	void InitializeCamera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane);
+	void InitializeCamera();
 	void ChangeCameraType(ECameraType type);
+
+	void SetCameraWidth(const float& width);
+	void SetCameraHeight(const float& height);
 
 	inline glm::mat4 GetMatrix() const { return cameraMatrix; }
 

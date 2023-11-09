@@ -268,7 +268,9 @@ static bool CollisionSphereVSSphere(Sphere* sphere1, Sphere* sphere2,
 	return false;
 }
 
-static glm::vec3 ClosestPtPointTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c)
+
+
+static glm::vec3 ClosestPointOnTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
 	glm::vec3 ab = b - a;
 	glm::vec3 ac = c - a;
@@ -320,6 +322,7 @@ static glm::vec3 ClosestPtPointTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, g
 	float w = 1.0f - u - v; // = vc / (va + vb + vc)
 	return u * a + v * b + w * c;
 }
+
 static glm::vec3 ClosestPtPlaneToAABB(const Plane& plane, const Aabb& aabb) 
 {
 	// Calculate the signed distance from the AABB center to the plane
@@ -361,6 +364,57 @@ static glm::vec3 ClosestPtTriangleToAABB(const Aabb& aabb, const Triangle& trian
 	return intersectionPoint;
 }
 
+static glm::vec3 ClosestPointOnSegment(const glm::vec3& start, const glm::vec3& end, const glm::vec3& point)
+{
+	glm::vec3 direction = end - start;
+	float t = glm::dot(point - start, direction) / glm::length(direction);
+	t = glm::clamp(t, 0.0f, 1.0f); // Ensure the point is within the segment
+	return start + t * direction;
+}
+
+//static glm::vec3 ClosestPointOnTriangle(const glm::vec3& point, const Triangle& triangle)
+//{// Calculate vectors from point to vertices of the triangle
+//	glm::vec3 edge0 = triangle.v2 - triangle.v1;
+//	glm::vec3 edge1 = triangle.v3 - triangle.v1;
+//	glm::vec3 edge2 = triangle.v3 - triangle.v2;
+//
+//	glm::vec3 v0 = triangle.v1 - point;
+//	glm::vec3 v1 = triangle.v2 - point;
+//	glm::vec3 v2 = triangle.v3 - point;
+//
+//	// Calculate dot products
+//	float dot00 = glm::dot(v0, v0);
+//	float dot01 = glm::dot(v0, v1);
+//	float dot02 = glm::dot(v0, v2);
+//	float dot11 = glm::dot(v1, v1);
+//	float dot12 = glm::dot(v1, v2);
+//
+//	// Compute barycentric coordinates
+//	float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+//	float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+//	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+//
+//	// The closest point is on the triangle, but it may be outside the edges
+//	if (u >= 0 && v >= 0 && u + v <= 1) {
+//		return triangle.v1 + u * edge0 + v * edge1;
+//	}
+//
+//	// If the closest point is outside the triangle, find the closest point on the edges
+//	float dist0 = glm::distance(point, ClosestPointOnSegment(triangle.v1, triangle.v2, point));
+//	float dist1 = glm::distance(point, ClosestPointOnSegment(triangle.v2, triangle.v3, point));
+//	float dist2 = glm::distance(point, ClosestPointOnSegment(triangle.v3, triangle.v1, point));
+//
+//	if (dist0 <= dist1 && dist0 <= dist2) {
+//		return ClosestPointOnSegment(triangle.v1, triangle.v2, point);
+//	}
+//	else if (dist1 <= dist2) {
+//		return ClosestPointOnSegment(triangle.v2, triangle.v3, point);
+//	}
+//	else {
+//		return ClosestPointOnSegment(triangle.v3, triangle.v1, point);
+//	}
+//}
+
 static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
 {
 	glm::vec3 v1ToSphere = sphere->position - triangle.v1;
@@ -372,12 +426,20 @@ static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, 
 		return false; 
 	}
 
-	glm::vec3 closestPointOnTriangle = ClosestPtPointTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
+	//glm::vec3 closestPointOnTriangle = ClosestPointOnTriangle(sphere->position, triangle);
+	glm::vec3 closestPointOnTriangle = ClosestPointOnTriangle(sphere->position, triangle.v1, triangle.v2, triangle.v3);
 
-	glm::vec3 closestPointToSphere = closestPointOnTriangle - sphere->position;
-	float distanceToClosest = glm::length(closestPointToSphere);
+	glm::vec3 diff = closestPointOnTriangle - sphere->position;
 
-	if (distanceToClosest <= sphere->radius)
+	/*if (glm::length(closestPointOnTriangle - sphere->position) <= sphere->radius * sphere->radius) 
+	{
+		collisionPoint = closestPointOnTriangle;
+		return true;
+	}*/
+
+	float sqDist = glm::dot(diff, diff);
+
+	if (sqDist <= sphere->radius * sphere->radius)
 	{
 		collisionPoint = closestPointOnTriangle;
 		return true;  
@@ -547,7 +609,7 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 					//Debugger::Print("Sphere vs Triangle");
 					//glm::vec3 normal = point - sphere->position;
 
-					glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
+				glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
 
 					collisionPoints.push_back(point);
 					collisionNormals.push_back(normal);
@@ -631,9 +693,11 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	return false;
 }
 
-static bool RayCastAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
+static bool RayCastAABB(const glm::vec3& rayOrigin, glm::vec3& rayDir,
 	const Aabb& aabb, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal) 
 {
+	rayDir = glm::normalize(rayDir);
+
 	glm::vec3 invDir = 1.0f / rayDir;
 	glm::vec3 tMin = (aabb.min - rayOrigin) * invDir;
 	glm::vec3 tMax = (aabb.max - rayOrigin) * invDir;
@@ -662,9 +726,11 @@ static bool RayCastAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
 	return true;
 }
 
-static bool RayCastSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, 
+static bool RayCastSphere(const glm::vec3& rayOrigin, glm::vec3& rayDir, 
 	Sphere* sphere, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal) 
 {
+	rayDir = glm::normalize(rayDir);
+
 	glm::vec3 L = sphere->position - rayOrigin;
 	float tca = glm::dot(L, rayDir);
 	if (tca < 0.0f) 
@@ -705,10 +771,12 @@ static bool RayCastSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
 	return true;
 }
 
-static bool RayCastTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, 
+static bool RayCastTriangle(const glm::vec3& rayOrigin, glm::vec3& rayDirection, 
 	const float& maxDistance, const Triangle& triangle,
 	glm::vec3& collisionPt, glm::vec3& collisionNr) 
 {
+	rayDirection = glm::normalize(rayDirection);
+
 	const float EPSILON = 0.000001f;
 
 	glm::vec3 edge1, edge2, h, s, q;
@@ -750,11 +818,13 @@ static bool RayCastTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDire
 	return false;
 }
 
-static bool RayCastMesh(const glm::vec3& rayOrigin, const glm::vec3& rayDirection,
+static bool RayCastMesh(const glm::vec3& rayOrigin, glm::vec3& rayDirection,
 	const glm::mat4& transformMatrix, const float& maxDistance,
 	const std::vector <std::vector <Triangle>>& triangles,
 	glm::vec3& collisionPt, glm::vec3& collisionNr)
 {
+	rayDirection = glm::normalize(rayDirection);
+
 	for (size_t i = 0; i < triangles.size(); i++)
 	{
 		const std::vector<Triangle>& triangleList = triangles[i];

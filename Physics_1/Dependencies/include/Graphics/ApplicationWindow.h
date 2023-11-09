@@ -18,7 +18,6 @@ class ApplicationWindow
 {
 private:
 	GLFWwindow* window;
-	Camera camera;
 
 	void MoveMouse();
 	void MoveCameraKeyBoard(GLFWwindow* window);
@@ -33,6 +32,9 @@ public:
 
 	float cameraPitch{ 0 };
 	float cameraYaw{ -90.0f };
+
+	float windowWidth{ 800.0f };
+	float windowHeight{ 600.0f };
 
 	bool mouseHeld{ false };
 	bool mouseCameraMove{ false };
@@ -52,12 +54,14 @@ public:
 	LightManager lightManager;
 	Shader lightShader;
 	Shader defShader;
+	Camera camera;
 
 	ApplicationWindow();
 	virtual ~ApplicationWindow() = 0;
 
 	void InitializeWindow(int windowWidth, int windowHeight);
 	void SetWindowIcon(const std::string& path);
+	void SetBackgroundColor(const glm::vec3& color);
 
 	void Render();
 	virtual void SetUp() = 0;

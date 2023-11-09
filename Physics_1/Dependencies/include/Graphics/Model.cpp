@@ -32,19 +32,19 @@ Model::~Model()
 	meshes.clear();
 }
 
-Model::Model(std::string path, bool loadTextures, bool loadMatProperties)
+Model::Model(const std::string& path, bool loadTextures, bool loadMatProperties)
 {
 	LoadModel(path, loadTextures, loadMatProperties);
 }
 
-void Model::Draw(Shader& shader)
+void Model::Draw(Shader* shader)
 {
 	if (!isActive) return;
 
 	for (unsigned int i = 0; i < meshes.size(); i++)
 	{
-		shader.Bind();
-		shader.SetUniformMat("model", transform.GetTransformMatrix());
+		shader->Bind();
+		shader->SetUniformMat("model", transform.GetTransformMatrix());
 
 		//if (loadMatProperties)
 		//{
@@ -57,13 +57,24 @@ void Model::Draw(Shader& shader)
 
 		if (loadTextures)
 		{
-			shader.SetUniformMat("inverseModel", transform.GetInverseMatrix());
+			shader->SetUniformMat("inverseModel", transform.GetInverseMatrix());
 		}
 		meshes[i]->DrawMesh(shader, loadMatProperties, isWireframe);
 	}
 }
 
-void Model::LoadModel(std::string path, bool loadTextures, bool loadMatProperties)
+void Model::CopyFromModel(const Model& model)
+{
+	isActive = model.isActive;
+	meshes = model.meshes;
+	directory = model.directory;
+	transform = model.transform;
+	//material = model.material;
+	loadTextures = model.loadTextures;
+	loadMatProperties = model.loadMatProperties;
+}
+
+void Model::LoadModel(const std::string& path, bool loadTextures, bool loadMatProperties)
 {
 	this->loadTextures = loadTextures;
 	this->loadMatProperties = loadMatProperties;

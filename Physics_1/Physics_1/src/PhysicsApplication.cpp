@@ -2,7 +2,8 @@
 
 void PhysicsApplication::SetUp()
 {
-	physicsEngine.gravity.y = (-9.8f/2.0f);
+	physicsEngine.gravity.y = ( - 9.8f / 2.0f);
+	//physicsEngine.gravity.x = (-9.8f/2.0f);
 	cameraPos.y = 5.0f;
 
 #pragma region Light
@@ -31,14 +32,22 @@ void PhysicsApplication::SetUp()
 	sphere.isWireframe = true;
 
 	sphere2 = sphere;
-	sphere2.transform.SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
-	sphere2.transform.SetScale(glm::vec3(1.0f));
+	sphere2.transform.SetPosition(glm::vec3(3.0f, 10.0f, 0.0f));
+	sphere2.transform.SetScale(glm::vec3(2.0f));
 	sphere2.isWireframe = false;
 
 	plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane.transform.SetScale(glm::vec3(3.0f));
 	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
 	plane.transform.SetRotation(glm::vec3(90.0f, 30.0f, 0.0f));
+	plane.isWireframe = true;
+	
+	
+	/*plane.LoadModel("Assets/Models/SM_Ship_Massive_Transport_01_xyz_n_rgba_uv_flatshaded_xyz_n_rgba_uv.ply");
+	plane.transform.SetScale(glm::vec3(0.001f));
+	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
+	plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	plane.isWireframe = false;*/
 
 	/*plane.modelId = "Terrain";
 	plane.LoadModel("Assets/Models/Terrain.ply",false, false);
@@ -62,7 +71,7 @@ void PhysicsApplication::SetUp()
 	spherePhyObject.properties.bounciness = 0.9f;
 	spherePhyObject.properties.gravityScale.y = 2;
 
-	sphere2PhyObject.Initialize(&sphere2, SPHERE, DYNAMIC, SOLID, true);
+	sphere2PhyObject.Initialize(&sphere2, SPHERE, KINEMATIC, SOLID, true);
 	sphere2PhyObject.velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 	//sphere2PhyObject.acceleration.y = (-9.8f / 2.0f);
 	sphere2PhyObject.properties.SetMass(1.75f);
@@ -82,7 +91,7 @@ void PhysicsApplication::SetUp()
 	planePhyObject.acceleration.y = (9.8f / 2.0f);
 	planePhyObject.SetMass(10.0f);*/
 
-	physicsEngine.AddPhysicsObject(&spherePhyObject);
+	//physicsEngine.AddPhysicsObject(&spherePhyObject);
 	physicsEngine.AddPhysicsObject(&sphere2PhyObject);
 	physicsEngine.AddPhysicsObject(&planePhyObject);
 

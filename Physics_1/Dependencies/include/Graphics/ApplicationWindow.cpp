@@ -24,7 +24,10 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(windowWidth, windowHeight, "Model Viewer", NULL, NULL);
+	this->windowWidth = windowWidth;
+	this->windowHeight = windowHeight;
+
+	window = glfwCreateWindow(this->windowWidth, this->windowHeight, "Model Viewer", NULL, NULL);
 
 	//User Pointer
 	glfwSetWindowUserPointer(window, this);
@@ -78,7 +81,10 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 	defShader.LoadShader("res/Shader/Shader.shader");
 	Debugger::Print("DefShader Shader Id : ", defShader.GetShaderId());
 
-	camera.InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 100.0f, 45.0f);
+	camera.SetCameraHeight(windowHeight);
+	camera.SetCameraWidth(windowWidth);
+
+	camera.InitializeCamera();
 }
 
 void ApplicationWindow::Render()
@@ -144,6 +150,11 @@ void ApplicationWindow::SetWindowIcon(const std::string& path)
 	Texture::LoadImage(path.c_str(), images[0]);
 
 	glfwSetWindowIcon(window, 1, images);
+}
+
+void ApplicationWindow::SetBackgroundColor(const glm::vec3& color)
+{
+	renderer.SetBackgroundColor(color);
 }
 
 void ApplicationWindow::CalculateCameraForward()

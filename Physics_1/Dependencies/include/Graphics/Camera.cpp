@@ -2,6 +2,10 @@
 
 Camera::Camera()
 {
+	this->cameraType = PERSPECTIVE;
+	this->nearPlane = 0.1f;
+	this->farPlane = 100.0f;
+	this->fov = 45.0f;
 }
 
 void Camera::InitializeCamera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane, float _fov) 
@@ -25,6 +29,11 @@ void Camera::InitializeCamera(ECameraType _cameraType, float _cameraWidth, float
 	farPlane = _farPlane;
 	fov = 0;
 
+	SetCameraProjection();
+}
+
+void Camera::InitializeCamera()
+{
 	SetCameraProjection();
 }
 
@@ -56,4 +65,14 @@ void Camera::ChangeCameraType(ECameraType type)
 {
 	cameraType = type;
 	SetCameraProjection();
+}
+
+void Camera::SetCameraWidth(const float& width)
+{
+	this->cameraWidth = width;
+}
+
+void Camera::SetCameraHeight(const float& height)
+{
+	this->cameraHeight = height;
 }
