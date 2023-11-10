@@ -1,129 +1,50 @@
 #include "PhysicsApplication.h"
+#include "Utilities/Random.h"
 
 void PhysicsApplication::SetUp()
 {
-	physicsEngine.gravity.y = ( - 9.8f / 2.0f);
+
+	physicsEngine.gravity.y = (-9.8f / 1.0f);
 	//physicsEngine.gravity.x = (-9.8f/2.0f);
-	cameraPos.y = 5.0f;
-
-#pragma region Light
-
-	dirLightModel.LoadModel("Assets/Models/DefaultSphere.fbx", false, false);
-	dirLightModel.transform.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	dirLightModel.transform.SetPosition(glm::vec3(0.0f, 0.0f, 1.0f));
-	dirLightModel.isActive = false;
-
-	dirLight.InitializeLight(dirLightModel, LightType::Directional);
-	dirLight.SetLightColor(glm::vec3(1.0f, 1.0f, 1.0f));
-	dirLight.intensity = 1.5f;
-
-#pragma endregion
-
-#pragma region Model
-
-	defSphere.LoadModel("Assets/Models/DefaultSphere.fbx");
-	defSphere.transform.SetScale(glm::vec3(0.05f, 0.05f, 0.05f));
-	defSphere.isWireframe = false;
-
-	sphere.LoadModel("Assets/Models/SpecSphere/Sphere 1.fbx");
-	sphere.modelId = "Sphere";
-	sphere.transform.SetPosition(glm::vec3(-3.0f, 10.0f, 0.0f)); 
-	sphere.transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
-	sphere.isWireframe = true;
-
-	sphere2 = sphere;
-	sphere2.transform.SetPosition(glm::vec3(3.0f, 10.0f, 0.0f));
-	sphere2.transform.SetScale(glm::vec3(2.0f));
-	sphere2.isWireframe = false;
-
-	plane.LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
-	plane.transform.SetScale(glm::vec3(3.0f));
-	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
-	plane.transform.SetRotation(glm::vec3(90.0f, 30.0f, 0.0f));
-	plane.isWireframe = true;
-	
-	
-	/*plane.LoadModel("Assets/Models/SM_Ship_Massive_Transport_01_xyz_n_rgba_uv_flatshaded_xyz_n_rgba_uv.ply");
-	plane.transform.SetScale(glm::vec3(0.001f));
-	plane.transform.SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
-	plane.transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-	plane.isWireframe = false;*/
-
-	/*plane.modelId = "Terrain";
-	plane.LoadModel("Assets/Models/Terrain.ply",false, false);
-	plane.transform.SetPosition(glm::vec3(1.0f, -50.0f, 0.0f));
-	plane.transform.SetRotation(glm::vec3(0.0f, 180.0f, 0.0f));
-	plane.isWireframe = true;*/
-
-	cube.LoadModel("Assets/Models/DefaultCube.fbx");
-	cube.transform.SetScale(glm::vec3(0.05f));
-
-#pragma endregion
-
-#pragma region Physics
 
 	physicsEngine.fixedStepTime = 0.01f;
 
-	spherePhyObject.Initialize(&sphere, SPHERE, DYNAMIC);
-	spherePhyObject.velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-	//spherePhyObject.acceleration.y = (-9.8f / 5.0f);
-	spherePhyObject.properties.SetMass(0.65f);
-	spherePhyObject.properties.bounciness = 0.9f;
-	spherePhyObject.properties.gravityScale.y = 2;
+	camera.InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 300.0f, 60.0f);
 
-	sphere2PhyObject.Initialize(&sphere2, SPHERE, KINEMATIC, SOLID, true);
-	sphere2PhyObject.velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-	//sphere2PhyObject.acceleration.y = (-9.8f / 2.0f);
-	sphere2PhyObject.properties.SetMass(1.75f);
-	sphere2PhyObject.properties.bounciness = 0.9f;
-	const char* cstr = "Hello";
+#pragma region Lights
 
-	sphere2PhyObject.AssignCollisionCallback([this](PhysicsObject* other)
-		{
-			std::cout << std::string((char*)other->userData) << std::endl;
-		});
-
-	planePhyObject.Initialize(&plane, MESH_OF_TRIANGLES,STATIC);
-
-	planePhyObject.userData = (void*)cstr;
-
-	/*planePhyObject.velocity = glm::vec3(0.0f, 0.5f, 0.0f);
-	planePhyObject.acceleration.y = (9.8f / 2.0f);
-	planePhyObject.SetMass(10.0f);*/
-
-	//physicsEngine.AddPhysicsObject(&spherePhyObject);
-	physicsEngine.AddPhysicsObject(&sphere2PhyObject);
-	physicsEngine.AddPhysicsObject(&planePhyObject);
-
-#pragma endregion
-
-#pragma region DebugSphere
-
-	//const std::vector<std::vector<Triangle>>& triangleList = planePhyObject.GetTriangleList();
-
-	/*for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
+	for (int i = 0; i < listOfLights.size(); i++)
 	{
-		debugSpheres[i] = defSphere;
+		listOflightModels[i]->LoadModel(lightModelPath, false, false);
+		listOfLights[i]->InitializeLight(*listOflightModels[i], listOfLights[i]->lightType);
+
+		renderer.AddModel(listOflightModels[i], &lightShader);
+		lightManager.AddLight(*listOfLights[i]);
 	}
-	
-	physicsEngine.SetDebugSpheres(debugSpheres, NUM_OF_DEBUG_SPHERES);*/
 
+
+	lightManager.AddShader(defShader);
 #pragma endregion
 
-#pragma region Renderers
+#pragma region Models
 
-	renderer.AddModel(dirLightModel, lightShader);
-	renderer.AddModel(sphere, defShader);
-	renderer.AddModel(sphere2, defShader);
-	renderer.AddModel(plane, defShader);
-	renderer.AddModel(cube, defShader);
-	/*for (int i = 0; i < NUM_OF_DEBUG_SPHERES; i++)
+	for (int i = 0; i < listOfModels.size(); i++)
 	{
-		renderer.AddModel(debugSpheres[i],defShader);
-	}*/
+		listOfModels[i]->model->LoadModel(modelPaths[i]);
+		renderer.AddModel(*listOfModels[i]->model, defShader);
 
-	lightManager.AddLight(dirLight);
-	lightManager.AddShader(defShader);
+		if (!listOfModels[i]->isPhyObj) continue;
+
+		PhysicsObject* phyObj = new PhysicsObject();
+
+		phyObj->Initialize(listOfModels[i]->model, listOfModels[i]->shape, listOfModels[i]->mode, listOfModels[i]->collisionMode);
+
+		phyObj->velocity = listOfModels[i]->velocity;
+		phyObj->properties.SetMass(listOfModels[i]->mass);
+
+		physicsEngine.AddPhysicsObject(phyObj);
+
+	}
 
 #pragma endregion
 
@@ -131,44 +52,7 @@ void PhysicsApplication::SetUp()
 
 void PhysicsApplication::PreRender()
 {
-	//cube.transform.SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
-	glm::vec3 collPt, collNr;
-
-	//if (RayCastAABB(glm::vec3(3.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-	//	planePhyObject.GetModelAABB(), 10.0f, collPt, collNr))
-	//{
-	//	cube.transform.SetPosition(collPt);
-	//	//Debugger::Print("Collision Point", collPt);
-	//	//Debugger::Print("Collision Normal", collNr);
-	//}
-
-	/*if (RayCast(glm::vec3(0.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), &sphere2PhyObject,
-		10.0f, collPt, collNr))
-	{
-		cube.transform.SetPosition(collPt);
-	}*/
-
-	//if (RayCastMesh(glm::vec3(0.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-	//	plane.transform.GetTransformMatrix(), planePhyObject.GetTriangleList(), collPt, collNr))
-	//{
-	//	//Debugger::Print("Ray Hit");
-	//	cube.transform.SetPosition(collPt);
-	//}
-
-	if (RayCast(glm::vec3(-4.5f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-		&planePhyObject, 30.0f, collPt, collNr))
-	{
-		cube.transform.SetPosition(collPt);
-	}
-
-	//if (RayCastSphere(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-	//	dynamic_cast<Sphere*>(sphere2PhyObject.GetTransformedPhysicsShape()),
-	//	10.0f, collPt, collNr))
-	//{
-	//	cube.transform.SetPosition(collPt);
-	//	//Debugger::Print("Collision Normal", collNr);
-	//}
 }
 
 void PhysicsApplication::PostRender()

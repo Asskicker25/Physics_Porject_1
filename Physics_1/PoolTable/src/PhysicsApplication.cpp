@@ -5,7 +5,7 @@ void PhysicsApplication::SetUp()
 {
 	physicsEngine.gravity.y = (-9.8f/2.0f);
 
-	physicsEngine.fixedStepTime = 0.02f;
+	physicsEngine.fixedStepTime = 0.01f;
 
 	cameraPos.y = 24.4914f;
 	cameraPos.z = 21.3531f;

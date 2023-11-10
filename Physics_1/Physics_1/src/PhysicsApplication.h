@@ -3,6 +3,17 @@
 #include <Graphics/ApplicationWindow.h>
 #include <PhysicsEngine.h>
 
+struct ModelAndPhysics
+{
+	Model* model;
+	bool isPhyObj = false;
+	PhysicsMode mode;
+	PhysicsShape shape;
+	CollisionMode collisionMode;
+	glm::vec3 velocity;
+	float mass;
+};
+
 class PhysicsApplication : public ApplicationWindow
 {
 
@@ -10,29 +21,22 @@ private:
 
 	static const int NUM_OF_DEBUG_SPHERES = 100;
 
+	const std::string& lightModelPath = "Assets/Models/DefaultSphere.fbx";
+
+
 	PhysicsEngine physicsEngine;
-
-	Model dirLightModel;
-
-	Model sphere;
-	Model sphere2;
-	Model defSphere;
-
-	Model plane;
-	Model cube;
-
-	Model poolTable;
 
 	Model debugSpheres[NUM_OF_DEBUG_SPHERES];
 
-	PhysicsObject spherePhyObject;
-	PhysicsObject sphere2PhyObject;
-	PhysicsObject planePhyObject;
-
-	Light dirLight;
-
 
 public:
+
+	std::vector<ModelAndPhysics*> listOfModels;
+	std::vector<Model*> listOflightModels;
+	std::vector<std::string> modelPaths;
+	std::vector<Light*> listOfLights;
+
+
 	void SetUp() override;
 	void PreRender() override;
 	void PostRender() override;

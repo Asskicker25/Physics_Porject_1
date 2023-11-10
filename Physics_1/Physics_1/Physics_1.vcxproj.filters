@@ -26,9 +26,15 @@
     <ClInclude Include="src\PhysicsApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utilities\Random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\Remap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Models\SpecSphere\Sphere 1.fbx" />
+    <None Include="Assets\Models\SpecSphere\Sphere1.fbx" />
     <None Include="Assets\Models\DefaultSphere.fbx" />
     <None Include="res\Shader\LightShader.shader" />
     <None Include="res\Shader\Shader.shader" />

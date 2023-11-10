@@ -9,7 +9,7 @@ class PhysicsApplication : public ApplicationWindow
 private:
 
 	static const int NUM_OF_DEBUG_SPHERES = 100;
-	static const int NUM_OF_BALLS = 10;
+	static const int NUM_OF_BALLS = 20;
 
 	PhysicsEngine physicsEngine;
 

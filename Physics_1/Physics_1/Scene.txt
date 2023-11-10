@@ -1,0 +1,52 @@
+#Camera
+Position : {  0, 0 ,50 }
+Rotation : { -20 , -90 , 0.0 }
+
+#Light 
+Type : { Directional }
+Color : { 1.0 , 1.0 , 1.0 }
+Position : { 0.0 , 10.0 , 0.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Intensity : { 1.0 }
+
+
+#Model
+Model path : { Assets/Models/SpecSphere/Sphere1.fbx }
+Model Id : { Sphere }
+Position : { 3.0, 4.0, -4.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Scale : { 2.0 , 2.0 , 2.0 } 
+PhysicsObject : { true }
+PhysicsShape : { SPHERE }
+PhysicsMode : { DYNAMIC } 
+CollisionMode : { SOLID } 
+Velocity : { 5.0 , 0.0 , 0.0 }
+Mass : { 3.0 }
+
+#Model
+Model path : { Assets/Models/Plane/PlaneWithTex.fbx }
+Model Id : { Plane }
+Position : { 20.0, 4.0, 10.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Scale : { 0.5 , 0.5 , 0.5 } 
+PhysicsObject : { true }
+PhysicsShape : { SPHERE }
+PhysicsMode : { DYNAMIC } 
+CollisionMode : { SOLID } 
+Velocity : { 0.0 , 0.0 , 0.0 }
+Mass : { 1.0 }
+
+#Model
+Model path : { Assets/Models/Terrain.ply }
+Model Id : { Terrain }
+Position : { 1.0, -50.0, 0.0 }
+Rotation : { 0.0 , 180.0 , 0.0 }
+Scale : { 1.0 , 1.0 , 1.0 } 
+Wireframe : { true }
+PhysicsObject : { true }
+PhysicsShape : { MESH }
+PhysicsMode : { STATIC } 
+CollisionMode : { SOLID } 
+
+
+

@@ -143,13 +143,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\PhysicsApplication.h" />
+    <ClInclude Include="src\Utilities\Random.h" />
+    <ClInclude Include="src\Utilities\Remap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Models\DefaultCube.fbx" />
     <None Include="Assets\Models\DefaultSphere.fbx" />
     <None Include="Assets\Models\Plane.fbx" />
     <None Include="Assets\Models\PoolTable\pooltable.fbx" />
-    <None Include="Assets\Models\SpecSphere\Sphere 1.fbx" />
+    <None Include="Assets\Models\SpecSphere\Sphere1.fbx" />
     <None Include="Assets\Models\Terrain.ply" />
     <None Include="res\Shader\LightShader.shader" />
     <None Include="res\Shader\Shader.shader" />
