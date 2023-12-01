@@ -9,16 +9,16 @@ void PhysicsApplication::SetUp()
 
 	physicsEngine.fixedStepTime = 0.01f;
 
-	camera.InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 300.0f, 60.0f);
+	camera->InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 300.0f, 60.0f);
 
 #pragma region Lights
 
 	for (int i = 0; i < listOfLights.size(); i++)
 	{
-		listOflightModels[i]->LoadModel(lightModelPath, false, false);
+		listOflightModels[i]->LoadModel(lightModelPath, false);
 		listOfLights[i]->InitializeLight(*listOflightModels[i], listOfLights[i]->lightType);
 
-		renderer.AddModel(listOflightModels[i], &lightShader);
+		renderer.AddModel(listOflightModels[i], &solidColorShader);
 		lightManager.AddLight(*listOfLights[i]);
 	}
 

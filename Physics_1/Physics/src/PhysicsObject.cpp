@@ -111,12 +111,12 @@ Aabb PhysicsObject::CalculateModelAABB()
 
 	Aabb minMax;
 
-	minMax.min = model->meshes[0]->vertices[0].positions;
-	minMax.max = model->meshes[0]->vertices[0].positions;
+	minMax.min = model->meshes[0]->mesh->vertices[0].positions;
+	minMax.max = model->meshes[0]->mesh->vertices[0].positions;
 
-	for (std::shared_ptr<Mesh> mesh : model->meshes)
+	for (MeshAndMaterial* mesh : model->meshes)
 	{
-		Aabb temp = CalculateAABB(mesh->vertices);
+		Aabb temp = CalculateAABB(mesh->mesh->vertices);
 
 		minMax.min.x = std::min(temp.min.x, minMax.min.x);
 		minMax.min.y = std::min(temp.min.y, minMax.min.y);
@@ -215,15 +215,15 @@ void PhysicsObject::CalculateTriangleSpheres()
 	triangles.clear();  
 	triangleSpheres.clear();
 
-	for (const std::shared_ptr<Mesh>& mesh : model->meshes)
+	for (MeshAndMaterial* mesh : model->meshes)
 	{
 		std::vector<Triangle> meshTriangles;
 		std::vector<Sphere*> meshSphers;
 
-		meshTriangles.reserve(mesh->triangles.size()); 
-		meshSphers.reserve(mesh->triangles.size());
+		meshTriangles.reserve(mesh->mesh->triangles.size()); 
+		meshSphers.reserve(mesh->mesh->triangles.size());
 
-		for (const Triangles& triangle : mesh->triangles)
+		for (const Triangles& triangle : mesh->mesh->triangles)
 		{
 			Triangle temp;
 

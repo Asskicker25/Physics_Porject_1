@@ -13,6 +13,10 @@
 #include "Light.h"
 #include "LightManager.h"
 
+#include "Material.h"
+#include "UnlitColorMaterial.h"
+#include "CubeMapTexture.h"
+#include "SkyBoxMaterial.h"
 
 class ApplicationWindow
 {
@@ -30,8 +34,8 @@ public:
 	float moveSpeed{ 10.0f };
 	float mouseSens{ 0.1f };
 
-	float cameraPitch{ 0 };
-	float cameraYaw{ -90.0f };
+	/*float cameraPitch{ 0 };
+	float cameraYaw{ -90.0f };*/
 
 	float windowWidth{ 800.0f };
 	float windowHeight{ 600.0f };
@@ -45,16 +49,26 @@ public:
 	glm::vec2 lastMousePos{ 0 };
 	glm::vec2 mouseDeltaPos{ 0 };
 
-	glm::vec3 cameraPos{ 0.0f,0.0f,3.0f };
-	glm::vec3 cameraFront{ 0.0f,0.0f,-1.0f };
-	glm::vec3 cameraUp{ 0.0f, 1.0f, 0.0f };
+	glm::mat4 view = glm::mat4(1.0f);
 
+	/*glm::vec3 cameraPos{ 0.0f,0.0f,3.0f };
+	glm::vec3 cameraFront{ 0.0f,0.0f,-1.0f };
+	glm::vec3 cameraUp{ 0.0f, 1.0f, 0.0f };*/
 
 	Renderer renderer;
 	LightManager lightManager;
-	Shader lightShader;
+
+	DebugModels* debugCubes;
+
+	Shader solidColorShader;
 	Shader defShader;
-	Camera camera;
+	Shader alphaBlendShader;
+	Shader alphaCutOutShader;
+	Shader skyboxShader;
+
+	Model* skyBox;
+
+	Camera* camera;
 
 	ApplicationWindow();
 	virtual ~ApplicationWindow() = 0;
@@ -73,7 +87,6 @@ public:
 	virtual void MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods) = 0;
 
 	void MouseHeldCallback(GLFWwindow* window, int& button, int& action, int& mods);
-	void CalculateCameraForward();
 };
 
 

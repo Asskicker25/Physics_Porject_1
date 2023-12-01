@@ -95,8 +95,10 @@ Shader::Shader()
 {
 }
 
-Shader::Shader(const std::string& path)
+Shader::Shader(const std::string& path, BlendMode transparentMode)
 {
+	this->blendMode = transparentMode;
+
 	ShaderSource shaderSrc = ParseShader(path);
 
 	shaderId = CompileProgram(shaderSrc.vertexSrc, shaderSrc.fragmentSrc);
@@ -107,8 +109,10 @@ Shader::~Shader()
 	GLCALL(glDeleteProgram(shaderId));
 }
 
-void Shader::LoadShader(const std::string& path)
+void Shader::LoadShader(const std::string& path, BlendMode transparentMode)
 {
+	this->blendMode = transparentMode;
+
 	ShaderSource shaderSrc = ParseShader(path);
 
 	shaderId = CompileProgram(shaderSrc.vertexSrc, shaderSrc.fragmentSrc);
@@ -152,7 +156,7 @@ void Shader::SetUniform1i(const std::string& property, int slot)
 
 void Shader::SetUniformMat(const std::string& property, glm::mat4 value)
 {
-	glUniformMatrix4fv(GetLocation(property), 1, GL_FALSE, glm::value_ptr(value));
+	GLCALL(glUniformMatrix4fv(GetLocation(property), 1, GL_FALSE, glm::value_ptr(value)));
 }
 
 int Shader::GetLocation(const std::string& property)

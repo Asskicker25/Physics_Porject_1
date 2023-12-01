@@ -7,21 +7,22 @@ void PhysicsApplication::SetUp()
 
 	physicsEngine.fixedStepTime = 0.01f;
 
-	cameraPos.y = 24.4914f;
-	cameraPos.z = 21.3531f;
-	cameraPitch = -40;
+	camera->cameraPos.y = 24.4914f;
+	camera->cameraPos.z = 21.3531f;
 
+	camera->SetCameraRotation(glm::vec3(-40, -90, 0));
+	
 	moveSpeed = 5;
 
 #pragma region Light
 
-	dirLightModel.LoadModel("Assets/Models/DefaultSphere.fbx", false, false);
+	dirLightModel.LoadModel("Assets/Models/DefaultSphere.fbx", false);
 	dirLightModel.transform.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	dirLightModel.transform.SetPosition(glm::vec3(0.0f, 0.0f, 1.0f));
 	dirLightModel.isActive = false;
 
 	dirLight.InitializeLight(dirLightModel, LightType::Directional);
-	dirLight.SetLightColor(glm::vec3(1.0f, 1.0f, 1.0f));
+	dirLight.SetLightColor(glm::vec4(1.0f, 1.0f, 1.0f,1.0f));
 	dirLight.intensity = 2.0f;
 
 #pragma endregion
@@ -30,7 +31,7 @@ void PhysicsApplication::SetUp()
 
 	poolTable.LoadModel("Assets/Models/PoolTable/pooltable.fbx");
 	poolTable.transform.SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
-	poolTable.transform.SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+	poolTable.transform.SetRotation(glm::vec3(90.0f, 90.0f, 0.0f));
 	poolTable.transform.SetScale(glm::vec3(0.01f));
 	poolTable.isWireframe = false;
 

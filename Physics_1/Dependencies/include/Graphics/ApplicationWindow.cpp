@@ -2,6 +2,7 @@
 
 ApplicationWindow::ApplicationWindow()
 {
+	camera = new Camera();
 
 }
 
@@ -75,23 +76,65 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 		Debugger::Print("GLAD Initialized Successfully");
 	}
 
-	lightShader.LoadShader("res/Shader/LightShader.shader");
-	Debugger::Print("Light Shader Id : ", lightShader.GetShaderId());
+	skyBox = new Model("res/Models/DefaultCube.fbx", false);
+	skyBox->meshes[0]->material = new SkyBoxMaterial();
+
+	SkyBoxMaterial* skyBoxMaterial = skyBox->meshes[0]->material->AsSkyBoxMaterial();
+
+	skyBoxMaterial->skyBoxTexture->LoadTexture({
+		"res/Textures/SkyBox/Right.jpg",
+		"res/Textures/SkyBox/Left.jpg",
+		"res/Textures/SkyBox/Up.jpg",
+		"res/Textures/SkyBox/Down.jpg",
+		"res/Textures/SkyBox/Front.jpg",
+		"res/Textures/SkyBox/Back.jpg",
+		});
+
+	skyboxShader.LoadShader("res/Shader/SkyBox.shader");
+	skyboxShader.applyModel = false;
+	Debugger::Print("SkyboxShader  Id : ", skyboxShader.GetShaderId());
+
+	solidColorShader.LoadShader("res/Shader/SolidColorShader.shader");
+	Debugger::Print("SolidColorShader  Id : ", solidColorShader.GetShaderId());
 
 	defShader.LoadShader("res/Shader/Shader.shader");
 	Debugger::Print("DefShader Shader Id : ", defShader.GetShaderId());
+	defShader.applyInverseModel = true;
 
-	camera.SetCameraHeight(windowHeight);
-	camera.SetCameraWidth(windowWidth);
+	alphaBlendShader.LoadShader("res/Shader/Shader.shader");
+	Debugger::Print("TranparentShader Shader Id : ", alphaBlendShader.GetShaderId());
+	alphaBlendShader.blendMode = ALPHA_BLEND;
+	alphaBlendShader.applyInverseModel = true;
 
-	camera.InitializeCamera();
+	alphaCutOutShader.LoadShader("res/Shader/Shader.shader");
+	Debugger::Print("AlphaCutOutShader Shader Id : ", alphaCutOutShader.GetShaderId());
+	alphaCutOutShader.blendMode = ALPHA_CUTOUT;
+	alphaCutOutShader.applyInverseModel = true;
+
+	renderer.solidColorShader = &solidColorShader;
+	renderer.camera = camera;
+
+
+	debugCubes = new DebugModels("res/Models/DefaultCube.fbx");
+	renderer.debugCubes = debugCubes;
+
+	renderer.skyBox = new ModelAndShader({ skyBox,&skyboxShader });
+
+	renderer.Initialize();
+
+	lightManager.AddShader(defShader);
+	lightManager.AddShader(alphaBlendShader);
+	lightManager.AddShader(alphaCutOutShader);
+
+	camera->SetCameraHeight(windowHeight);
+	camera->SetCameraWidth(windowWidth);
+
+	camera->InitializeCamera();
 }
 
 void ApplicationWindow::Render()
 {
 	SetUp();
-
-	CalculateCameraForward();
 
 	lastFrameTime = glfwGetTime();
 
@@ -108,28 +151,47 @@ void ApplicationWindow::Render()
 		ProcessInput(window);
 
 		renderer.Clear();
+		//debugRenderer.Clear();
+
+		view = glm::mat4(1.0f);
+		view = glm::lookAt(camera->cameraPos, camera->cameraPos + camera->cameraFront, camera->cameraUp);
 
 		PreRender();
 
 		lightManager.RenderLight();
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		defShader.Bind();
 
 		//Model values
-		defShader.SetUniformMat("projection", camera.GetMatrix());
+		defShader.SetUniformMat("projection", camera->GetMatrix());
 		defShader.SetUniformMat("view", view);
-		defShader.SetUniform3f("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
+		defShader.SetUniform3f("viewPos", camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
 
-		lightShader.Bind();
+		solidColorShader.Bind();
 
-		lightShader.SetUniformMat("projection", camera.GetMatrix());
-		lightShader.SetUniformMat("view", view);
-		lightShader.SetUniform3f("lightColor", 1.0f, 1.0f, 1.0f);
+		solidColorShader.SetUniformMat("projection", camera->GetMatrix());
+		solidColorShader.SetUniformMat("view", view);
+
+		alphaBlendShader.Bind();
+		alphaBlendShader.SetUniformMat("projection", camera->GetMatrix());
+		alphaBlendShader.SetUniformMat("view", view);
+		alphaBlendShader.SetUniform3f("viewPos", camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
+
+		alphaCutOutShader.Bind();
+		alphaCutOutShader.SetUniformMat("projection", camera->GetMatrix());
+		alphaCutOutShader.SetUniformMat("view", view);
+		alphaCutOutShader.SetUniform3f("viewPos", camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
+
+		view = glm::mat4(glm::mat3(view));
+		skyboxShader.Bind();
+		skyboxShader.SetUniformMat("projection", camera->GetMatrix());
+		skyboxShader.SetUniformMat("view", view);
 
 		renderer.Draw();
+		//debugRenderer.Draw();
+
+		debugCubes->Clear();
 
 		PostRender();
 
@@ -157,16 +219,6 @@ void ApplicationWindow::SetBackgroundColor(const glm::vec3& color)
 	renderer.SetBackgroundColor(color);
 }
 
-void ApplicationWindow::CalculateCameraForward()
-{
-	glm::vec3 direction;
-
-	direction.x = glm::cos(glm::radians(cameraYaw)) * glm::cos(glm::radians(cameraPitch));
-	direction.y = glm::sin(glm::radians(cameraPitch));
-	direction.z = glm::sin(glm::radians(cameraYaw)) * glm::cos(glm::radians(cameraPitch));
-
-	cameraFront = glm::normalize(direction);
-}
 
 void ApplicationWindow::GetCursorCallback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -197,16 +249,16 @@ void ApplicationWindow::MoveMouse()
 	//if (lastMousePos.x == 0 && lastMousePos.y == 0) return;
 
 
-	if (cameraPitch > 89.0f)	cameraPitch = 89.0f;
-	if (cameraPitch < -89.0f)	cameraPitch = -89.0f;
+	if (camera->cameraPitch > 89.0f)	camera->cameraPitch = 89.0f;
+	if (camera->cameraPitch < -89.0f)	camera->cameraPitch = -89.0f;
 
 	//std::cout << cameraYaw << std::endl;
 
 	//std::cout << "Camera Yaw " << cameraYaw << std::endl;
-	cameraYaw += mouseDeltaPos.x * mouseSens;
-	cameraPitch += mouseDeltaPos.y * mouseSens;
+	camera->cameraYaw += mouseDeltaPos.x * mouseSens;
+	camera->cameraPitch += mouseDeltaPos.y * mouseSens;
 
-	CalculateCameraForward();
+	camera->SetCameraForward();
 }
 
 void ApplicationWindow::MoveCameraKeyBoard(GLFWwindow* window)
@@ -217,30 +269,29 @@ void ApplicationWindow::MoveCameraKeyBoard(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		cameraPos += cameraFront * speed;
+		camera->cameraPos += camera->cameraFront * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 
-		cameraPos -= cameraFront * speed;
+		camera->cameraPos -= camera->cameraFront * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		cameraPos -= glm::cross(cameraFront, cameraUp) * speed;
+		camera->cameraPos -= glm::cross(camera->cameraFront, camera->cameraUp) * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 
-		cameraPos += glm::cross(cameraFront, cameraUp) * speed;
+		camera->cameraPos += glm::cross(camera->cameraFront, camera->cameraUp) * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-
-		cameraPos -= cameraUp * speed;
+		camera->cameraPos -= camera->cameraUp * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		cameraPos += cameraUp * speed;
+		camera->cameraPos += camera->cameraUp * speed;
 	}
 }
 

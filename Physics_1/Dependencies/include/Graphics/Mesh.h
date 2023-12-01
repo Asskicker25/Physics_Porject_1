@@ -10,6 +10,8 @@
 #include "Material.h"
 #include "Triangle.h"
 
+class Renderer;
+
 #pragma once
 class Mesh
 {
@@ -18,11 +20,16 @@ public:
 	std::vector< unsigned int> indices;
 	std::vector< Triangles > triangles;
 	std::vector< Texture*> textures;
-	Material* material = nullptr;
 
 	Mesh();
-	Mesh(std::vector<Vertex>& vertices, std::vector< unsigned int>& indices, Material* mat);
-	void DrawMesh(Shader* shader, bool loadMaterials = true, bool isWireFrame = false);
+	Mesh(std::vector<Vertex>& vertices, std::vector< unsigned int>& indices);
+
+	void SetRenderer(Renderer* renderer);
+
+	void DrawShadedMesh(Shader* shader, BaseMaterial* material,  bool isWireFrame = false);
+	void DrawSolidColorMesh(Shader* shader, glm::vec3 color, bool isWireFrame = false);
+	void DrawNormals(Shader* shader, glm::vec3 color, glm::mat4 transformMatrix);
+
 	void UpdateVertices();
 	VertexArray VAO;
 
@@ -30,6 +37,8 @@ private:
 	VertexBuffer VBO;
 	IndexBuffer IBO;
 	VertexLayout layout;
+
+	Renderer* renderer;
 
 	//unsigned int VAO, VBO, EBO;
 

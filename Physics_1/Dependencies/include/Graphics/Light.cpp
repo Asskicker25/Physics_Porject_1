@@ -44,14 +44,26 @@ void Light::InitializeLight(Model* model, LightType lightType)
 	transform = &(lightModel->transform);
 }
 
-glm::vec3 Light::GetLightColor()
-{
-	return material.GetBaseColor() * intensity;
+glm::vec4 Light::GetLightColor()
+{ 
+	glm::vec4 baseColor = glm::vec4(
+		material.GetBaseColor().x * intensity, 
+		material.GetBaseColor().y * intensity,
+		material.GetBaseColor().z * intensity,
+		material.GetBaseColor().w);
+
+	return baseColor;
 }
 
-glm::vec3 Light::GetAmbientColor()
+glm::vec4 Light::GetAmbientColor()
 {
-	return material.GetAmbientColor() * intensity;
+	glm::vec4 ambientColor = glm::vec4(
+		material.GetAmbientColor().x * intensity,
+		material.GetAmbientColor().y * intensity,
+		material.GetAmbientColor().z * intensity,
+		material.GetAmbientColor().w);
+
+	return ambientColor;
 }
 
 //glm::vec3 Light::GetSpecularColor()
@@ -69,12 +81,12 @@ float Light::GetAmbientValue()
 //	return material.specularValue;
 //}
 
-void Light::SetLightColor(glm::vec3 color)
+void Light::SetLightColor(glm::vec4 color)
 {
 	material.SetBaseColor(color);
 }
 
-void Light::SetAmbientColor(glm::vec3 color)
+void Light::SetAmbientColor(glm::vec4 color)
 {
 	material.SetAmbientColor(color);
 }

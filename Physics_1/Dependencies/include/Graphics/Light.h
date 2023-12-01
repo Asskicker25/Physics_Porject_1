@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Transform.h"
 #include "Material.h"
 #include "Model.h"
 
@@ -39,12 +38,12 @@ public:
 	void InitializeLight(Model& model, LightType lightType = LightType::Point);
 	void InitializeLight(Model* model, LightType lightType = LightType::Point);
 
-	glm::vec3 GetLightColor();
-	glm::vec3 GetAmbientColor();
+	glm::vec4 GetLightColor();
+	glm::vec4 GetAmbientColor();
 	float GetAmbientValue();
 
-	void SetLightColor(glm::vec3 color);
-	void SetAmbientColor(glm::vec3 color);
+	void SetLightColor(glm::vec4 color);
+	void SetAmbientColor(glm::vec4 color);
 	void SetAmbientValue(float ambientValue);
 };
 

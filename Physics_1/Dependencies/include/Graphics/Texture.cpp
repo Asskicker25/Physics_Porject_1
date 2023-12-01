@@ -1,12 +1,5 @@
 #include "Texture.h"
 
-
-bool Texture::fileExists(const std::string& path)
-{
-	std::ifstream file(path);
-	return file.good();
-}
-
 void Texture::LoadImage(const char* path, Image& image)
 {
 	int width, height, channels;
@@ -56,13 +49,15 @@ void Texture::LoadImage(const char* path, GLFWimage& image)
 
 Texture::Texture(const std::string& path)
 {
+	this->path = path;
+
 	GLCALL(glGenTextures(1, &renderedID));
 	GLCALL(glBindTexture(GL_TEXTURE_2D, renderedID));
 
 	LoadImage(path.c_str(), texture);
 
-	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
 	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST));
 	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 	GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0,texture.format , GL_UNSIGNED_BYTE, texture.pixelData));
@@ -87,4 +82,21 @@ void Texture::Unbind()
 void Texture::SetTextureSlot(int slot)
 {
 	GLCALL(glActiveTexture(GL_TEXTURE0 + slot));
+}
+
+void Texture::LoadTexture(const std::string& path)
+{
+	this->path = path;
+
+	GLCALL(glGenTextures(1, &renderedID));
+	GLCALL(glBindTexture(GL_TEXTURE_2D, renderedID));
+
+	LoadImage(path.c_str(), texture);
+
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, texture.format, GL_UNSIGNED_BYTE, texture.pixelData));
+	GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
 }

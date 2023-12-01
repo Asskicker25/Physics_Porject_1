@@ -1,9 +1,12 @@
 #include "Model.h"
+#include "Renderer.h"
+#include "UnlitColorMaterial.h"
+#include "Material.h"
+
 
 Model::Model()
 {
-	loadMatProperties = true;
-	loadTextures = true;
+
 }
 
 Model::Model(const Model& model)
@@ -12,9 +15,9 @@ Model::Model(const Model& model)
 	meshes = model.meshes;
 	directory = model.directory;
 	transform = model.transform;
-	//material = model.material;
 	loadTextures = model.loadTextures;
-	loadMatProperties = model.loadMatProperties;
+	//material = model.material;
+
 }
 
 
@@ -32,9 +35,21 @@ Model::~Model()
 	meshes.clear();
 }
 
-Model::Model(const std::string& path, bool loadTextures, bool loadMatProperties)
+Model::Model(const std::string& path, bool loadTextures)
 {
-	LoadModel(path, loadTextures, loadMatProperties);
+	this->loadTextures = loadTextures;
+
+	LoadModel(path, loadTextures);
+}
+
+void Model::SetRenderer(Renderer* renderer)
+{
+	this->renderer = renderer;
+
+	for (MeshAndMaterial* mesh : meshes)
+	{
+		mesh->mesh->SetRenderer(renderer);
+	}
 }
 
 void Model::Draw(Shader* shader)
@@ -43,41 +58,127 @@ void Model::Draw(Shader* shader)
 
 	for (unsigned int i = 0; i < meshes.size(); i++)
 	{
+		switch (renderer->renderMode)
+		{
+		case SHADED:
+
+			DrawShaded(meshes[i], shader);
+
+			break;
+		case WIREFRAME:
+
+			DrawWireframe(meshes[i], renderer->solidColorShader);
+
+			break;
+
+		case SHADED_WIREFRAME:
+
+			DrawShaded(meshes[i], shader);
+
+			DrawWireframe(meshes[i], renderer->solidColorShader);
+			break;
+		}
+
+		/*	if (!renderer->showNormals) continue;
+
+			DrawNormals(meshes[i], renderer->solidColorShader);*/
+	}
+
+
+}
+
+void Model::DrawSolidColor(Shader* shader, glm::vec3 color)
+{
+	if (!isActive) return;
+
+	for (unsigned int i = 0; i < meshes.size(); i++)
+	{
 		shader->Bind();
 		shader->SetUniformMat("model", transform.GetTransformMatrix());
 
-		//if (loadMatProperties)
-		//{
-		//	//Material
-		//	shader.SetUniform3f("material.baseColor", material.GetBaseColor().x, material.GetBaseColor().y, material.GetBaseColor().z);
-		//	shader.SetUniform3f("material.ambientColor", material.GetAmbientColor().x, material.GetAmbientColor().y, material.GetAmbientColor().z);
-		//	shader.SetUniform1f("material.specularValue", material.GetSpecularValue());
-		//	shader.SetUniform1f("material.shininess", material.shininess);
-		//}
+		meshes[i]->mesh->DrawSolidColorMesh(shader, color);
 
-		if (loadTextures)
-		{
-			shader->SetUniformMat("inverseModel", transform.GetInverseMatrix());
-		}
-		meshes[i]->DrawMesh(shader, loadMatProperties, isWireframe);
 	}
 }
 
-void Model::CopyFromModel(const Model& model)
+void Model::DrawShaded(MeshAndMaterial* mesh, Shader* shader)
 {
-	isActive = model.isActive;
-	meshes = model.meshes;
-	directory = model.directory;
-	transform = model.transform;
-	//material = model.material;
-	loadTextures = model.loadTextures;
-	loadMatProperties = model.loadMatProperties;
+	shader->Bind();
+
+	if (shader->applyModel)
+	{
+		shader->SetUniformMat("model", transform.GetTransformMatrix());
+	}
+
+	if (shader->applyInverseModel)
+	{
+		shader->SetUniformMat("inverseModel", transform.GetInverseMatrix());
+	}
+
+	mesh->mesh->DrawShadedMesh(shader, mesh->material, false);
 }
 
-void Model::LoadModel(const std::string& path, bool loadTextures, bool loadMatProperties)
+void Model::DrawWireframe(MeshAndMaterial* mesh, Shader* shader)
+{
+	shader->Bind();
+	shader->SetUniformMat("model", transform.GetTransformMatrix());
+
+	mesh->mesh->DrawSolidColorMesh(renderer->solidColorShader, renderer->wireframeMaterial->GetBaseColor(), true);
+}
+
+
+void Model::DrawNormals(MeshAndMaterial* mesh, Shader* shader)
+{
+	shader->Bind();
+	shader->SetUniformMat("model", transform.GetTransformMatrix());
+
+	mesh->mesh->DrawNormals(shader, renderer->normalsMaterial->GetBaseColor(), transform.GetTransformMatrix());
+}
+
+void Model::DrawNormals()
+{
+	if (!isActive) return;
+
+	for (unsigned int i = 0; i < meshes.size(); i++)
+	{
+		DrawNormals(meshes[i], renderer->solidColorShader);
+	}
+}
+
+void Model::DrawShaded(Shader* shader)
+{
+	if (!isActive) return;
+
+	for (unsigned int i = 0; i < meshes.size(); i++)
+	{
+		DrawShaded(meshes[i], shader);
+	}
+}
+
+Model* Model::CopyFromModel(const Model& model)
+{
+	isActive = model.isActive;
+	directory = model.directory;
+	transform = model.transform;
+	loadTextures = model.loadTextures;
+	//material = model.material;
+
+	for (MeshAndMaterial* mesh : model.meshes)
+	{
+		MeshAndMaterial* newMesh = new MeshAndMaterial();
+
+		newMesh->mesh = mesh->mesh;
+		newMesh->material = mesh->material->CloneMaterial();
+
+		meshes.push_back(newMesh);
+	}
+
+	return this;
+}
+
+void Model::LoadModel(const std::string& path, bool loadTextures)
 {
 	this->loadTextures = loadTextures;
-	this->loadMatProperties = loadMatProperties;
 
 	std::ifstream file(path);
 
@@ -120,7 +221,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+MeshAndMaterial* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -204,27 +305,46 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
-	Material* meshMat = new Material();
+	BaseMaterial* meshMat;
 	aiColor4D baseColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 
 	if (mesh->mMaterialIndex >= 0)
 	{
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		//aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &baseColor);
-		
+
 		if (loadTextures)
 		{
-			meshMat->diffuseTexture = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-			meshMat->specularTexture = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+			meshMat = new Material();
+			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+			meshMat->AsMaterial()->diffuseTexture = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+			meshMat->AsMaterial()->specularTexture = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+			meshMat->AsMaterial()->alphaMask = LoadMaterialTextures(material, aiTextureType_OPACITY, "texture_opacity");
+
+			if (meshMat->AsMaterial()->alphaMask->path != "res/Textures/DefaultTextures/Opacity_Default.png")
+			{
+				meshMat->AsMaterial()->useMaskTexture = true;
+			}
+
+			meshMat->AsMaterial()->SetBaseColor(glm::vec4(baseColor.r, baseColor.g, baseColor.b, baseColor.a));
+
 		}
+		else
+		{
+			meshMat = new UnlitColorMaterial();
+			meshMat->AsUnlitMaterial()->SetBaseColor(glm::vec4(baseColor.r, baseColor.g, baseColor.b, baseColor.a));
+		}
+
+	}
+	else
+	{
+		meshMat = new UnlitColorMaterial();
+		meshMat->AsUnlitMaterial()->SetBaseColor(glm::vec4(baseColor.r, baseColor.g, baseColor.b, baseColor.a));
 	}
 
-	meshMat->SetBaseColor(glm::vec3(baseColor.r, baseColor.g, baseColor.b));
-
-
-	return std::make_shared<Mesh>(vertices, indices, meshMat);
+	return new MeshAndMaterial{ std::make_shared<Mesh>(vertices, indices) , meshMat };
 }
 
 
@@ -262,12 +382,11 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 		std::string filename = std::string(texString.C_Str());
 		filename = directory + '/' + filename;
 
-		if (Texture::fileExists(filename))
+		if (fileExists(filename))
 		{
 			Texture* texture = new Texture(filename);
 
 			texture->type = typeName;
-			texture->path = texString.C_Str();
 			texturesLoaded.push_back(texture);
 
 			return texture;
@@ -279,6 +398,7 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 	}
 }
 
+
 Texture* Model::LoadDefaultMaterialTextures(aiTextureType type, std::string typeName)
 {
 	std::string path = "";
@@ -289,6 +409,9 @@ Texture* Model::LoadDefaultMaterialTextures(aiTextureType type, std::string type
 		break;
 	case aiTextureType_SPECULAR:
 		path = "res/Textures/DefaultTextures/Specular_Default.jpg";
+		break;
+	case aiTextureType_OPACITY:
+		path = "res/Textures/DefaultTextures/Opacity_Default.png";
 		break;
 	}
 	Texture* texture = new Texture(path);

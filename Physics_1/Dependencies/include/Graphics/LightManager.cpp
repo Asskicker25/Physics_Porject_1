@@ -88,12 +88,12 @@ void LightManager::RenderLight()
 			shaders[i]->SetUniform3f("lights[" + str + "]." + "direction", value.x, value.y, value.z);
 
 			//baseColor
-			value = lights[j]->GetLightColor();
-			shaders[i]->SetUniform3f("lights[" + str + "]." + "baseColor", value.x, value.y, value.z);
+			glm::vec4 valueVec4 = lights[j]->GetLightColor();
+			shaders[i]->SetUniform4f("lights[" + str + "]." + "baseColor", valueVec4.x, valueVec4.y, valueVec4.z, valueVec4.w);
 
 			//ambientColor
-			value = lights[j]->GetAmbientColor();
-			shaders[i]->SetUniform3f("lights[" + str + "]." + "ambientColor", value.x, value.y, value.z);
+			valueVec4 = lights[j]->GetAmbientColor();
+			shaders[i]->SetUniform4f("lights[" + str + "]." + "ambientColor", valueVec4.x, valueVec4.y, valueVec4.z, valueVec4.w);
 
 			//atten
 			shaders[i]->SetUniform4f("lights[" + str + "]." + "atten",

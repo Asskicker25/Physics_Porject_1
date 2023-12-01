@@ -9,6 +9,13 @@ enum ShaderType
 	FRAGMENT_SHADER = 1
 };
 
+enum BlendMode
+{
+	OPAQUE = 1,
+	ALPHA_BLEND = 2,
+	ALPHA_CUTOUT = 3
+};
+
 struct ShaderSource
 {
 	std::string vertexSrc;
@@ -23,11 +30,16 @@ private:
 	int GetLocation(const std::string& property);
 
 public:
+	BlendMode blendMode;
+
+	bool applyInverseModel = false;
+	bool applyModel = true;
+
 	Shader();
-	Shader(const std::string& path);
+	Shader(const std::string& path, BlendMode transparentMode = OPAQUE);
 	~Shader();
 
-	void LoadShader(const std::string& path);
+	void LoadShader(const std::string& path, BlendMode transparentMode = OPAQUE);
 	void Bind();
 	void Unbind();
 	unsigned int GetShaderId();

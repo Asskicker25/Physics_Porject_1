@@ -1,17 +1,16 @@
 #include "Mesh.h"
+#include "Renderer.h"
 
 Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, Material* material)
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
 {
 	VAO.Bind();
 
 	this->vertices = vertices;
 	this->indices = indices;
-
-	this->material = material;
 
 	/*if (textures.size() != 0)
 	{
@@ -24,35 +23,17 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, Ma
 	SetupMesh();
 }
 
-void Mesh::DrawMesh(Shader* shader, bool loadMaterials, bool isWireframe)
+void Mesh::SetRenderer(Renderer* renderer)
 {
-	//VAO.Bind();
+	this->renderer = renderer;
+}
 
-	if (loadMaterials)
-	{
-		shader->SetUniform3f("material.baseColor", material->GetBaseColor().x, material->GetBaseColor().y, material->GetBaseColor().z);
-		shader->SetUniform3f("material.ambientColor", material->GetAmbientColor().x, material->GetAmbientColor().y, material->GetAmbientColor().z);
-		shader->SetUniform1f("material.specularValue", material->GetSpecularValue());
-		shader->SetUniform1f("material.shininess", material->shininess);
-
-		if (material->diffuseTexture != nullptr)
-		{
-			material->diffuseTexture->SetTextureSlot(0);
-			shader->SetUniform1i("texture_diffuse1", 0);
-			material->diffuseTexture->Bind();
-		}
-
-		if (material->specularTexture != nullptr)
-		{
-			material->specularTexture->SetTextureSlot(1);
-			shader->SetUniform1i("texture_specular1", 1);
-			material->specularTexture->Bind();
-		}
-	}
-	
+void Mesh::DrawShadedMesh(Shader* shader, BaseMaterial* material, bool isWireframe)
+{
+	material->UpdateMaterial(shader);
 
 	VAO.Bind();
-	
+
 	if (isWireframe)
 	{
 		GLCALL(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
@@ -64,11 +45,57 @@ void Mesh::DrawMesh(Shader* shader, bool loadMaterials, bool isWireframe)
 
 	GLCALL(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
 
-	material->diffuseTexture->Unbind();
-	material->specularTexture->Unbind();
+	/*material->diffuseTexture->Unbind();
+	material->specularTexture->Unbind();*/
 	VAO.UnBind();
 
 }
+
+void Mesh::DrawSolidColorMesh(Shader* shader, glm::vec3 color, bool isWireFrame)
+{
+	shader->Bind();
+	shader->SetUniform3f("solidColor", color.x, color.y, color.z);
+
+	VAO.Bind();
+
+	if (isWireFrame)
+	{
+		GLCALL(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+	}
+	else
+	{
+		GLCALL(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+	}
+
+	GLCALL(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
+
+	VAO.UnBind();
+}
+
+void Mesh::DrawNormals(Shader* shader, glm::vec3 color, glm::mat4 transformMatrix)
+{
+	shader->Bind();
+	shader->SetUniform3f("solidColor", color.x, color.y, color.z);
+
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		Model* model = renderer->debugCubes->DrawDebugModel();
+
+		glm::vec3 transformedCenter = transformMatrix * glm::vec4(triangles[i].center, 1.0f);
+
+		model->transform.SetPosition(transformedCenter);
+		model->transform.SetScale(renderer->GetNormalsScale());
+
+		model->transform.SetOrientationFromDirections(transformMatrix * glm::vec4(triangles[i].normal, 0.0f),
+			transformMatrix * glm::vec4(triangles[i].tangent,0.0f));
+
+		
+		model->DrawSolidColor(shader, color);
+		//model->Draw(shader);
+	}
+}
+
 
 void Mesh::UpdateVertices()
 {
@@ -104,16 +131,22 @@ void Mesh::SetupMesh()
 
 void Mesh::CalculateTriangles()
 {
-	for (size_t i = 0; i < indices.size(); i += 3) 
+	for (size_t i = 0; i < indices.size(); i += 3)
 	{
 		Triangles triangle;
 		triangle.v1 = vertices[indices[i]].positions;
 		triangle.v2 = vertices[indices[i + 1]].positions;
 		triangle.v3 = vertices[indices[i + 2]].positions;
 
+		triangle.center = (triangle.v1 + triangle.v2 + triangle.v3) / 3.0f;
+
 		triangle.normal = (vertices[indices[i]].normals +
 			vertices[indices[i + 1]].normals +
 			vertices[indices[i + 2]].normals) / 3.0f;
+
+		glm::vec3 edge = triangle.v2 - triangle.v1;
+
+		triangle.tangent = glm::normalize(glm::cross(triangle.normal, edge));
 
 		triangles.push_back(triangle);
 	}

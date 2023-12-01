@@ -450,7 +450,7 @@ void ReadFile(const std::string& filePath)
 
 			if (section == "Light")
 			{
-				light->SetLightColor(glm::vec3(values[0], values[1], values[2]));
+				light->SetLightColor(glm::vec4(values[0], values[1], values[2], 1.0f));
 			}
 			else if (section == "Model")
 			{
@@ -482,7 +482,7 @@ void ReadFile(const std::string& filePath)
 
 			if (section == "Camera")
 			{
-				application.cameraPos = glm::vec3(values[0], values[1], values[2]);
+				application.camera->cameraPos = glm::vec3(values[0], values[1], values[2]);
 			}
 			else
 			{
@@ -514,8 +514,8 @@ void ReadFile(const std::string& filePath)
 			}
 			if (section == "Camera")
 			{
-				application.cameraPitch = values[0];
-				application.cameraYaw = values[1];
+				application.camera->cameraPitch = values[0];
+				application.camera->cameraYaw = values[1];
 			}
 			else
 			{
