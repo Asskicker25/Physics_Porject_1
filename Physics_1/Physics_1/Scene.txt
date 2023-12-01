@@ -21,7 +21,62 @@ PhysicsShape : { SPHERE }
 PhysicsMode : { DYNAMIC } 
 CollisionMode : { SOLID } 
 Velocity : { 5.0 , 0.0 , 0.0 }
-Mass : { 3.0 }
+Mass : { 1.0 }
+
+
+#Model
+Model path : { Assets/Models/SpecSphere/Sphere1.fbx }
+Model Id : { Sphere }
+Position : { 30.0, 4.0, 0.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Scale : { 2.0 , 2.0 , 2.0 } 
+PhysicsObject : { true }
+PhysicsShape : { SPHERE }
+PhysicsMode : { DYNAMIC } 
+CollisionMode : { SOLID } 
+Velocity : { -5.0 , 0.0 , 0.0 }
+Mass : { 1.0 }
+
+#Model
+Model path : { Assets/Models/SpecSphere/Sphere1.fbx }
+Model Id : { Sphere }
+Position : { -30.0, 4.0, 20.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Scale : { 2.0 , 2.0 , 2.0 } 
+PhysicsObject : { true }
+PhysicsShape : { SPHERE }
+PhysicsMode : { DYNAMIC } 
+CollisionMode : { SOLID } 
+Velocity : { 0.0 , 0.0 , 0.0 }
+Mass : { 1.0 }
+
+#Model
+Model path : { Assets/Models/SpecSphere/Sphere1.fbx }
+Model Id : { Sphere }
+Position : { -10.0, 4.0, 40.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Scale : { 2.0 , 2.0 , 2.0 } 
+PhysicsObject : { true }
+PhysicsShape : { SPHERE }
+PhysicsMode : { DYNAMIC } 
+CollisionMode : { SOLID } 
+Velocity : { 5.0 , 10.0 , 0.0 }
+Mass : { 1.0 }
+
+
+
+#Model
+Model path : { Assets/Models/SpecSphere/Sphere1.fbx }
+Model Id : { Sphere }
+Position : { -30.0, 4.0, 0.0 }
+Rotation : { 0.0 , 0.0 , 0.0 }
+Scale : { 2.0 , 2.0 , 2.0 } 
+PhysicsObject : { true }
+PhysicsShape : { SPHERE }
+PhysicsMode : { DYNAMIC } 
+CollisionMode : { SOLID } 
+Velocity : { 0.0 , 0.0 , 0.0 }
+Mass : { 1.0 }
 
 #Model
 Model path : { Assets/Models/Plane/PlaneWithTex.fbx }

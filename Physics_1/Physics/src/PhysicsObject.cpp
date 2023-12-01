@@ -50,9 +50,19 @@ const std::vector<glm::vec3>& PhysicsObject::GetCollisionPoints()
 	return collisionPoints;
 }
 
+const std::vector<glm::vec3>& PhysicsObject::GetCollisionNormals()
+{
+	return collisionNormals;
+}
+
 void PhysicsObject::SetCollisionPoints(const std::vector<glm::vec3>& collisionPoints)
 {
 	this->collisionPoints = collisionPoints;
+}
+
+void PhysicsObject::SetCollisionNormals(const std::vector<glm::vec3>& collisionNormals)
+{
+	this->collisionNormals = collisionNormals;
 }
 
 void PhysicsObject::SetVisible(bool activeSelf)

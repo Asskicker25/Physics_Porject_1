@@ -111,6 +111,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 					collisionNormals.insert(collisionNormals.end(), perObjectNormals.begin(), perObjectNormals.end());
 
 					iteratorObject->SetCollisionPoints(collisionPoints);
+					iteratorObject->SetCollisionNormals(collisionNormals);
 				}
 
 #pragma region CollisionInvoke
