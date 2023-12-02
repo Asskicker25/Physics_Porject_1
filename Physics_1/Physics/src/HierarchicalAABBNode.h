@@ -19,10 +19,10 @@ public:
 	std::vector<int> triangleIndices;
 
 	HierarchicalAABBNode(const Aabb& aabb, const std::vector<Triangle>& triangles,
-		std::vector<int> triangleIndices, int nodeIndex, bool leftNode, HierarchicalAABBNode* parentNode);
+		std::vector<int> triangleIndices, int nodeIndex, HierarchicalAABBNode* parentNode);
 	~HierarchicalAABBNode(); 
 
-	void SplitNode(const std::vector<Triangle>& triangleList );
+	void SplitNode(const std::vector<Triangle>& triangleList);
 
 };
 

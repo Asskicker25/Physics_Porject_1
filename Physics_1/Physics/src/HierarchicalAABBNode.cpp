@@ -1,7 +1,7 @@
 #include "HierarchicalAABBNode.h"
 
 HierarchicalAABBNode::HierarchicalAABBNode(const Aabb& aabb,
-	const std::vector<Triangle>& triangles, std::vector<int> triangleIndices, int nodeIndex, bool leftNode,
+	const std::vector<Triangle>& triangles, std::vector<int> triangleIndices, int nodeIndex,
 	HierarchicalAABBNode* parentNode)
 	: aabb(aabb), leftNode(nullptr), rightNode(nullptr)
 {
@@ -31,13 +31,11 @@ HierarchicalAABBNode::HierarchicalAABBNode(const Aabb& aabb,
 
 	if (nodeIndex < maxDepth)
 	{
-		if ((int)this->triangleIndices.size() >= maxNumOfTriangles)
+		if ((int)this->triangleIndices.size() > maxNumOfTriangles)
 		{
 			SplitNode(triangles);
 		}
 	}
-
-
 
 }
 
@@ -59,6 +57,12 @@ void HierarchicalAABBNode::SplitNode(const std::vector<Triangle>& triangleList)
 	Aabb rightAABB = aabb;
 	rightAABB.min[splitAxis] = splitPosition;
 
-	leftNode = new HierarchicalAABBNode(leftAABB, triangleList, triangleIndices, (nodeIndex + 1), true, this);
-	rightNode = new HierarchicalAABBNode(rightAABB, triangleList, triangleIndices, (nodeIndex + 1), false, this);
+	leftNode = new HierarchicalAABBNode(leftAABB, triangleList, triangleIndices, (nodeIndex + 1), this);
+	rightNode = new HierarchicalAABBNode(rightAABB, triangleList, triangleIndices, (nodeIndex + 1), this);
+
+	if (this->triangleIndices.size() > maxNumOfTriangles && nodeIndex < maxDepth)
+	{
+		//triangleIndices.clear();
+	}
+
 }

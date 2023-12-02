@@ -28,5 +28,5 @@ void HierarchicalAABB::Construct()
 		transformedTriangles.push_back(triangle);
 	}
 
-	rootNode = new HierarchicalAABBNode(phyObj->GetModelAABB(), transformedTriangles, {}, 0, true, nullptr);
+	rootNode = new HierarchicalAABBNode(phyObj->GetModelAABB(), transformedTriangles, {}, 0, nullptr);
 }

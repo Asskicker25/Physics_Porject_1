@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <Graphics/Renderer.h>
 
+class HierarchicalAABBNode;
+
 enum PhysicsShape
 {
 	SPHERE,
@@ -664,6 +666,12 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 	return false;
 }
+
+static bool CollisionSphereVsMeshOfTriangles(const Aabb& sphereAabb, Sphere* sphere, HierarchicalAABBNode* rootNode,
+	const glm::mat4 transformMatrix)
+{
+}
+	
 
 static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	const glm::mat4& transformMatrix,
