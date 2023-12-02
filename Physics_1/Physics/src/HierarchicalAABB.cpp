@@ -9,7 +9,7 @@ HierarchicalAABB::HierarchicalAABB(PhysicsObject* phyObj)
 
 void HierarchicalAABB::Construct()
 {
-	glm::mat4 transformedMatrix = phyObj->GetModel()->transform.GetTransformMatrix();
+	/*glm::mat4 transformedMatrix = phyObj->GetModel()->transform.GetTransformMatrix();
 	for (int i = 0; i < phyObj->GetTriangleList().size(); i++)
 	{
 		Triangle triangle = phyObj->GetTriangleList()[i];
@@ -26,7 +26,7 @@ void HierarchicalAABB::Construct()
 		}
 
 		transformedTriangles.push_back(triangle);
-	}
+	}*/
 
-	rootNode = new HierarchicalAABBNode(phyObj->GetModelAABB(), transformedTriangles, {}, 0, nullptr);
+	//rootNode = new HierarchicalAABBNode(phyObj->GetModelAABB(), phyObj, {}, 0, nullptr);
 }

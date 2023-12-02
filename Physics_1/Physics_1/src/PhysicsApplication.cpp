@@ -102,6 +102,14 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 		{
 			aabbDrawDepthIndex++;
 		}
+		else if (key == GLFW_KEY_UP)
+		{
+			hat->transform.position.x += 5;
+		}
+		else if (key == GLFW_KEY_DOWN)
+		{
+			hat->transform.position.x -= 5;
+		}
 	}
 }
 
@@ -121,7 +129,7 @@ void PhysicsApplication::DrawAABBRecursive(HierarchicalAABBNode* node)
 
 	if (node->triangleIndices.size() != 0)
 	{
-		renderer.DrawAABB(GetGraphicsAabb(node->aabb), aabbColor[2]);
+		renderer.DrawAABB(GetGraphicsAabb(node->GetAABB()), aabbColor[2]);
 	}
 
 	if (node->leftNode == nullptr) return;

@@ -18,7 +18,9 @@ private:
 	glm::mat4 cachedMatrix;
 
 	std::vector <Triangle> triangles;
+	std::vector<Triangle> transformedTriangles;
 	std::vector <Sphere*>  triangleSpheres;
+	std::vector <Sphere*>  transformedSpheres;
 	std::vector <glm::vec3> collisionPoints;
 	std::vector <glm::vec3> collisionNormals;
 

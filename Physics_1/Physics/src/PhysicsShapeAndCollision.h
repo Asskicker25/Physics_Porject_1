@@ -617,7 +617,7 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 	std::vector<glm::vec3>& collisionNormals)
 {
 
-	float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
+	//float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
 
 	collisionPoints.clear();
 	Sphere* sphereTriangle = new Sphere();
@@ -627,11 +627,11 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 		Triangle triangle = triangles[i];
 
 		// Transform the sphere's position using the transformMatrix
-		glm::vec4 transformedCenter = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
-		sphereTriangle->position = glm::vec3(transformedCenter);
+		//glm::vec4 transformedCenter = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
+		//sphereTriangle->position = glm::vec3(transformedCenter);
 
 		// Transform the sphere's radius based on scaling
-		sphereTriangle->radius = triangleSpheres[i]->radius * maxScale;
+		//sphereTriangle->radius = triangleSpheres[i]->radius * maxScale;
 
 		// Now you can check for collision between the transformed sphere and sphereTriangle
 		std::vector<glm::vec3> collisionPoint;
@@ -640,19 +640,19 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 		{
 			glm::vec3 point = glm::vec3(0.0f);
 
-			triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
-			triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
-			triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
+			//triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+			//triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+			//triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
 
 			if (CollisionSphereVsTriangle(sphere, triangle, point))
 			{
 				//Debugger::Print("Sphere vs Triangle");
 				//glm::vec3 normal = point - sphere->position;
 
-				glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
+				//glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
 
 				collisionPoints.push_back(point);
-				collisionNormals.push_back(normal);
+				collisionNormals.push_back(triangle.normal);
 			}
 		}
 	}
@@ -681,7 +681,7 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	std::vector<glm::vec3>& collisionNormals)
 {
 
-	float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
+	//float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
 
 	collisionPoints.clear();
 	Sphere* sphereTriangle = new Sphere();
@@ -692,11 +692,11 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 		Triangle triangle = triangles[i];
 
 		// Transform the sphere's position using the transformMatrix
-		glm::vec4 transformedCenter = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
-		sphereTriangle->position = glm::vec3(transformedCenter);
+		//glm::vec4 transformedCenter = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
+		//sphereTriangle->position = glm::vec3(transformedCenter);
 
 		// Transform the sphere's radius based on scaling
-		sphereTriangle->radius = triangleSpheres[i]->radius * maxScale;
+		//sphereTriangle->radius = triangleSpheres[i]->radius * maxScale;
 
 		// Now you can check for collision between the transformed sphere and sphereTriangle
 		std::vector<glm::vec3> collisionPoint;
@@ -708,17 +708,17 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 			//std::cout << "SphereVsAAB" << std::endl;
 			glm::vec3 point = glm::vec3(0.0f);
 
-			triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
-			triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
-			triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
+			//triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+			//triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+			//triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
 
 			if (CollisionAABBVsTriangle(aabb, triangle, point))
 			{
 				//std::cout << "TVsAAB" << std::endl;
-				glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
+				//glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
 
 				collisionPoints.push_back(point);
-				collisionNormals.push_back(normal);
+				collisionNormals.push_back(triangle.normal);
 			}
 		}
 	}

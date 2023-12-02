@@ -37,12 +37,28 @@ void PhysicsObject::SetDrawOrientation(const glm::vec3& newOrientation)
 
 const std::vector<Triangle>& PhysicsObject::GetTriangleList()
 {
-	return triangles;
+	glm::mat4 transformMatrix = model->transform.GetTransformMatrix();
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		transformedTriangles[i].v1 = transformMatrix * glm::vec4(triangles[i].v1, 1.0f);
+		transformedTriangles[i].v2 = transformMatrix * glm::vec4(triangles[i].v2, 1.0f);
+		transformedTriangles[i].v3 = transformMatrix * glm::vec4(triangles[i].v3, 1.0f);
+		transformedTriangles[i].normal = transformMatrix * glm::vec4(triangles[i].normal, 0.0f);
+	}
+	return transformedTriangles;
 }
 
 const std::vector<Sphere*>& PhysicsObject::GetSphereList()
 {
-	return triangleSpheres;
+	glm::mat4 transformMatrix = model->transform.GetTransformMatrix();
+	float maxScale = glm::max(glm::max(transformMatrix[0][0], transformMatrix[1][1]), transformMatrix[2][2]);
+
+	for (int i = 0; i < triangleSpheres.size(); i++)
+	{
+		transformedSpheres[i]->position = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
+		transformedSpheres[i]->radius = triangleSpheres[i]->radius * maxScale;
+	}
+	return transformedSpheres;
 }
 
 const std::vector<glm::vec3>& PhysicsObject::GetCollisionPoints()
@@ -232,6 +248,9 @@ void PhysicsObject::CalculateTriangleSpheres()
 			triangleSpheres.push_back(new Sphere(sphereCenter, radius));
 		}
 	}
+
+	transformedTriangles.resize(triangles.size());
+	transformedSpheres.resize(triangleSpheres.size(), new Sphere());
 }
 
 bool PhysicsObject::CheckCollision(PhysicsObject* other,
