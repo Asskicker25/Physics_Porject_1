@@ -58,6 +58,12 @@ void Model::Draw(Shader* shader)
 
 	for (unsigned int i = 0; i < meshes.size(); i++)
 	{
+		if (isWireframe)
+		{
+			DrawWireframe(meshes[i], renderer->solidColorShader);
+			continue;
+		}
+
 		switch (renderer->renderMode)
 		{
 		case SHADED:
@@ -153,6 +159,18 @@ void Model::DrawShaded(Shader* shader)
 	{
 		DrawShaded(meshes[i], shader);
 	}
+}
+
+void Model::DrawWireframe(const glm::vec3& color)
+{
+	renderer->solidColorShader->Bind();
+	renderer->solidColorShader->SetUniformMat("model", transform.GetTransformMatrix());
+	
+	for (unsigned int i = 0; i < meshes.size(); i++)
+	{
+		meshes[i]->mesh->DrawSolidColorMesh(renderer->solidColorShader, color, true);
+	}
+	
 }
 
 Model* Model::CopyFromModel(const Model& model)
@@ -385,7 +403,7 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 		if (fileExists(filename))
 		{
 			Texture* texture = new Texture(filename);
-
+			texture->path = texString.C_Str();
 			texture->type = typeName;
 			texturesLoaded.push_back(texture);
 

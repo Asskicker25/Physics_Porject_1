@@ -18,24 +18,25 @@ class PhysicsApplication : public ApplicationWindow
 {
 
 private:
-
-	static const int NUM_OF_DEBUG_SPHERES = 100;
-
-	const std::string& lightModelPath = "Assets/Models/DefaultSphere.fbx";
-
-
 	PhysicsEngine physicsEngine;
 
-	Model debugSpheres[NUM_OF_DEBUG_SPHERES];
+	glm::vec4 aabbColor[3] = { 
+		glm::vec4(1.0, 0.0, 0.0f, 1.0f),
+		glm::vec4(0.0, 1.0, 0.0f, 1.0f),
+		glm::vec4(0.0, 0.0, 1.0f, 1.0f) 
+	};
+
+	int aabbDrawDepthIndex = 0;
 
 
 public:
 
-	std::vector<ModelAndPhysics*> listOfModels;
-	std::vector<Model*> listOflightModels;
-	std::vector<std::string> modelPaths;
-	std::vector<Light*> listOfLights;
-
+	Model* sphere;
+	Model* plane;
+	Model* hat;
+	PhysicsObject* spherePhy;
+	PhysicsObject* planePhy;
+	PhysicsObject* hatPhy;
 
 	void SetUp() override;
 	void PreRender() override;
@@ -43,6 +44,8 @@ public:
 	void ProcessInput(GLFWwindow* window) override;
 	void KeyCallBack(GLFWwindow* window, int& key, int& scancode, int& action, int& mods) override;
 	void MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods) override;
+
+	void DrawAABBRecursive(HierarchicalAABBNode* node);
 
 };
 

@@ -21,6 +21,18 @@ public:
 	Shader* shader;
 };
 
+struct modelAABB
+{
+	modelAABB() {}
+	modelAABB(glm::vec3 min, glm::vec3 max)
+	{
+		this->min = min;
+		this->max = max;
+	}
+	glm::vec3 min;
+	glm::vec3 max;
+};
+
 struct CompareDistances 
 {
 	const glm::vec3& cameraPos;
@@ -80,5 +92,7 @@ public:
 	void SortBlendModels();
 	const glm::vec3&  GetNormalsScale();
 	void SetNormalsLineScale(const glm::vec3& scale);
+	void DrawAABB(const modelAABB& aabb, glm::vec4 color = glm::vec4(0.0,0.0,1.0,1.0));
+	void DrawCube(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale, const glm::vec4 color);
 };
 

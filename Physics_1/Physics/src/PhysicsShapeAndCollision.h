@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <Graphics/Renderer.h>
 
 enum PhysicsShape
 {
@@ -41,6 +42,24 @@ struct Aabb : public iShape
 	}
 	glm::vec3 min;
 	glm::vec3 max;
+
+	int GetMaxExtentAxis() const
+	{
+		glm::vec3 extents = max - min;
+
+		if (extents.x > extents.y && extents.x > extents.z)
+		{
+			return 0;
+		}
+		else if (extents.y > extents.z)
+		{
+			return 1;
+		}
+		else
+		{
+			return 2;
+		}
+	}
 };
 
 struct Sphere : public iShape
@@ -83,6 +102,11 @@ struct Plane : iShape
 	glm::vec3 normal;
 	float dotofPoint;
 };
+
+static const modelAABB& GetGraphicsAabb(const Aabb& aabb)
+{
+	return { aabb.min, aabb.max };
+}
 
 static Aabb CalculateAABB(const std::vector<Vertex>& vertices)
 {
@@ -195,6 +219,25 @@ static const glm::vec3& ClosestPtPointAABB(glm::vec3 p, Aabb b)
 		q[i] = v;
 	}
 	return q;
+}
+
+static bool IsPointInsideAABB(const glm::vec3& point, const Aabb& aabb)
+{
+	return (
+		point.x >= aabb.min.x && point.x <= aabb.max.x &&
+		point.y >= aabb.min.y && point.y <= aabb.max.y &&
+		point.z >= aabb.min.z && point.z <= aabb.max.z
+		);
+}
+
+static bool IsTriangleInsideAABB(const Triangle& triangle, const Aabb& aabb)
+{
+	if (IsPointInsideAABB(triangle.v1, aabb)) return true;
+	if (IsPointInsideAABB(triangle.v2, aabb)) return true;
+	if (IsPointInsideAABB(triangle.v3, aabb)) return true;
+
+	return false;
+
 }
 
 static bool CollisionSpherevsAABB(Sphere* sphere, const Aabb& aabb, bool isSphere,
@@ -323,7 +366,7 @@ static glm::vec3 ClosestPointOnTriangle(glm::vec3 p, glm::vec3 a, glm::vec3 b, g
 	return u * a + v * b + w * c;
 }
 
-static glm::vec3 ClosestPtPlaneToAABB(const Plane& plane, const Aabb& aabb) 
+static glm::vec3 ClosestPtPlaneToAABB(const Plane& plane, const Aabb& aabb)
 {
 	// Calculate the signed distance from the AABB center to the plane
 	glm::vec3 aabbCenter = 0.5f * (aabb.min + aabb.max);
@@ -421,9 +464,9 @@ static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, 
 
 	float distanceToPlane = glm::dot(v1ToSphere, triangle.normal);
 
-	if (distanceToPlane < -sphere->radius) 
+	if (distanceToPlane < -sphere->radius)
 	{
-		return false; 
+		return false;
 	}
 
 	//glm::vec3 closestPointOnTriangle = ClosestPointOnTriangle(sphere->position, triangle);
@@ -431,7 +474,7 @@ static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, 
 
 	glm::vec3 diff = closestPointOnTriangle - sphere->position;
 
-	/*if (glm::length(closestPointOnTriangle - sphere->position) <= sphere->radius * sphere->radius) 
+	/*if (glm::length(closestPointOnTriangle - sphere->position) <= sphere->radius * sphere->radius)
 	{
 		collisionPoint = closestPointOnTriangle;
 		return true;
@@ -442,9 +485,9 @@ static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, 
 	if (sqDist <= sphere->radius * sphere->radius)
 	{
 		collisionPoint = closestPointOnTriangle;
-		return true;  
+		return true;
 	}
-	return false; 
+	return false;
 }
 
 //static bool CollisionSphereVsTriangle(Sphere* sphere, const Triangle& triangle, glm::vec3& collisionPoint)
@@ -478,9 +521,9 @@ static bool CollisionAABBVsPlane(const Plane& plane, const Aabb& aabb, glm::vec3
 	return false;
 }
 
-static bool CollisionAABBVsTriangle(const Aabb& aabb,const Triangle& triangle, glm::vec3& collisionPoint)
+static bool CollisionAABBVsTriangle(const Aabb& aabb, const Triangle& triangle, glm::vec3& collisionPoint)
 {
-	for (int i = 0; i < 3; i++) 
+	for (int i = 0; i < 3; i++)
 	{
 		glm::vec3 axis;
 		if (i == 0) axis = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -566,8 +609,8 @@ static bool CollisionAABBVsTriangle(const Aabb& aabb,const Triangle& triangle, g
 
 static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 	const glm::mat4& transformMatrix,
-	const std::vector <std::vector <Triangle>>& triangles,
-	const std::vector<std::vector<Sphere*>>& triangleSpheres,
+	const std::vector <Triangle>& triangles,
+	const std::vector<Sphere*>& triangleSpheres,
 	std::vector<glm::vec3>& collisionPoints,
 	std::vector<glm::vec3>& collisionNormals)
 {
@@ -579,41 +622,35 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 	for (size_t i = 0; i < triangles.size(); i++)
 	{
-		const std::vector<Triangle>& triangleList = triangles[i];
-		const std::vector<Sphere*>& sphereList = triangleSpheres[i];
+		Triangle triangle = triangles[i];
 
-		for (size_t j = 0; j < triangleList.size(); j++)
+		// Transform the sphere's position using the transformMatrix
+		glm::vec4 transformedCenter = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
+		sphereTriangle->position = glm::vec3(transformedCenter);
+
+		// Transform the sphere's radius based on scaling
+		sphereTriangle->radius = triangleSpheres[i]->radius * maxScale;
+
+		// Now you can check for collision between the transformed sphere and sphereTriangle
+		std::vector<glm::vec3> collisionPoint;
+		std::vector<glm::vec3> collisionNormal;
+		if (CollisionSphereVSSphere(sphere, sphereTriangle, collisionPoint, collisionNormal))
 		{
-			Triangle triangle = triangleList[j];
+			glm::vec3 point = glm::vec3(0.0f);
 
-			// Transform the sphere's position using the transformMatrix
-			glm::vec4 transformedCenter = transformMatrix * glm::vec4(sphereList[j]->position, 1.0f);
-			sphereTriangle->position = glm::vec3(transformedCenter);
+			triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+			triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+			triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
 
-			// Transform the sphere's radius based on scaling
-			sphereTriangle->radius = sphereList[j]->radius * maxScale;
-
-			// Now you can check for collision between the transformed sphere and sphereTriangle
-			std::vector<glm::vec3> collisionPoint;
-			std::vector<glm::vec3> collisionNormal;
-			if (CollisionSphereVSSphere(sphere, sphereTriangle, collisionPoint, collisionNormal))
+			if (CollisionSphereVsTriangle(sphere, triangle, point))
 			{
-				glm::vec3 point = glm::vec3(0.0f);
+				//Debugger::Print("Sphere vs Triangle");
+				//glm::vec3 normal = point - sphere->position;
 
-				triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
-				triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
-				triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
+				glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
 
-				if (CollisionSphereVsTriangle(sphere, triangle, point))
-				{
-					//Debugger::Print("Sphere vs Triangle");
-					//glm::vec3 normal = point - sphere->position;
-
-				glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal,0.0f);
-
-					collisionPoints.push_back(point);
-					collisionNormals.push_back(normal);
-				}
+				collisionPoints.push_back(point);
+				collisionNormals.push_back(normal);
 			}
 		}
 	}
@@ -630,8 +667,8 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	const glm::mat4& transformMatrix,
-	const std::vector <std::vector <Triangle>>& triangles,
-	const std::vector<std::vector<Sphere*>>& triangleSpheres,
+	const std::vector <Triangle>& triangles,
+	const std::vector<Sphere*>& triangleSpheres,
 	std::vector<glm::vec3>& collisionPoints,
 	std::vector<glm::vec3>& collisionNormals)
 {
@@ -643,42 +680,37 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 
 	for (size_t i = 0; i < triangles.size(); i++)
 	{
-		const std::vector<Triangle>& triangleList = triangles[i];
-		const std::vector<Sphere*>& sphereList = triangleSpheres[i];
 
-		for (size_t j = 0; j < triangleList.size(); j++)
+		Triangle triangle = triangles[i];
+
+		// Transform the sphere's position using the transformMatrix
+		glm::vec4 transformedCenter = transformMatrix * glm::vec4(triangleSpheres[i]->position, 1.0f);
+		sphereTriangle->position = glm::vec3(transformedCenter);
+
+		// Transform the sphere's radius based on scaling
+		sphereTriangle->radius = triangleSpheres[i]->radius * maxScale;
+
+		// Now you can check for collision between the transformed sphere and sphereTriangle
+		std::vector<glm::vec3> collisionPoint;
+		std::vector<glm::vec3> collisionNormal;
+
+
+		if (CollisionSpherevsAABB(sphereTriangle, aabb, false, collisionPoint, collisionNormal))
 		{
-			Triangle triangle = triangleList[j];
+			//std::cout << "SphereVsAAB" << std::endl;
+			glm::vec3 point = glm::vec3(0.0f);
 
-			// Transform the sphere's position using the transformMatrix
-			glm::vec4 transformedCenter = transformMatrix * glm::vec4(sphereList[j]->position, 1.0f);
-			sphereTriangle->position = glm::vec3(transformedCenter);
+			triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+			triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+			triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
 
-			// Transform the sphere's radius based on scaling
-			sphereTriangle->radius = sphereList[j]->radius * maxScale;
-
-			// Now you can check for collision between the transformed sphere and sphereTriangle
-			std::vector<glm::vec3> collisionPoint;
-			std::vector<glm::vec3> collisionNormal;
-
-
-			if (CollisionSpherevsAABB(sphereTriangle, aabb, false, collisionPoint, collisionNormal))
+			if (CollisionAABBVsTriangle(aabb, triangle, point))
 			{
-				//std::cout << "SphereVsAAB" << std::endl;
-				glm::vec3 point = glm::vec3(0.0f);
+				//std::cout << "TVsAAB" << std::endl;
+				glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
 
-				triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
-				triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
-				triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
-
-				if (CollisionAABBVsTriangle(aabb, triangle, point))
-				{
-					//std::cout << "TVsAAB" << std::endl;
-					glm::vec3 normal = transformMatrix * glm::vec4(triangle.normal, 0.0f);
-
-					collisionPoints.push_back(point);
-					collisionNormals.push_back(normal);
-				}
+				collisionPoints.push_back(point);
+				collisionNormals.push_back(normal);
 			}
 		}
 	}
@@ -694,7 +726,7 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 }
 
 static bool RayCastAABB(const glm::vec3& rayOrigin, glm::vec3& rayDir,
-	const Aabb& aabb, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal) 
+	const Aabb& aabb, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal)
 {
 	rayDir = glm::normalize(rayDir);
 
@@ -706,7 +738,7 @@ static bool RayCastAABB(const glm::vec3& rayOrigin, glm::vec3& rayDir,
 	float tFar = glm::min(glm::min(glm::max(tMin.x, tMax.x), glm::max(tMin.y, tMax.y)), glm::max(tMin.z, tMax.z));
 
 	if (tNear > tFar || tFar < 0.0f || tNear > rayDistance) {
-		return false; 
+		return false;
 	}
 
 	float t = tNear;
@@ -726,43 +758,43 @@ static bool RayCastAABB(const glm::vec3& rayOrigin, glm::vec3& rayDir,
 	return true;
 }
 
-static bool RayCastSphere(const glm::vec3& rayOrigin, glm::vec3& rayDir, 
-	Sphere* sphere, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal) 
+static bool RayCastSphere(const glm::vec3& rayOrigin, glm::vec3& rayDir,
+	Sphere* sphere, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal)
 {
 	rayDir = glm::normalize(rayDir);
 
 	glm::vec3 L = sphere->position - rayOrigin;
 	float tca = glm::dot(L, rayDir);
-	if (tca < 0.0f) 
+	if (tca < 0.0f)
 	{
-		return false;  
+		return false;
 	}
 
 	float d2 = glm::dot(L, L) - tca * tca;
 	if (d2 > sphere->radius * sphere->radius)
 	{
-		return false;  
+		return false;
 	}
 
 	float thc = sqrt(sphere->radius * sphere->radius - d2);
 	float t0 = tca - thc;
 	float t1 = tca + thc;
 
-	if (t0 > t1) 
+	if (t0 > t1)
 	{
 		std::swap(t0, t1);
 	}
 
 	if (t0 < 0.0f)
 	{
-		t0 = t1;  
-		if (t0 < 0.0f || t0 > rayDistance) 
+		t0 = t1;
+		if (t0 < 0.0f || t0 > rayDistance)
 		{
-			return false;  
+			return false;
 		}
 	}
 	else if (t0 > rayDistance) {
-		return false;  
+		return false;
 	}
 
 	collisionPt = rayOrigin + rayDir * t0;
@@ -771,9 +803,9 @@ static bool RayCastSphere(const glm::vec3& rayOrigin, glm::vec3& rayDir,
 	return true;
 }
 
-static bool RayCastTriangle(const glm::vec3& rayOrigin, glm::vec3& rayDirection, 
+static bool RayCastTriangle(const glm::vec3& rayOrigin, glm::vec3& rayDirection,
 	const float& maxDistance, const Triangle& triangle,
-	glm::vec3& collisionPt, glm::vec3& collisionNr) 
+	glm::vec3& collisionPt, glm::vec3& collisionNr)
 {
 	rayDirection = glm::normalize(rayDirection);
 
@@ -809,7 +841,7 @@ static bool RayCastTriangle(const glm::vec3& rayOrigin, glm::vec3& rayDirection,
 
 	t = f * glm::dot(edge2, q);
 
-	if (t > EPSILON && t <= maxDistance) 
+	if (t > EPSILON && t <= maxDistance)
 	{
 		collisionPt = rayOrigin + rayDirection * t;
 		return true;
@@ -820,27 +852,22 @@ static bool RayCastTriangle(const glm::vec3& rayOrigin, glm::vec3& rayDirection,
 
 static bool RayCastMesh(const glm::vec3& rayOrigin, glm::vec3& rayDirection,
 	const glm::mat4& transformMatrix, const float& maxDistance,
-	const std::vector <std::vector <Triangle>>& triangles,
+	const std::vector <Triangle>& triangles,
 	glm::vec3& collisionPt, glm::vec3& collisionNr)
 {
 	rayDirection = glm::normalize(rayDirection);
 
 	for (size_t i = 0; i < triangles.size(); i++)
 	{
-		const std::vector<Triangle>& triangleList = triangles[i];
+		Triangle triangle = triangles[i];
+		triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
+		triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
+		triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
 
-		for (size_t j = 0; j < triangleList.size(); j++)
+		if (RayCastTriangle(rayOrigin, rayDirection, maxDistance, triangle, collisionPt, collisionNr))
 		{
-			Triangle triangle = triangleList[j];
-			triangle.v1 = transformMatrix * glm::vec4(triangle.v1, 1.0f);
-			triangle.v2 = transformMatrix * glm::vec4(triangle.v2, 1.0f);
-			triangle.v3 = transformMatrix * glm::vec4(triangle.v3, 1.0f);
-
-			if (RayCastTriangle(rayOrigin, rayDirection, maxDistance, triangle, collisionPt, collisionNr))
-			{
-				collisionNr = transformMatrix * glm::vec4(triangle.normal, 0.0f);
-				return true;
-			}
+			collisionNr = transformMatrix * glm::vec4(triangle.normal, 0.0f);
+			return true;
 		}
 	}
 

@@ -6,7 +6,7 @@
 #include "PhysicsShapeAndCollision.h"
 #include "iPhysicsTransformable.h"
 #include "PhysicsProperties.h"
-
+#include "HierarchicalAABB.h"
 
 class PhysicsObject : public iPhysicsTransformable
 {
@@ -17,8 +17,8 @@ private:
 	Aabb aabb;
 	glm::mat4 cachedMatrix;
 
-	std::vector < std::vector < Triangle > > triangles;
-	std::vector < std::vector<Sphere*> > triangleSpheres;
+	std::vector <Triangle> triangles;
+	std::vector <Sphere*>  triangleSpheres;
 	std::vector <glm::vec3> collisionPoints;
 	std::vector <glm::vec3> collisionNormals;
 
@@ -33,8 +33,9 @@ public:
 	CollisionMode collisionMode = CollisionMode::SOLID;
 
 	PhysicsProperties properties;
+	
 
-	glm::vec3 position = glm::vec3(0.0f); 
+	glm::vec3 position = glm::vec3(0.0f);
 	//glm::vec3 oldPosition = glm::vec3(0.0f);
 
 	glm::vec3 velocity = glm::vec3(0.0f);
@@ -42,11 +43,12 @@ public:
 
 	iShape* physicsShape;
 	iShape* transformedPhysicsShape;
+	HierarchicalAABB* hierarchialAABB;
 	void* userData;
 
 	PhysicsObject();
 	~PhysicsObject();
-	
+
 	//void Initialize(Model* model,PhysicsShape shape, PhysicsMode mode = STATIC);
 	void Initialize(Model* model, PhysicsShape shape, PhysicsMode mode = STATIC,
 		CollisionMode collisionMode = SOLID, bool isCollisionInvoke = false);
@@ -66,14 +68,14 @@ public:
 	bool CheckCollision(PhysicsObject* other,
 		std::vector<glm::vec3>& collisionPoints,
 		std::vector<glm::vec3>& collisionNormals);
-	
-	const std::vector < std::vector < Triangle > >& GetTriangleList();
-	const std::vector < std::vector<Sphere*> >& GetSphereList();
+
+	const std::vector < Triangle >& GetTriangleList();
+	const std::vector < Sphere* >& GetSphereList();
 	const std::vector <glm::vec3>& GetCollisionPoints();
 	const std::vector <glm::vec3>& GetCollisionNormals();
 	void SetCollisionPoints(const std::vector <glm::vec3>& collisionPoints);
 	void SetCollisionNormals(const std::vector <glm::vec3>& collisionNormals);
-	
+
 	// Inherited via iPhysicsTransformable
 	glm::vec3 GetPosition() override;
 	glm::vec3 GetRotation() override;

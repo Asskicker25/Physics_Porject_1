@@ -35,12 +35,12 @@ void PhysicsObject::SetDrawOrientation(const glm::vec3& newOrientation)
 	model->transform.rotation = newOrientation;
 }
 
-const std::vector<std::vector<Triangle>>& PhysicsObject::GetTriangleList()
+const std::vector<Triangle>& PhysicsObject::GetTriangleList()
 {
 	return triangles;
 }
 
-const std::vector<std::vector<Sphere*>>& PhysicsObject::GetSphereList()
+const std::vector<Sphere*>& PhysicsObject::GetSphereList()
 {
 	return triangleSpheres;
 }
@@ -85,6 +85,7 @@ void PhysicsObject::Initialize(Model* model, PhysicsShape shape, PhysicsMode mod
 	this->isCollisionInvoke = isCollisionInvoke;
 
 	CalculatePhysicsShape();
+
 }
 
 void PhysicsObject::AssignCollisionCallback(const std::function<void(PhysicsObject*)>& collisionCallback)
@@ -106,7 +107,7 @@ Aabb PhysicsObject::CalculateModelAABB()
 {
 	if (model->meshes.empty())
 	{
-		return Aabb { glm::vec3(0.0f), glm::vec3(0.0f) };
+		return Aabb{ glm::vec3(0.0f), glm::vec3(0.0f) };
 	}
 
 	Aabb minMax;
@@ -127,7 +128,7 @@ Aabb PhysicsObject::CalculateModelAABB()
 		minMax.max.z = std::max(temp.max.z, minMax.max.z);
 	}
 
-	return Aabb{minMax.min, minMax.max };
+	return Aabb{ minMax.min, minMax.max };
 }
 
 Aabb PhysicsObject::GetModelAABB()
@@ -147,7 +148,7 @@ Aabb PhysicsObject::GetModelAABB()
 
 	localAABB.min = glm::min(minPoint, maxPoint);
 	localAABB.max = glm::max(minPoint, maxPoint);
-	
+
 	/*localAABB.min = minPoint;
 	localAABB.max = maxPoint;*/
 
@@ -159,7 +160,7 @@ Aabb PhysicsObject::GetModelAABB()
 void PhysicsObject::CalculatePhysicsShape()
 {
 	aabb = CalculateModelAABB();
-	
+
 
 	if (shape == SPHERE)
 	{
@@ -173,6 +174,7 @@ void PhysicsObject::CalculatePhysicsShape()
 	{
 		CalculateTriangleSpheres();
 		transformedPhysicsShape = new Triangle();
+		hierarchialAABB = new HierarchicalAABB(this);
 	}
 }
 
@@ -183,15 +185,15 @@ iShape* PhysicsObject::GetTransformedPhysicsShape()
 		Sphere* sphere = dynamic_cast<Sphere*>(physicsShape);
 
 		Sphere* temp = dynamic_cast<Sphere*> (transformedPhysicsShape);
-		temp->position = model->transform.GetTransformMatrix() * glm::vec4(sphere->position,1.0f);
+		temp->position = model->transform.GetTransformMatrix() * glm::vec4(sphere->position, 1.0f);
 
 		/*temp->radius = sphere->radius * glm::length(model->transform.scale);*/
 
-		temp->radius = sphere->radius * 
+		temp->radius = sphere->radius *
 			glm::max(
-			glm::max(model->transform.scale.x,model->transform.scale.y),
-			model->transform.scale.z);
-		
+				glm::max(model->transform.scale.x, model->transform.scale.y),
+				model->transform.scale.z);
+
 		return transformedPhysicsShape;
 	}
 	else if (shape == TRIANGLE)
@@ -203,26 +205,16 @@ iShape* PhysicsObject::GetTransformedPhysicsShape()
 
 void PhysicsObject::CalculateTriangleSpheres()
 {
-	for (std::vector<Sphere*>& sphereList : triangleSpheres)
+	for (Sphere* sphere : triangleSpheres)
 	{
-		for (Sphere* sphere : sphereList) 
-		{
-			delete sphere;  
-		}
-		sphereList.clear();
+		delete sphere;
 	}
 
-	triangles.clear();  
+	triangles.clear();
 	triangleSpheres.clear();
 
 	for (MeshAndMaterial* mesh : model->meshes)
 	{
-		std::vector<Triangle> meshTriangles;
-		std::vector<Sphere*> meshSphers;
-
-		meshTriangles.reserve(mesh->mesh->triangles.size()); 
-		meshSphers.reserve(mesh->mesh->triangles.size());
-
 		for (const Triangles& triangle : mesh->mesh->triangles)
 		{
 			Triangle temp;
@@ -236,56 +228,13 @@ void PhysicsObject::CalculateTriangleSpheres()
 			float radius = glm::max(glm::distance(sphereCenter, temp.v1),
 				glm::max(glm::distance(sphereCenter, temp.v2), glm::distance(sphereCenter, temp.v3)));
 
-			meshTriangles.push_back(std::move(temp));  
-			meshSphers.push_back(new Sphere (sphereCenter, radius));
+			triangles.push_back(std::move(temp));
+			triangleSpheres.push_back(new Sphere(sphereCenter, radius));
 		}
-
-		triangles.push_back(std::move(meshTriangles)); 
-		triangleSpheres.push_back(std::move(meshSphers));
 	}
 }
 
-
-//Aabb PhysicsObject::GetModelAABB()
-//{
-//
-//	glm::mat4 m = model->transform.GetTransformMatrix();
-//
-//	if (cachedMatrix == m)
-//	{
-//		return cachedAABB;
-//	}
-//
-//	cachedMatrix = m;
-//
-//	glm::vec3 t = model->transform.position;
-//
-//	Aabb b;
-//
-//	// For all three axes
-//	for (int i = 0; i < 3; i++) {
-//		// Start by adding in translation
-//		b.min[i] = b.max[i] = t[i];
-//		// Form extent by summing smaller and larger terms respectively
-//		for (int j = 0; j < 3; j++) {
-//			float e = m[i][j] * aabb.min[j];
-//			float f = m[i][j] * aabb.max[j];
-//			if (e < f) {
-//				b.min[i] += e;
-//				b.max[i] += f;
-//			}
-//			else {
-//				b.min[i] += f;
-//				b.max[i] += e;
-//			}
-//		}
-//	}
-//
-//	cachedAABB = b;
-//	return b;
-//}
-
-bool PhysicsObject::CheckCollision(PhysicsObject* other, 
+bool PhysicsObject::CheckCollision(PhysicsObject* other,
 	std::vector<glm::vec3>& collisionPoints,
 	std::vector<glm::vec3>& collisionNormals)
 {
@@ -314,7 +263,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 				other->GetTriangleList(), other->GetSphereList(),
 				collisionPoints, collisionNormals);
 		}
-	break;
+		break;
 #pragma endregion
 
 #pragma region AABBVs
@@ -338,7 +287,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 				other->GetTriangleList(), other->GetSphereList(),
 				collisionPoints, collisionNormals);
 		}
-	break;
+		break;
 #pragma endregion
 
 	}

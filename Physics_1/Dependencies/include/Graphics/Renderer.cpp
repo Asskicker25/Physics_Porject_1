@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "UnlitColorMaterial.h"
 
 
 void Renderer::Initialize()
@@ -206,5 +207,28 @@ const glm::vec3& Renderer::GetNormalsScale()
 void Renderer::SetNormalsLineScale(const glm::vec3& scale)
 {
 	this->normalsScale = scale;
+}
+
+void Renderer::DrawAABB(const modelAABB& aabb, glm::vec4 color)
+{
+	glm::vec3 targetExtents = 0.5f * (aabb.max - aabb.min);
+	glm::vec3 center = 0.5f * (aabb.max + aabb.min);
+
+	Model* cube = debugCubes->DrawDebugModel();
+	cube->SetRenderer(this);
+	cube->transform.SetPosition(center);
+	cube->transform.SetRotation(glm::vec3(0));
+	cube->transform.SetScale(targetExtents);
+	cube->DrawWireframe(color);
+}
+
+void Renderer::DrawCube(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale, const glm::vec4 color)
+{
+	Model* cube = debugCubes->DrawDebugModel();
+	cube->SetRenderer(this);
+	cube->transform.SetPosition(pos);
+	cube->transform.SetRotation(rot);
+	cube->transform.SetScale(scale);
+	cube->DrawWireframe(color);
 }
 

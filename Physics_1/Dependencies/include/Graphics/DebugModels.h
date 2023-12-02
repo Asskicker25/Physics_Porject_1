@@ -13,7 +13,6 @@ private:
 	std::vector<Model*> listOfModels;
 
 	Model* placeHolder;
-	Renderer* renderer;
 
 public:
 	DebugModels(const std::string& path);

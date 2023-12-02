@@ -3,7 +3,6 @@
 
 DebugModels::DebugModels(const std::string& path)
 {
-	this->renderer = renderer;
 	placeHolder = new Model(path,false);
 	placeHolder->isActive = false;
 

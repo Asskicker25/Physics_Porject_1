@@ -19,12 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\HierarchicalAABBNode.h" />
+    <ClInclude Include="src\HierarchicalAABB.h" />
     <ClInclude Include="src\PhysicsProperties.h" />
     <ClInclude Include="src\PhysicsEngine.h" />
     <ClInclude Include="src\PhysicsObject.h" />
     <ClInclude Include="src\PhysicsShapeAndCollision.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\HierarchicalAABBNode.cpp" />
+    <ClCompile Include="src\HierarchicalAABB.cpp" />
     <ClCompile Include="src\PhysicsProperties.cpp" />
     <ClCompile Include="src\PhysicsEngine.cpp" />
     <ClCompile Include="src\iPhysicsTransformable.h" />
