@@ -34,9 +34,14 @@ public:
 	Model* sphere;
 	Model* plane;
 	Model* hat;
+	Model* pumpkin;
+	Model* table;
+
 	PhysicsObject* spherePhy;
 	PhysicsObject* planePhy;
 	PhysicsObject* hatPhy;
+	PhysicsObject* pumpkinPhy;
+	PhysicsObject* tablePhy;
 
 	void SetUp() override;
 	void PreRender() override;

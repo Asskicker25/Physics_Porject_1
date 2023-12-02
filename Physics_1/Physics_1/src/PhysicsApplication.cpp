@@ -8,6 +8,7 @@ void PhysicsApplication::SetUp()
 	//physicsEngine.gravity.x = (-9.8f/2.0f);
 
 	physicsEngine.fixedStepTime = 0.01f;
+	renderer.wireframeMaterial->SetBaseColor(glm::vec4(0));
 
 	camera->cameraPos.z = 10;
 	camera->InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 300.0f, 60.0f);
@@ -47,6 +48,27 @@ void PhysicsApplication::SetUp()
 	hatPhy->Initialize(hat, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(hatPhy);
 	renderer.AddModel(hat, &defShader);
+
+
+	pumpkin = new Model("Assets/Models/Pumpkin.fbx");
+	pumpkin->transform.SetPosition(glm::vec3(-30, 0, 0));
+	pumpkin->transform.SetRotation(glm::vec3(-90, 0, 0));
+	pumpkin->transform.SetScale(glm::vec3(50));
+	pumpkin->isWireframe = true;
+	pumpkinPhy = new PhysicsObject();
+	pumpkinPhy->Initialize(pumpkin, MESH_OF_TRIANGLES, STATIC);
+	physicsEngine.AddPhysicsObject(pumpkinPhy);
+	renderer.AddModel(pumpkin, &defShader);
+
+	table = new Model("Assets/Models/Table.fbx");
+	table->transform.SetPosition(glm::vec3(60, 0, 0));
+	table->transform.SetRotation(glm::vec3(-90, 0, 0));
+	table->transform.SetScale(glm::vec3(50));
+	table->isWireframe = true;
+	tablePhy = new PhysicsObject();
+	tablePhy->Initialize(table, MESH_OF_TRIANGLES, STATIC);
+	physicsEngine.AddPhysicsObject(tablePhy);
+	renderer.AddModel(table, &defShader);
 }
 
 void PhysicsApplication::PreRender()
@@ -59,6 +81,8 @@ void PhysicsApplication::PostRender()
 	physicsEngine.Update(deltaTime);
 
 	DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
+	DrawAABBRecursive(pumpkinPhy->hierarchialAABB->rootNode);
+	DrawAABBRecursive(tablePhy->hierarchialAABB->rootNode);
 	//renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), abbColor);
 }
 
@@ -89,10 +113,15 @@ void PhysicsApplication::DrawAABBRecursive(HierarchicalAABBNode* node)
 {
 	if (node == nullptr) return;
 
-	if (node->nodeIndex == aabbDrawDepthIndex)
+	/*if (node->nodeIndex == aabbDrawDepthIndex)
 	{
 		renderer.DrawAABB(GetGraphicsAabb(node->aabb), aabbColor[2]);
 		return;
+	}*/
+
+	if (node->triangleIndices.size() != 0)
+	{
+		renderer.DrawAABB(GetGraphicsAabb(node->aabb), aabbColor[2]);
 	}
 
 	if (node->leftNode == nullptr) return;

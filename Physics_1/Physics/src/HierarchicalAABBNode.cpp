@@ -17,13 +17,19 @@ HierarchicalAABBNode::HierarchicalAABBNode(const Aabb& aabb,
 		}
 
 		SplitNode(triangles);
+		this->triangleIndices.clear();
 		return;
 	}
 
 	for (int i = 0; i < triangleIndices.size(); i++)
 	{
 		int triangleIndex = triangleIndices[i];
-		if (IsTriangleInsideAABB(triangles[triangleIndex], aabb))
+		/*if (IsTriangleInsideAABB(triangles[triangleIndex], aabb))
+		{
+			this->triangleIndices.push_back(triangleIndex);
+		}*/
+		glm::vec3 clpt;
+		if (CollisionAABBVsTriangle(aabb,triangles[triangleIndex], clpt))
 		{
 			this->triangleIndices.push_back(triangleIndex);
 		}
@@ -34,6 +40,7 @@ HierarchicalAABBNode::HierarchicalAABBNode(const Aabb& aabb,
 		if ((int)this->triangleIndices.size() > maxNumOfTriangles)
 		{
 			SplitNode(triangles);
+			this->triangleIndices.clear();
 		}
 	}
 
@@ -57,12 +64,22 @@ void HierarchicalAABBNode::SplitNode(const std::vector<Triangle>& triangleList)
 	Aabb rightAABB = aabb;
 	rightAABB.min[splitAxis] = splitPosition;
 
-	leftNode = new HierarchicalAABBNode(leftAABB, triangleList, triangleIndices, (nodeIndex + 1), this);
-	rightNode = new HierarchicalAABBNode(rightAABB, triangleList, triangleIndices, (nodeIndex + 1), this);
+	std::vector<int> leftTriangleIndices;
+	std::vector<int> rightTriangleIndices;
 
-	if (this->triangleIndices.size() > maxNumOfTriangles && nodeIndex < maxDepth)
+	for (int i : triangleIndices)
 	{
-		//triangleIndices.clear();
+		leftTriangleIndices.push_back(i);
+		rightTriangleIndices.push_back(i);
 	}
+
+
+	leftNode = new HierarchicalAABBNode(leftAABB, triangleList, leftTriangleIndices, (nodeIndex + 1), this);
+	rightNode = new HierarchicalAABBNode(rightAABB, triangleList, rightTriangleIndices, (nodeIndex + 1), this);
+
+	//if (this->triangleIndices.size() > maxNumOfTriangles && nodeIndex < maxDepth)
+	//{
+	//	//triangleIndices.clear();
+	//}
 
 }
