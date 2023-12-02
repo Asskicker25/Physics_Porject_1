@@ -27,6 +27,7 @@ private:
 public:
 
 	bool isCollisionInvoke = false;
+	bool useBvh = true;
 
 	PhysicsMode mode = PhysicsMode::STATIC;
 	PhysicsShape shape = PhysicsShape::SPHERE;
@@ -59,6 +60,7 @@ public:
 
 	Aabb CalculateModelAABB();
 	Aabb GetModelAABB();
+	Aabb GetAABB();
 
 	void CalculatePhysicsShape();
 	iShape* GetTransformedPhysicsShape();

@@ -28,6 +28,9 @@ private:
 
 	int aabbDrawDepthIndex = 0;
 
+	int numberOfSpheres = 20;
+
+	float xRange = 30;
 
 public:
 
@@ -36,12 +39,18 @@ public:
 	Model* hat;
 	Model* pumpkin;
 	Model* table;
+	Model* terrain;
+
 
 	PhysicsObject* spherePhy;
 	PhysicsObject* planePhy;
 	PhysicsObject* hatPhy;
 	PhysicsObject* pumpkinPhy;
 	PhysicsObject* tablePhy;
+	PhysicsObject* terrainPhy;
+
+	std::vector<PhysicsObject*> listOfPhyObjects;
+
 
 	void SetUp() override;
 	void PreRender() override;

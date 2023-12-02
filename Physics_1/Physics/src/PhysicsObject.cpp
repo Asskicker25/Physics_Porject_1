@@ -157,6 +157,11 @@ Aabb PhysicsObject::GetModelAABB()
 	return localAABB;
 }
 
+Aabb PhysicsObject::GetAABB()
+{
+	return aabb;
+}
+
 void PhysicsObject::CalculatePhysicsShape()
 {
 	aabb = CalculateModelAABB();
@@ -258,6 +263,15 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 		case CAPSULE:
 			break;
 		case MESH_OF_TRIANGLES:
+			if(other->useBvh)
+			{
+				return CollisionSphereVsMeshOfTriangles(GetModelAABB(),
+					dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
+						other->hierarchialAABB->rootNode, other->model->transform.GetTransformMatrix(),
+						other->GetTriangleList(), collisionPoints, collisionNormals
+						);
+			}
+
 			return CollisionSphereVsMeshOfTriangles(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
 				other->model->transform.GetTransformMatrix(),
 				other->GetTriangleList(), other->GetSphereList(),
@@ -282,10 +296,59 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 		case CAPSULE:
 			break;
 		case MESH_OF_TRIANGLES:
+			if (other->useBvh)
+			{
+				return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
+					other->hierarchialAABB->rootNode, other->model->transform.GetTransformMatrix(),
+					other->GetTriangleList(), collisionPoints, collisionNormals);
+			}
 			return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
 				other->model->transform.GetTransformMatrix(),
 				other->GetTriangleList(), other->GetSphereList(),
 				collisionPoints, collisionNormals);
+		}
+		break;
+#pragma endregion
+
+#pragma region MESH_OF_TRIANGLES
+	case MESH_OF_TRIANGLES:
+		switch (other->shape)
+		{
+		case AABB:
+			if (other->useBvh)
+			{
+				return CollisionAABBVsMeshOfTriangles(other->GetModelAABB(),
+					hierarchialAABB->rootNode, model->transform.GetTransformMatrix(),
+					GetTriangleList(), collisionPoints, collisionNormals);
+			}
+			return CollisionAABBVsMeshOfTriangles(other->GetModelAABB(),
+				model->transform.GetTransformMatrix(),
+				GetTriangleList(), GetSphereList(),
+				collisionPoints, collisionNormals);
+
+		case SPHERE:
+			if (other->useBvh)
+			{
+				return CollisionSphereVsMeshOfTriangles(other->GetModelAABB(),
+					dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()),
+					hierarchialAABB->rootNode, model->transform.GetTransformMatrix(),
+					GetTriangleList(), collisionPoints, collisionNormals
+				);
+			}
+
+			return CollisionSphereVsMeshOfTriangles(dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()),
+				model->transform.GetTransformMatrix(),
+				GetTriangleList(), GetSphereList(),
+				collisionPoints, collisionNormals);
+		case TRIANGLE:
+			break;
+		case PLANE:
+			break;
+		case CAPSULE:
+			break;
+		case MESH_OF_TRIANGLES:
+			break;
+			
 		}
 		break;
 #pragma endregion

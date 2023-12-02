@@ -13,20 +13,14 @@ void HierarchicalAABB::Construct()
 	for (int i = 0; i < phyObj->GetTriangleList().size(); i++)
 	{
 		Triangle triangle = phyObj->GetTriangleList()[i];
-		if (i == 0)
-		{
-			Debugger::Print("OG : ", triangle.v1);
-		}
+		
 		triangle.v1 = transformedMatrix * glm::vec4(triangle.v1, 1.0f);
 		triangle.v2 = transformedMatrix * glm::vec4(triangle.v2, 1.0f);
 		triangle.v3 = transformedMatrix * glm::vec4(triangle.v3, 1.0f) ;
-		if (i == 0)
-		{
-			Debugger::Print("NEW : ", triangle.v1);
-		}
 
 		transformedTriangles.push_back(triangle);
 	}
 
-	rootNode = new HierarchicalAABBNode(phyObj->GetModelAABB(), transformedTriangles, {}, 0, nullptr);
+	rootNode = new HierarchicalAABBNode(phyObj->GetAABB(), phyObj->GetTriangleList(), {}, 0, nullptr,
+		phyObj->GetModel());
 }

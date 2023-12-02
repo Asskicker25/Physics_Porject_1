@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include <Graphics/Model.h>
 #include "PhysicsShapeAndCollision.h"
 
 class HierarchicalAABBNode
@@ -7,11 +9,12 @@ class HierarchicalAABBNode
 private:
 	int maxNumOfTriangles = 3;
 	int maxDepth = 10;
+	Model* model;
+	Aabb aabb;
 
 public:
 	int nodeIndex = 0;
 
-	Aabb aabb;
 
 	HierarchicalAABBNode* parentNode = nullptr;
 	HierarchicalAABBNode* leftNode;
@@ -19,10 +22,11 @@ public:
 	std::vector<int> triangleIndices;
 
 	HierarchicalAABBNode(const Aabb& aabb, const std::vector<Triangle>& triangles,
-		std::vector<int> triangleIndices, int nodeIndex, HierarchicalAABBNode* parentNode);
+		std::vector<int> triangleIndices, int nodeIndex, HierarchicalAABBNode* parentNode, Model* model);
 	~HierarchicalAABBNode(); 
 
 	void SplitNode(const std::vector<Triangle>& triangleList);
+	Aabb GetModelAABB();
 
 };
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <glm/glm.hpp>
 #include <Graphics/Renderer.h>
 
@@ -659,19 +660,17 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 
 	delete sphereTriangle;
 
-
 	if (collisionPoints.size() > 0)
 		return true;
-	//std::cout << "Size : " << collisionPoints.size()<<std::endl;
 
 	return false;
 }
 
-static bool CollisionSphereVsMeshOfTriangles(const Aabb& sphereAabb, Sphere* sphere, HierarchicalAABBNode* rootNode,
-	const glm::mat4 transformMatrix)
-{
-}
-	
+extern  void CollisionAABBvsHAABB(const Aabb& sphereAabb, HierarchicalAABBNode* rootNode, std::set<int>& triangleIndices);
+extern  bool CollisionSphereVsMeshOfTriangles(const Aabb& sphereAabb, Sphere* sphere, HierarchicalAABBNode* rootNode,
+	const glm::mat4 transformMatrix, const std::vector <Triangle>& triangles,
+	std::vector<glm::vec3>& collisionPoints,
+	std::vector<glm::vec3>& collisionNormals);
 
 static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	const glm::mat4& transformMatrix,
@@ -732,6 +731,12 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 
 	return false;
 }
+
+extern bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb, HierarchicalAABBNode* rootNode,
+	const glm::mat4 transformMatrix, const std::vector <Triangle>& triangles,
+	std::vector<glm::vec3>& collisionPoints,
+	std::vector<glm::vec3>& collisionNormals);
+
 
 static bool RayCastAABB(const glm::vec3& rayOrigin, glm::vec3& rayDir,
 	const Aabb& aabb, float rayDistance, glm::vec3& collisionPt, glm::vec3& collisionNormal)

@@ -33,6 +33,7 @@
     <ClCompile Include="src\PhysicsEngine.cpp" />
     <ClCompile Include="src\iPhysicsTransformable.h" />
     <ClCompile Include="src\PhysicsObject.cpp" />
+    <ClCompile Include="src\PhysicsShapeAndCollision.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -22,15 +22,32 @@ void PhysicsApplication::SetUp()
 	lightManager.AddLight(dirLight);
 
 	sphere = new Model("Assets/Models/DefaultSphere.fbx");
-	sphere->transform.SetPosition(glm::vec3(3.0, 0, 0));
+	sphere->transform.SetPosition(glm::vec3(3.0, 10, 0));
 	sphere->transform.SetScale(glm::vec3(1));
 	spherePhy = new PhysicsObject();
-	spherePhy->Initialize(sphere, SPHERE, DYNAMIC);
+	spherePhy->Initialize(sphere, MESH_OF_TRIANGLES, DYNAMIC);
 	physicsEngine.AddPhysicsObject(spherePhy);
 	renderer.AddModel(sphere, &defShader);
 
+	for (int i = 0; i < numberOfSpheres; i++)
+	{
+		float xValue = GetRandomFloatNumber(-xRange, xRange);
+		float zValue = GetRandomFloatNumber(-xRange, xRange);
 
-	plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
+		Model* newModel = new Model();
+		newModel->CopyFromModel(*sphere);
+		newModel->transform.position.x = xValue;
+		newModel->transform.position.z = zValue;
+		renderer.AddModel(newModel, &defShader);
+
+		PhysicsObject* newPhyObj = new PhysicsObject();
+		newPhyObj->Initialize(newModel, MESH_OF_TRIANGLES, DYNAMIC);
+		physicsEngine.AddPhysicsObject(newPhyObj);
+		
+	}
+
+	
+	/*plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane->transform.SetPosition(glm::vec3(0, -5, 0));
 	plane->transform.SetRotation(glm::vec3(-90, 0, 0));
 	plane->isWireframe = true;
@@ -68,7 +85,20 @@ void PhysicsApplication::SetUp()
 	tablePhy = new PhysicsObject();
 	tablePhy->Initialize(table, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(tablePhy);
-	renderer.AddModel(table, &defShader);
+	renderer.AddModel(table, &defShader);*/
+	
+
+	terrain = new Model("Assets/Models/Terrain.ply");
+	terrain->transform.SetPosition(glm::vec3(0, -40, 0));
+	terrain->transform.SetRotation(glm::vec3(0, 0, 0));
+	renderer.AddModel(terrain, &defShader);
+
+	terrainPhy = new PhysicsObject();
+	terrainPhy->Initialize(terrain, AABB, STATIC);
+	physicsEngine.AddPhysicsObject(terrainPhy);
+	listOfPhyObjects.push_back(terrainPhy);
+
+
 }
 
 void PhysicsApplication::PreRender()
@@ -80,9 +110,13 @@ void PhysicsApplication::PostRender()
 {
 	physicsEngine.Update(deltaTime);
 
-	DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
-	DrawAABBRecursive(pumpkinPhy->hierarchialAABB->rootNode);
-	DrawAABBRecursive(tablePhy->hierarchialAABB->rootNode);
+	//DrawAABBRecursive(terrainPhy->hierarchialAABB->rootNode);
+
+
+	//DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
+	//DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
+	//DrawAABBRecursive(pumpkinPhy->hierarchialAABB->rootNode);
+	//DrawAABBRecursive(tablePhy->hierarchialAABB->rootNode);
 	//renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), abbColor);
 }
 
@@ -102,6 +136,33 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 		{
 			aabbDrawDepthIndex++;
 		}
+		else if (key == GLFW_KEY_UP)
+		{
+			hat->transform.position.x += 5;
+			hat->transform.SetRotation(glm::vec3(
+				hat->transform.rotation.x + 30, hat->transform.rotation.y, hat->transform.rotation.z));
+			hat->transform.scale.x += 5;
+			hat->transform.scale.y += 5;
+			hat->transform.scale.z += 5;
+
+		}
+		else if (key == GLFW_KEY_DOWN)
+		{
+			hat->transform.position.x -= 5;
+			hat->transform.SetRotation(glm::vec3(
+				hat->transform.rotation.x - 30, hat->transform.rotation.y, hat->transform.rotation.z));
+			hat->transform.scale.x -= 5;
+			hat->transform.scale.y -= 5;
+			hat->transform.scale.z -= 5;
+
+		}
+		else if (key == GLFW_KEY_SPACE)
+		{
+			for (PhysicsObject* phyObj : listOfPhyObjects)
+			{
+				phyObj->useBvh = !phyObj->useBvh;
+			}
+		}
 	}
 }
 
@@ -115,13 +176,13 @@ void PhysicsApplication::DrawAABBRecursive(HierarchicalAABBNode* node)
 
 	/*if (node->nodeIndex == aabbDrawDepthIndex)
 	{
-		renderer.DrawAABB(GetGraphicsAabb(node->aabb), aabbColor[2]);
+		renderer.DrawAABB(GetGraphicsAabb(node->GetModelAABB()), aabbColor[2]);
 		return;
 	}*/
 
 	if (node->triangleIndices.size() != 0)
 	{
-		renderer.DrawAABB(GetGraphicsAabb(node->aabb), aabbColor[2]);
+		renderer.DrawAABB(GetGraphicsAabb(node->GetModelAABB()), aabbColor[2]);
 	}
 
 	if (node->leftNode == nullptr) return;
