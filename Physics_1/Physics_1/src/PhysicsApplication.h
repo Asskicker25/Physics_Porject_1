@@ -28,7 +28,7 @@ private:
 
 	int aabbDrawDepthIndex = 0;
 
-	int numberOfSpheres = 20;
+	int numberOfSpheres = 0;
 
 	float xRange = 30;
 
@@ -40,6 +40,7 @@ public:
 	Model* pumpkin;
 	Model* table;
 	Model* terrain;
+	Model* test;
 
 
 	PhysicsObject* spherePhy;
@@ -48,6 +49,7 @@ public:
 	PhysicsObject* pumpkinPhy;
 	PhysicsObject* tablePhy;
 	PhysicsObject* terrainPhy;
+	PhysicsObject* testphy;
 
 	std::vector<PhysicsObject*> listOfPhyObjects;
 

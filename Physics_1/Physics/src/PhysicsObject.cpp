@@ -347,6 +347,9 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 		case CAPSULE:
 			break;
 		case MESH_OF_TRIANGLES:
+			return CollisionMeshVsMesh(hierarchialAABB->rootNode, other->hierarchialAABB->rootNode,
+				model->transform.GetTransformMatrix(), other->model->transform.GetTransformMatrix(),
+				GetTriangleList(), other->GetTriangleList(), collisionPoints, collisionNormals);
 			break;
 			
 		}

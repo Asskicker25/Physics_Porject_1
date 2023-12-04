@@ -25,7 +25,7 @@ void PhysicsApplication::SetUp()
 	sphere->transform.SetPosition(glm::vec3(3.0, 10, 0));
 	sphere->transform.SetScale(glm::vec3(1));
 	spherePhy = new PhysicsObject();
-	spherePhy->Initialize(sphere, MESH_OF_TRIANGLES, DYNAMIC);
+	spherePhy->Initialize(sphere, AABB, DYNAMIC);
 	physicsEngine.AddPhysicsObject(spherePhy);
 	renderer.AddModel(sphere, &defShader);
 
@@ -46,15 +46,25 @@ void PhysicsApplication::SetUp()
 		
 	}
 
-	
-	/*plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
+	plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane->transform.SetPosition(glm::vec3(0, -5, 0));
-	plane->transform.SetRotation(glm::vec3(-90, 0, 0));
+	plane->transform.SetRotation(glm::vec3(-40, 0, 40));
 	plane->isWireframe = true;
 	planePhy = new PhysicsObject();
 	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(planePhy);
 	renderer.AddModel(plane, &defShader);
+
+	test = new Model("Assets/Models/TeaTable.obj");
+	test->transform.SetPosition(glm::vec3(0, 0, 0));
+	test->transform.SetRotation(glm::vec3(-45, 0, 0));
+	test->isWireframe = true;
+	testphy = new PhysicsObject();
+	testphy->Initialize(test, MESH_OF_TRIANGLES, STATIC);
+	physicsEngine.AddPhysicsObject(testphy);
+	renderer.AddModel(test, &defShader);
+
+	/*
 
 	hat = new Model("Assets/Models/Hat.fbx");
 	hat->transform.SetPosition(glm::vec3(0, 0, 0));
@@ -88,15 +98,15 @@ void PhysicsApplication::SetUp()
 	renderer.AddModel(table, &defShader);*/
 	
 
-	terrain = new Model("Assets/Models/Terrain.ply");
+	/*terrain = new Model("Assets/Models/Terrain.ply");
 	terrain->transform.SetPosition(glm::vec3(0, -40, 0));
 	terrain->transform.SetRotation(glm::vec3(0, 0, 0));
 	renderer.AddModel(terrain, &defShader);
 
 	terrainPhy = new PhysicsObject();
-	terrainPhy->Initialize(terrain, AABB, STATIC);
+	terrainPhy->Initialize(terrain, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(terrainPhy);
-	listOfPhyObjects.push_back(terrainPhy);
+	listOfPhyObjects.push_back(terrainPhy);*/
 
 
 }
@@ -110,13 +120,17 @@ void PhysicsApplication::PostRender()
 {
 	physicsEngine.Update(deltaTime);
 
+	renderer.DrawAABB(GetGraphicsAabb(testphy->GetModelAABB()), aabbColor[2]);
+	renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), aabbColor[2]);
+
 	//DrawAABBRecursive(terrainPhy->hierarchialAABB->rootNode);
+	//DrawAABBRecursive(testphy->hierarchialAABB->rootNode);
 
 
-	//DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
-	//DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
-	//DrawAABBRecursive(pumpkinPhy->hierarchialAABB->rootNode);
-	//DrawAABBRecursive(tablePhy->hierarchialAABB->rootNode);
+	/*DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
+	DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
+	DrawAABBRecursive(pumpkinPhy->hierarchialAABB->rootNode);
+	DrawAABBRecursive(tablePhy->hierarchialAABB->rootNode);*/
 	//renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), abbColor);
 }
 
@@ -138,22 +152,22 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 		}
 		else if (key == GLFW_KEY_UP)
 		{
-			hat->transform.position.x += 5;
-			hat->transform.SetRotation(glm::vec3(
-				hat->transform.rotation.x + 30, hat->transform.rotation.y, hat->transform.rotation.z));
-			hat->transform.scale.x += 5;
-			hat->transform.scale.y += 5;
-			hat->transform.scale.z += 5;
+			test->transform.position.x += 5;
+			test->transform.SetRotation(glm::vec3(
+				test->transform.rotation.x + 30, test->transform.rotation.y, test->transform.rotation.z));
+			test->transform.scale.x += 5;
+			test->transform.scale.y += 5;
+			test->transform.scale.z += 5;
 
 		}
 		else if (key == GLFW_KEY_DOWN)
 		{
-			hat->transform.position.x -= 5;
-			hat->transform.SetRotation(glm::vec3(
-				hat->transform.rotation.x - 30, hat->transform.rotation.y, hat->transform.rotation.z));
-			hat->transform.scale.x -= 5;
-			hat->transform.scale.y -= 5;
-			hat->transform.scale.z -= 5;
+			test->transform.position.x -= 5;
+			test->transform.SetRotation(glm::vec3(
+				test->transform.rotation.x - 30, test->transform.rotation.y, test->transform.rotation.z));
+			test->transform.scale.x -= 5;
+			test->transform.scale.y -= 5;
+			test->transform.scale.z -= 5;
 
 		}
 		else if (key == GLFW_KEY_SPACE)
@@ -174,16 +188,16 @@ void PhysicsApplication::DrawAABBRecursive(HierarchicalAABBNode* node)
 {
 	if (node == nullptr) return;
 
-	/*if (node->nodeIndex == aabbDrawDepthIndex)
+	if (node->nodeIndex == aabbDrawDepthIndex)
 	{
 		renderer.DrawAABB(GetGraphicsAabb(node->GetModelAABB()), aabbColor[2]);
 		return;
-	}*/
+	}
 
-	if (node->triangleIndices.size() != 0)
+	/*if (node->triangleIndices.size() != 0)
 	{
 		renderer.DrawAABB(GetGraphicsAabb(node->GetModelAABB()), aabbColor[2]);
-	}
+	}*/
 
 	if (node->leftNode == nullptr) return;
 

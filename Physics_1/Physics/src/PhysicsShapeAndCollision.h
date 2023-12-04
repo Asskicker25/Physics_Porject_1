@@ -556,6 +556,165 @@ static bool CollisionAABBVsTriangle(const Aabb& aabb, const Triangle& triangle, 
 	return true;
 }
 
+static bool PointInsideTriangle(const glm::vec3& point, const Triangle& triangle, glm::vec3& collisionPt) 
+{
+	glm::vec3 edge1 = triangle.v2 - triangle.v1;
+	glm::vec3 edge2 = triangle.v3 - triangle.v1;
+	glm::vec3 normal = glm::cross(edge1, edge2);
+
+	// Barycentric coordinates to check if the point is inside the triangle
+	float dot00 = glm::dot(edge1, edge1);
+	float dot01 = glm::dot(edge1, edge2);
+	float dot11 = glm::dot(edge2, edge2);
+	float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+
+	glm::vec3 d = point - triangle.v1;
+
+	float u = (dot11 * glm::dot(d, edge1) - dot01 * glm::dot(d, edge2)) * invDenom;
+	float v = (dot00 * glm::dot(d, edge2) - dot01 * glm::dot(d, edge1)) * invDenom;
+
+	if (u >= 0.0f && v >= 0.0f && u + v <= 1.0f) {
+		collisionPt = u * triangle.v1 + v * triangle.v2 + (1.0f - u - v) * triangle.v3;
+		return true;
+	}
+
+	return false;
+}
+
+static bool LineSegmentIntersect(const glm::vec3& p1, const glm::vec3& q1, const glm::vec3& p2, const glm::vec3& q2, glm::vec3& collisionPoint) {
+	auto orientation = [](const glm::vec3& p, const glm::vec3& q, const glm::vec3& r) {
+		float val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+		if (val == 0.0f) return 0; // Collinear
+		return (val > 0) ? 1 : 2; // Clockwise or counterclockwise
+		};
+
+	auto onSegment = [](const glm::vec3& p, const glm::vec3& q, const glm::vec3& r) {
+		return (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
+			q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y));
+		};
+
+	int o1 = orientation(p1, q1, p2);
+	int o2 = orientation(p1, q1, q2);
+	int o3 = orientation(p2, q2, p1);
+	int o4 = orientation(p2, q2, q1);
+
+	// General case
+	if (o1 != o2 && o3 != o4) {
+		// Calculate the intersection point
+		float t = ((p1.x - q1.x) * (p2.y - p1.y) + (p1.y - q1.y) * (p1.x - p2.x)) /
+			((p1.x - q1.x) * (p2.y - q2.y) + (p1.y - q1.y) * (p2.x - q2.x));
+
+		collisionPoint.x = p1.x + t * (q1.x - p1.x);
+		collisionPoint.y = p1.y + t * (q1.y - p1.y);
+		collisionPoint.z = p1.z + t * (q1.z - p1.z);
+
+		return true;
+	}
+
+	// Special Cases
+
+	// p1, q1 and p2 are collinear and p2 lies on segment p1q1
+	if (o1 == 0 && onSegment(p1, p2, q1)) {
+		collisionPoint = p2;
+		return true;
+	}
+
+	// p1, q1 and q2 are collinear and q2 lies on segment p1q1
+	if (o2 == 0 && onSegment(p1, q2, q1)) {
+		collisionPoint = q2;
+		return true;
+	}
+
+	// p2, q2 and p1 are collinear and p1 lies on segment p2q2
+	if (o3 == 0 && onSegment(p2, p1, q2)) {
+		collisionPoint = p1;
+		return true;
+	}
+
+	// p2, q2 and q1 are collinear and q1 lies on segment p2q2
+	if (o4 == 0 && onSegment(p2, q1, q2)) {
+		collisionPoint = q1;
+		return true;
+	}
+
+	return false; // Doesn't fall in any of the above cases
+}
+
+// Function to check if two triangles intersect by checking edge-segment intersection
+static bool CollisionTriangleVsTriangle(const Triangle& triangle1, const Triangle& triangle2,
+	glm::vec3& collisionPoint)
+{
+	glm::vec3 collPt;
+	glm::vec3 sumCollPt = glm::vec3(0);
+	int count = 0;
+
+
+	if (PointInsideTriangle(triangle1.v1, triangle2, collPt))
+	{
+		sumCollPt += collPt;
+		count++;
+	}
+
+	if (PointInsideTriangle(triangle1.v2, triangle2, collPt))
+	{
+		sumCollPt += collPt;
+		count++;
+	}
+
+	if (PointInsideTriangle(triangle1.v3, triangle2, collPt))
+	{
+		sumCollPt += collPt;
+		count++;
+	}
+
+	if (count != 0)
+	{
+		collisionPoint.x = sumCollPt.x / count;
+		collisionPoint.y = sumCollPt.y / count;
+		collisionPoint.z = sumCollPt.z / count;
+		return true;
+	}
+
+	if (PointInsideTriangle(triangle2.v1, triangle1, collPt))
+	{
+		sumCollPt += collPt;
+		count++;
+	}
+
+	if (PointInsideTriangle(triangle2.v2, triangle1, collPt))
+	{
+		sumCollPt += collPt;
+		count++;
+	}
+
+	if (PointInsideTriangle(triangle2.v3, triangle1, collPt))
+	{
+		sumCollPt += collPt;
+		count++;
+	}
+
+	if (count != 0)
+	{
+		collisionPoint.x = sumCollPt.x / count;
+		collisionPoint.y = sumCollPt.y / count;
+		collisionPoint.z = sumCollPt.z / count;
+		return true;
+	}
+	
+
+	// Check for edge-segment intersection
+	if (LineSegmentIntersect(triangle1.v1, triangle1.v2, triangle2.v1, triangle2.v2, collisionPoint) ||
+		LineSegmentIntersect(triangle1.v1, triangle1.v2, triangle2.v2, triangle2.v3, collisionPoint) ||
+		// Add more segments as needed
+		// ...
+		LineSegmentIntersect(triangle1.v3, triangle1.v1, triangle2.v1, triangle2.v2, collisionPoint) ||
+		LineSegmentIntersect(triangle1.v3, triangle1.v1, triangle2.v2, triangle2.v3, collisionPoint)) {
+		return true;
+	}
+
+	return false;
+}
+
 //static bool CollisionAABBVsTriangle(const Aabb& aabb,const Triangle& t, glm::vec3& collisionPoint)
 //{
 //	//Debugger::Print("AABB VS PLANE");
@@ -734,6 +893,12 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 
 extern bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb, HierarchicalAABBNode* rootNode,
 	const glm::mat4 transformMatrix, const std::vector <Triangle>& triangles,
+	std::vector<glm::vec3>& collisionPoints,
+	std::vector<glm::vec3>& collisionNormals);
+
+extern bool CollisionMeshVsMesh(HierarchicalAABBNode* mesh1, HierarchicalAABBNode* mesh2,
+	const glm::mat4 transformMatrix1, const glm::mat4 transformMatrix2,
+	const std::vector <Triangle>& triangles1, const std::vector <Triangle>& triangles2,
 	std::vector<glm::vec3>& collisionPoints,
 	std::vector<glm::vec3>& collisionNormals);
 
