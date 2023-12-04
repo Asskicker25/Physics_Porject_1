@@ -675,6 +675,8 @@ static bool CollisionTriangleVsTriangle(const Triangle& triangle1, const Triangl
 		return true;
 	}
 
+	sumCollPt = glm::vec3(0);
+
 	if (PointInsideTriangle(triangle2.v1, triangle1, collPt))
 	{
 		sumCollPt += collPt;

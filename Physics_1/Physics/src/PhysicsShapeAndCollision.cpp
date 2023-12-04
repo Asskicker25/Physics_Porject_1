@@ -165,6 +165,8 @@ bool CollisionMeshVsMesh(HierarchicalAABBNode* mesh1, HierarchicalAABBNode* mesh
 		}
 	}
 
+	if (collisionPoints.empty()) return false;
+
 	std::cout << "Size 1 : " << triangleIndices1.size() << std::endl;
 	std::cout << "Size 2 : " << triangleIndices2.size() << std::endl;
 	std::cout << "Collision Pt  : " << collisionPoints.size() << std::endl;

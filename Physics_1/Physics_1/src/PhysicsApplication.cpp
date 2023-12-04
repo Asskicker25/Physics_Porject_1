@@ -24,13 +24,15 @@ void PhysicsApplication::SetUp()
 	lightManager.AddLight(dirLight);
 
 	sphere = new Model("Assets/Models/DefaultSphere.fbx");
-	sphere->transform.SetPosition(glm::vec3(3.0, 30, 0));
+	sphere->transform.SetPosition(glm::vec3(3.0, 10, 0));
 	sphere->transform.SetScale(glm::vec3(1));
 	spherePhy = new PhysicsObject();
 	spherePhy->maxDepth = 10;
-	spherePhy->Initialize(sphere, SPHERE, DYNAMIC);
+	spherePhy->Initialize(sphere, MESH_OF_TRIANGLES, DYNAMIC);
 	physicsEngine.AddPhysicsObject(spherePhy);
 	renderer.AddModel(sphere, &defShader);
+	listOfPhyObjects.push_back(spherePhy);
+
 	
 	/*Model* sphere2 = new Model();
 	sphere2->CopyFromModel(*sphere);
@@ -58,17 +60,18 @@ void PhysicsApplication::SetUp()
 	//	
 	//}
 
-	//plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
-	//plane->transform.SetPosition(glm::vec3(0, -5, 0));
-	//plane->transform.SetRotation(glm::vec3(-90, 0, 0));
-	//plane->isWireframe = true;
-	//planePhy = new PhysicsObject();
-	//planePhy->maxDepth = 10;
-	//planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
-	//physicsEngine.AddPhysicsObject(planePhy);
-	//renderer.AddModel(plane, &defShader);
+	/*plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
+	plane->transform.SetPosition(glm::vec3(0, -5, 0));
+	plane->transform.SetRotation(glm::vec3(-90, 0, 0));
+	plane->isWireframe = true;
+	planePhy = new PhysicsObject();
+	planePhy->maxDepth = 10;
+	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
+	physicsEngine.AddPhysicsObject(planePhy);
+	renderer.AddModel(plane, &defShader);
+	listOfPhyObjects.push_back(planePhy);*/
 
-	hogwarts = new Model("Assets/Models/Hogwarts_3ds_export (rotated and re-normalized).ply");
+	/*hogwarts = new Model("Assets/Models/Hogwarts_3ds_export (rotated and re-normalized).ply");
 	hogwarts->transform.SetPosition(glm::vec3(0, -5, 0));
 	hogwarts->transform.SetRotation(glm::vec3(0, 0, 0));
 	hogwarts->transform.SetScale(glm::vec3(0.001f, 0.001f, 0.001f));
@@ -76,7 +79,7 @@ void PhysicsApplication::SetUp()
 	hogwartsPhy = new PhysicsObject();
 	hogwartsPhy->Initialize(hogwarts, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(hogwartsPhy);
-	renderer.AddModel(hogwarts, &defShader);
+	renderer.AddModel(hogwarts, &defShader);*/
 
 	renderer.selectedModel = plane2;
 
@@ -115,7 +118,7 @@ void PhysicsApplication::SetUp()
 	renderer.AddModel(table, &defShader);*/
 	
 
-	/*terrain = new Model("Assets/Models/Terrain.ply");
+	terrain = new Model("Assets/Models/Terrain.ply");
 	terrain->transform.SetPosition(glm::vec3(0, -40, 0));
 	terrain->transform.SetRotation(glm::vec3(0, 0, 0));
 	renderer.AddModel(terrain, &defShader);
@@ -123,7 +126,7 @@ void PhysicsApplication::SetUp()
 	terrainPhy = new PhysicsObject();
 	terrainPhy->Initialize(terrain, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(terrainPhy);
-	listOfPhyObjects.push_back(terrainPhy);*/
+	listOfPhyObjects.push_back(terrainPhy);
 
 
 }
