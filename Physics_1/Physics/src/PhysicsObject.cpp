@@ -142,19 +142,32 @@ Aabb PhysicsObject::GetModelAABB()
 
 	cachedMatrix = transformMatrix;
 
-	Aabb localAABB;
-	glm::vec3 minPoint = glm::vec3(transformMatrix * glm::vec4(aabb.min, 1.0f));
-	glm::vec3 maxPoint = glm::vec3(transformMatrix * glm::vec4(aabb.max, 1.0f));
+	glm::vec3 originalMinV = aabb.min;
+	glm::vec3 originalMaxV = aabb.max;
 
-	localAABB.min = glm::min(minPoint, maxPoint);
-	localAABB.max = glm::max(minPoint, maxPoint);
+	glm::vec4 vertices[8];
+	vertices[0] = transformMatrix * glm::vec4(originalMinV.x, originalMinV.y, originalMinV.z, 1.0f);
+	vertices[1] = transformMatrix * glm::vec4(originalMinV.x, originalMinV.y, originalMaxV.z, 1.0f);
+	vertices[2] = transformMatrix * glm::vec4(originalMinV.x, originalMaxV.y, originalMinV.z, 1.0f);
+	vertices[3] = transformMatrix * glm::vec4(originalMinV.x, originalMaxV.y, originalMaxV.z, 1.0f);
+	vertices[4] = transformMatrix * glm::vec4(originalMaxV.x, originalMinV.y, originalMinV.z, 1.0f);
+	vertices[5] = transformMatrix * glm::vec4(originalMaxV.x, originalMinV.y, originalMaxV.z, 1.0f);
+	vertices[6] = transformMatrix * glm::vec4(originalMaxV.x, originalMaxV.y, originalMinV.z, 1.0f);
+	vertices[7] = transformMatrix * glm::vec4(originalMaxV.x, originalMaxV.y, originalMaxV.z, 1.0f);
 
-	/*localAABB.min = minPoint;
-	localAABB.max = maxPoint;*/
+	glm::vec3 transformedMinV = glm::vec3(vertices[0]);
+	glm::vec3 transformedMaxV = glm::vec3(vertices[0]);
 
-	cachedAABB = localAABB;
+	for (int i = 1; i < 8; ++i) {
+		transformedMinV = glm::min(transformedMinV, glm::vec3(vertices[i]));
+		transformedMaxV = glm::max(transformedMaxV, glm::vec3(vertices[i]));
+	}
 
-	return localAABB;
+	Aabb localAabb(transformedMinV, transformedMaxV);
+
+	cachedAABB = localAabb;
+
+	return localAabb;
 }
 
 Aabb PhysicsObject::GetAABB()

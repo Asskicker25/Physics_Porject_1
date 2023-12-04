@@ -6,6 +6,8 @@ void PhysicsApplication::SetUp()
 
 	//physicsEngine.gravity.y = (-9.8f / 1.0f);
 	//physicsEngine.gravity.x = (-9.8f/2.0f);
+	renderer.showNormals = true;
+	renderer.SetNormalsLineScale(glm::vec3(0.01, 3.0, 0.01));
 
 	physicsEngine.fixedStepTime = 0.01f;
 	renderer.wireframeMaterial->SetBaseColor(glm::vec4(0));
@@ -25,44 +27,49 @@ void PhysicsApplication::SetUp()
 	sphere->transform.SetPosition(glm::vec3(3.0, 10, 0));
 	sphere->transform.SetScale(glm::vec3(1));
 	spherePhy = new PhysicsObject();
-	spherePhy->Initialize(sphere, AABB, DYNAMIC);
+	spherePhy->Initialize(sphere, MESH_OF_TRIANGLES, DYNAMIC);
 	physicsEngine.AddPhysicsObject(spherePhy);
 	renderer.AddModel(sphere, &defShader);
+	
+	/*Model* sphere2 = new Model();
+	sphere2->CopyFromModel(*sphere);
+	sphere2->transform.SetPosition(glm::vec3(3.0, 0, 0));
+	PhysicsObject* spherePhy2 = new PhysicsObject();
+	spherePhy2->Initialize(sphere2, SPHERE, DYNAMIC);
+	physicsEngine.AddPhysicsObject(spherePhy2);
+	renderer.AddModel(sphere2, &defShader);
+	spherePhy2->velocity.y = 10;*/
 
-	for (int i = 0; i < numberOfSpheres; i++)
-	{
-		float xValue = GetRandomFloatNumber(-xRange, xRange);
-		float zValue = GetRandomFloatNumber(-xRange, xRange);
+	//for (int i = 0; i < numberOfSpheres; i++)
+	//{
+	//	float xValue = GetRandomFloatNumber(-xRange, xRange);
+	//	float zValue = GetRandomFloatNumber(-xRange, xRange);
 
-		Model* newModel = new Model();
-		newModel->CopyFromModel(*sphere);
-		newModel->transform.position.x = xValue;
-		newModel->transform.position.z = zValue;
-		renderer.AddModel(newModel, &defShader);
+	//	Model* newModel = new Model();
+	//	newModel->CopyFromModel(*sphere);
+	//	newModel->transform.position.x = xValue;
+	//	newModel->transform.position.z = zValue;
+	//	renderer.AddModel(newModel, &defShader);
 
-		PhysicsObject* newPhyObj = new PhysicsObject();
-		newPhyObj->Initialize(newModel, MESH_OF_TRIANGLES, DYNAMIC);
-		physicsEngine.AddPhysicsObject(newPhyObj);
-		
-	}
+	//	PhysicsObject* newPhyObj = new PhysicsObject();
+	//	newPhyObj->Initialize(newModel, MESH_OF_TRIANGLES, DYNAMIC);
+	//	physicsEngine.AddPhysicsObject(newPhyObj);
+	//	
+	//}
 
 	plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane->transform.SetPosition(glm::vec3(0, -5, 0));
-	plane->transform.SetRotation(glm::vec3(-40, 0, 40));
+	plane->transform.SetRotation(glm::vec3(-90, 0, 45));
 	plane->isWireframe = true;
 	planePhy = new PhysicsObject();
 	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(planePhy);
 	renderer.AddModel(plane, &defShader);
 
-	test = new Model("Assets/Models/TeaTable.obj");
-	test->transform.SetPosition(glm::vec3(0, 0, 0));
-	test->transform.SetRotation(glm::vec3(-45, 0, 0));
-	test->isWireframe = true;
-	testphy = new PhysicsObject();
-	testphy->Initialize(test, MESH_OF_TRIANGLES, STATIC);
-	physicsEngine.AddPhysicsObject(testphy);
-	renderer.AddModel(test, &defShader);
+	
+
+	renderer.selectedModel = plane2;
+
 
 	/*
 
@@ -120,15 +127,21 @@ void PhysicsApplication::PostRender()
 {
 	physicsEngine.Update(deltaTime);
 
-	renderer.DrawAABB(GetGraphicsAabb(testphy->GetModelAABB()), aabbColor[2]);
-	renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), aabbColor[2]);
+	/*Sphere* sphere1 = dynamic_cast<Sphere*>(planePhy->GetTransformedPhysicsShape());
+	Sphere* sphere2 = dynamic_cast<Sphere*>(planePhy2->GetTransformedPhysicsShape());
+
+	renderer.DrawSphere(sphere1->position, sphere1->radius);
+	renderer.DrawSphere(sphere2->position, sphere2->radius);*/
+
+	/*renderer.DrawAABB(GetGraphicsAabb(planePhy2->GetModelAABB()), aabbColor[2]);
+	renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), aabbColor[2]);*/
 
 	//DrawAABBRecursive(terrainPhy->hierarchialAABB->rootNode);
 	//DrawAABBRecursive(testphy->hierarchialAABB->rootNode);
 
 
-	/*DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
-	DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
+	//DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
+	/*DrawAABBRecursive(hatPhy->hierarchialAABB->rootNode);
 	DrawAABBRecursive(pumpkinPhy->hierarchialAABB->rootNode);
 	DrawAABBRecursive(tablePhy->hierarchialAABB->rootNode);*/
 	//renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), abbColor);
@@ -152,22 +165,22 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 		}
 		else if (key == GLFW_KEY_UP)
 		{
-			test->transform.position.x += 5;
-			test->transform.SetRotation(glm::vec3(
-				test->transform.rotation.x + 30, test->transform.rotation.y, test->transform.rotation.z));
-			test->transform.scale.x += 5;
-			test->transform.scale.y += 5;
-			test->transform.scale.z += 5;
+			hat->transform.position.x += 5;
+			hat->transform.SetRotation(glm::vec3(
+				hat->transform.rotation.x + 30, hat->transform.rotation.y, hat->transform.rotation.z));
+			hat->transform.scale.x += 5;
+			hat->transform.scale.y += 5;
+			hat->transform.scale.z += 5;
 
 		}
 		else if (key == GLFW_KEY_DOWN)
 		{
-			test->transform.position.x -= 5;
-			test->transform.SetRotation(glm::vec3(
-				test->transform.rotation.x - 30, test->transform.rotation.y, test->transform.rotation.z));
-			test->transform.scale.x -= 5;
-			test->transform.scale.y -= 5;
-			test->transform.scale.z -= 5;
+			hat->transform.position.x -= 5;
+			hat->transform.SetRotation(glm::vec3(
+				hat->transform.rotation.x - 30, hat->transform.rotation.y, hat->transform.rotation.z));
+			hat->transform.scale.x -= 5;
+			hat->transform.scale.y -= 5;
+			hat->transform.scale.z -= 5;
 
 		}
 		else if (key == GLFW_KEY_SPACE)

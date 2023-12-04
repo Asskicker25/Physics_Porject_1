@@ -36,20 +36,20 @@ public:
 
 	Model* sphere;
 	Model* plane;
+	Model* plane2;
 	Model* hat;
 	Model* pumpkin;
 	Model* table;
 	Model* terrain;
-	Model* test;
 
 
 	PhysicsObject* spherePhy;
 	PhysicsObject* planePhy;
+	PhysicsObject* planePhy2;
 	PhysicsObject* hatPhy;
 	PhysicsObject* pumpkinPhy;
 	PhysicsObject* tablePhy;
 	PhysicsObject* terrainPhy;
-	PhysicsObject* testphy;
 
 	std::vector<PhysicsObject*> listOfPhyObjects;
 

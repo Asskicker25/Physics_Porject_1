@@ -59,6 +59,7 @@ public:
 	LightManager lightManager;
 
 	DebugModels* debugCubes;
+	DebugModels* debugSpheres;
 
 	Shader solidColorShader;
 	Shader defShader;

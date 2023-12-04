@@ -17,9 +17,12 @@ HierarchicalAABBNode::HierarchicalAABBNode(const Aabb& aabb,
 			this->triangleIndices.push_back(i);
 		}
 
-		SplitNode(triangles);
-		this->triangleIndices.clear();
-		return;
+		if ((int)this->triangleIndices.size() > maxNumOfTriangles)
+		{
+			SplitNode(triangles);
+			this->triangleIndices.clear();
+			return;
+		}
 	}
 
 	for (int i = 0; i < triangleIndices.size(); i++)
@@ -87,19 +90,29 @@ void HierarchicalAABBNode::SplitNode(const std::vector<Triangle>& triangleList)
 
 Aabb HierarchicalAABBNode::GetModelAABB()
 {
-	if (model == nullptr)
-	{
-		std::cout << std::endl;
-	}
 
 	glm::mat4 transformMatrix = model->transform.GetTransformMatrix();
 
-	Aabb localAABB;
-	glm::vec3 minPoint = glm::vec3(transformMatrix * glm::vec4(aabb.min, 1.0f));
-	glm::vec3 maxPoint = glm::vec3(transformMatrix * glm::vec4(aabb.max, 1.0f));
+	glm::vec3 originalMinV = aabb.min;
+	glm::vec3 originalMaxV = aabb.max;
 
-	localAABB.min = glm::min(minPoint, maxPoint);
-	localAABB.max = glm::max(minPoint, maxPoint);
+	glm::vec4 vertices[8];
+	vertices[0] = transformMatrix * glm::vec4(originalMinV.x, originalMinV.y, originalMinV.z, 1.0f);
+	vertices[1] = transformMatrix * glm::vec4(originalMinV.x, originalMinV.y, originalMaxV.z, 1.0f);
+	vertices[2] = transformMatrix * glm::vec4(originalMinV.x, originalMaxV.y, originalMinV.z, 1.0f);
+	vertices[3] = transformMatrix * glm::vec4(originalMinV.x, originalMaxV.y, originalMaxV.z, 1.0f);
+	vertices[4] = transformMatrix * glm::vec4(originalMaxV.x, originalMinV.y, originalMinV.z, 1.0f);
+	vertices[5] = transformMatrix * glm::vec4(originalMaxV.x, originalMinV.y, originalMaxV.z, 1.0f);
+	vertices[6] = transformMatrix * glm::vec4(originalMaxV.x, originalMaxV.y, originalMinV.z, 1.0f);
+	vertices[7] = transformMatrix * glm::vec4(originalMaxV.x, originalMaxV.y, originalMaxV.z, 1.0f);
 
-	return localAABB;
+	glm::vec3 transformedMinV = glm::vec3(vertices[0]);
+	glm::vec3 transformedMaxV = glm::vec3(vertices[0]);
+
+	for (int i = 1; i < 8; ++i) {
+		transformedMinV = glm::min(transformedMinV, glm::vec3(vertices[i]));
+		transformedMaxV = glm::max(transformedMaxV, glm::vec3(vertices[i]));
+	}
+
+	return 	Aabb(transformedMinV, transformedMaxV);
 }

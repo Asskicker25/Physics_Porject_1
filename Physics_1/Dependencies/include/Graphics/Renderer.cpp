@@ -232,3 +232,12 @@ void Renderer::DrawCube(const glm::vec3 pos, const glm::vec3 rot, const glm::vec
 	cube->DrawWireframe(color);
 }
 
+void Renderer::DrawSphere(const glm::vec3 center, float radius, glm::vec4 color)
+{
+	Model* sphere = debugSpheres->DrawDebugModel();
+	sphere->SetRenderer(this);
+	sphere->transform.SetPosition(center);
+	sphere->transform.SetScale(glm::vec3(radius));
+	sphere->DrawWireframe(color);
+}
+

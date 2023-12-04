@@ -74,6 +74,7 @@ public:
 	ModelAndShader* skyBox;
 
 	DebugModels* debugCubes;
+	DebugModels* debugSpheres;
 
 	RenderMode renderMode = SHADED;
 
@@ -94,5 +95,6 @@ public:
 	void SetNormalsLineScale(const glm::vec3& scale);
 	void DrawAABB(const modelAABB& aabb, glm::vec4 color = glm::vec4(0.0,0.0,1.0,1.0));
 	void DrawCube(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale, const glm::vec4 color);
+	void DrawSphere(const glm::vec3 center, float radius, glm::vec4 color = glm::vec4(0.0, 0.0, 1.0, 1.0));
 };
 

@@ -116,7 +116,9 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 
 
 	debugCubes = new DebugModels("res/Models/DefaultCube.fbx");
+	debugSpheres = new DebugModels("res/Models/DefaultSphere.fbx");
 	renderer.debugCubes = debugCubes;
+	renderer.debugSpheres = debugSpheres;
 
 	renderer.skyBox = new ModelAndShader({ skyBox,&skyboxShader });
 

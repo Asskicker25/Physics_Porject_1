@@ -87,55 +87,88 @@ bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb, HierarchicalAABBNode* root
 	return true;
 }
 
+void CollisionMeshVsMeshRecursive(HierarchicalAABBNode* mesh1, HierarchicalAABBNode* mesh2,
+	std::set<int>& triangleIndices1, std::set<int>& triangleIndices2)
+{
+	if (CollisionAABBvsAABB(mesh1->GetModelAABB(), mesh2->GetModelAABB()))
+	{
+		if (mesh1->leftNode != nullptr)
+		{
+			if (mesh2->leftNode != nullptr)
+			{
+				CollisionMeshVsMeshRecursive(mesh1->leftNode, mesh2->leftNode, triangleIndices1, triangleIndices2);
+				CollisionMeshVsMeshRecursive(mesh1->leftNode, mesh2->rightNode, triangleIndices1, triangleIndices2);
+
+				CollisionMeshVsMeshRecursive(mesh1->rightNode, mesh2->leftNode, triangleIndices1, triangleIndices2);
+				CollisionMeshVsMeshRecursive(mesh1->rightNode, mesh2->rightNode, triangleIndices1, triangleIndices2);
+			}
+			else
+			{
+				CollisionMeshVsMeshRecursive(mesh1->leftNode, mesh2, triangleIndices1, triangleIndices2);
+				CollisionMeshVsMeshRecursive(mesh1->rightNode, mesh2, triangleIndices1, triangleIndices2);
+			}
+		}
+		else
+		{
+			if (mesh2->leftNode != nullptr)
+			{
+				CollisionMeshVsMeshRecursive(mesh1, mesh2->leftNode, triangleIndices1, triangleIndices2);
+				CollisionMeshVsMeshRecursive(mesh1, mesh2->rightNode, triangleIndices1, triangleIndices2);
+			}
+			else
+			{
+				triangleIndices1.insert(mesh1->triangleIndices.begin(), mesh1->triangleIndices.end());
+				triangleIndices2.insert(mesh2->triangleIndices.begin(), mesh2->triangleIndices.end());
+			}
+		}
+	}
+}
+
+
 bool CollisionMeshVsMesh(HierarchicalAABBNode* mesh1, HierarchicalAABBNode* mesh2, 
 	const glm::mat4 transformMatrix1, const glm::mat4 transformMatrix2, 
 	const std::vector<Triangle>& triangles1, const std::vector<Triangle>& triangles2, 
 	std::vector<glm::vec3>& collisionPoints, std::vector<glm::vec3>& collisionNormals)
 {
+
 	std::set<int> triangleIndices1;
 	std::set<int> triangleIndices2;
 
-	CollisionAABBvsHAABB(mesh1->GetModelAABB(), mesh2, triangleIndices1);
-	CollisionAABBvsHAABB(mesh2->GetModelAABB(), mesh1, triangleIndices2);
+	CollisionMeshVsMeshRecursive(mesh1, mesh2, triangleIndices1, triangleIndices2);
 
 	if (triangleIndices1.empty() || triangleIndices2.empty()) return false;
 
-	int iterationCount = 0;
 
 	for (int i : triangleIndices1)
 	{
+		Triangle triangle1 = triangles1[i];
+		triangle1.v1 = transformMatrix1 * glm::vec4(triangle1.v1, 1.0f);
+		triangle1.v2 = transformMatrix1 * glm::vec4(triangle1.v2, 1.0f);
+		triangle1.v3 = transformMatrix1 * glm::vec4(triangle1.v3, 1.0f);
+		triangle1.normal = transformMatrix1 * glm::vec4(triangle1.normal, 0.0f);
+
 		for (int j : triangleIndices2)
 		{
-			Triangle triangle1; //j Loop Triangle of mesh1
-			Triangle triangle2; //i Loop Triangle of mesh2
 
-			triangle1.v1 = transformMatrix1 * glm::vec4(triangles1[j].v1, 1.0f);
-			triangle1.v2 = transformMatrix1 * glm::vec4(triangles1[j].v2, 1.0f);
-			triangle1.v3 = transformMatrix1 * glm::vec4(triangles1[j].v3, 1.0f);
-			triangle1.normal = transformMatrix1 * glm::vec4(triangles1[j].normal, 0.0f);
+			Triangle triangle2 = triangles2[j];
+			triangle2.v1 = transformMatrix2 * glm::vec4(triangle2.v1, 1.0f);
+			triangle2.v2 = transformMatrix2 * glm::vec4(triangle2.v2, 1.0f);
+			triangle2.v3 = transformMatrix2 * glm::vec4(triangle2.v3, 1.0f);
+			triangle2.normal = transformMatrix2 * glm::vec4(triangle2.normal, 0.0f);
 
-			triangle2.v1 = transformMatrix2 * glm::vec4(triangles2[i].v1, 1.0f);
-			triangle2.v2 = transformMatrix2 * glm::vec4(triangles2[i].v2, 1.0f);
-			triangle2.v3 = transformMatrix2 * glm::vec4(triangles2[i].v3, 1.0f);
-			triangle2.normal = transformMatrix2 * glm::vec4(triangles2[i].normal, 0.0f);
-
-			iterationCount++;
-
-			glm::vec3 collisionPt;
-			if (CollisionTriangleVsTriangle(triangle1, triangle2, collisionPt))
+			glm::vec3 collPt;
+			if (CollisionTriangleVsTriangle(triangle1, triangle2, collPt))
 			{
-				collisionPoints.push_back(collisionPt);
+				collisionPoints.push_back(collPt);
 				collisionNormals.push_back(triangle2.normal);
 			}
-
 		}
-
 	}
 
-	std::cout << "Size 1 : " << triangleIndices1.size() << " Size 2 :  " << triangleIndices2.size() << std::endl;
+	std::cout << "Size 1 : " << triangleIndices1.size() << std::endl;
+	std::cout << "Size 2 : " << triangleIndices2.size() << std::endl;
+	std::cout << "Collision Pt  : " << collisionPoints.size() << std::endl;
 
-	std::cout << "Collision Pt Size : " << collisionPoints.size()<< " , " << collisionNormals.size() << std::endl;
-	std::cout << "Iteration Count : " << iterationCount << std::endl;
+
 	return true;
-	
 }
