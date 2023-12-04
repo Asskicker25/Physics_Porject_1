@@ -9,12 +9,13 @@ class HierarchicalAABB
 private:
 
 	PhysicsObject* phyObj = nullptr;
+	int maxDepth = 0;
 	std::vector<Triangle> transformedTriangles;
 
 public:
 	HierarchicalAABBNode* rootNode = nullptr;
 
-	HierarchicalAABB(PhysicsObject* phyObj);
+	HierarchicalAABB(PhysicsObject* phyObj, int maxDepth);
 	void Construct();
 
 };

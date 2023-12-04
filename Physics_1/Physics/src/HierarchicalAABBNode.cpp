@@ -2,13 +2,14 @@
 
 HierarchicalAABBNode::HierarchicalAABBNode(const Aabb& aabb,
 	const std::vector<Triangle>& triangles, std::vector<int> triangleIndices, int nodeIndex,
-	HierarchicalAABBNode* parentNode, Model* model)
+	HierarchicalAABBNode* parentNode, Model* model, int maxDepth)
 	: aabb(aabb), leftNode(nullptr), rightNode(nullptr)
 {
 	this->aabb = aabb;
 	this->nodeIndex = nodeIndex;
 	this->parentNode = parentNode;
 	this->model = model;
+	this->maxDepth = maxDepth;
 
 	if ((int)triangleIndices.size() == 0)
 	{
@@ -78,8 +79,8 @@ void HierarchicalAABBNode::SplitNode(const std::vector<Triangle>& triangleList)
 	}
 
 
-	leftNode = new HierarchicalAABBNode(leftAABB, triangleList, leftTriangleIndices, (nodeIndex + 1), this, model);
-	rightNode = new HierarchicalAABBNode(rightAABB, triangleList, rightTriangleIndices, (nodeIndex + 1), this, model);
+	leftNode = new HierarchicalAABBNode(leftAABB, triangleList, leftTriangleIndices, (nodeIndex + 1), this, model,maxDepth);
+	rightNode = new HierarchicalAABBNode(rightAABB, triangleList, rightTriangleIndices, (nodeIndex + 1), this, model, maxDepth);
 
 	//if (this->triangleIndices.size() > maxNumOfTriangles && nodeIndex < maxDepth)
 	//{

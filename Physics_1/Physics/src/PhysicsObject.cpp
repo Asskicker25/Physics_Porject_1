@@ -192,7 +192,7 @@ void PhysicsObject::CalculatePhysicsShape()
 	{
 		CalculateTriangleSpheres();
 		transformedPhysicsShape = new Triangle();
-		hierarchialAABB = new HierarchicalAABB(this);
+		hierarchialAABB = new HierarchicalAABB(this, maxDepth);
 	}
 }
 

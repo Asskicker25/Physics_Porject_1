@@ -24,10 +24,11 @@ void PhysicsApplication::SetUp()
 	lightManager.AddLight(dirLight);
 
 	sphere = new Model("Assets/Models/DefaultSphere.fbx");
-	sphere->transform.SetPosition(glm::vec3(3.0, 10, 0));
+	sphere->transform.SetPosition(glm::vec3(3.0, 30, 0));
 	sphere->transform.SetScale(glm::vec3(1));
 	spherePhy = new PhysicsObject();
-	spherePhy->Initialize(sphere, MESH_OF_TRIANGLES, DYNAMIC);
+	spherePhy->maxDepth = 10;
+	spherePhy->Initialize(sphere, SPHERE, DYNAMIC);
 	physicsEngine.AddPhysicsObject(spherePhy);
 	renderer.AddModel(sphere, &defShader);
 	
@@ -57,16 +58,25 @@ void PhysicsApplication::SetUp()
 	//	
 	//}
 
-	plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
-	plane->transform.SetPosition(glm::vec3(0, -5, 0));
-	plane->transform.SetRotation(glm::vec3(-90, 0, 45));
-	plane->isWireframe = true;
-	planePhy = new PhysicsObject();
-	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
-	physicsEngine.AddPhysicsObject(planePhy);
-	renderer.AddModel(plane, &defShader);
+	//plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
+	//plane->transform.SetPosition(glm::vec3(0, -5, 0));
+	//plane->transform.SetRotation(glm::vec3(-90, 0, 0));
+	//plane->isWireframe = true;
+	//planePhy = new PhysicsObject();
+	//planePhy->maxDepth = 10;
+	//planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
+	//physicsEngine.AddPhysicsObject(planePhy);
+	//renderer.AddModel(plane, &defShader);
 
-	
+	hogwarts = new Model("Assets/Models/Hogwarts_3ds_export (rotated and re-normalized).ply");
+	hogwarts->transform.SetPosition(glm::vec3(0, -5, 0));
+	hogwarts->transform.SetRotation(glm::vec3(0, 0, 0));
+	hogwarts->transform.SetScale(glm::vec3(0.001f, 0.001f, 0.001f));
+	hogwarts->isWireframe = false;
+	hogwartsPhy = new PhysicsObject();
+	hogwartsPhy->Initialize(hogwarts, MESH_OF_TRIANGLES, STATIC);
+	physicsEngine.AddPhysicsObject(hogwartsPhy);
+	renderer.AddModel(hogwarts, &defShader);
 
 	renderer.selectedModel = plane2;
 
@@ -136,7 +146,8 @@ void PhysicsApplication::PostRender()
 	/*renderer.DrawAABB(GetGraphicsAabb(planePhy2->GetModelAABB()), aabbColor[2]);
 	renderer.DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), aabbColor[2]);*/
 
-	//DrawAABBRecursive(terrainPhy->hierarchialAABB->rootNode);
+	/*DrawAABBRecursive(spherePhy->hierarchialAABB->rootNode);
+	DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);*/
 	//DrawAABBRecursive(testphy->hierarchialAABB->rootNode);
 
 
@@ -201,16 +212,16 @@ void PhysicsApplication::DrawAABBRecursive(HierarchicalAABBNode* node)
 {
 	if (node == nullptr) return;
 
-	if (node->nodeIndex == aabbDrawDepthIndex)
+	/*if (node->nodeIndex == aabbDrawDepthIndex)
 	{
 		renderer.DrawAABB(GetGraphicsAabb(node->GetModelAABB()), aabbColor[2]);
 		return;
-	}
+	}*/
 
-	/*if (node->triangleIndices.size() != 0)
+	if (node->triangleIndices.size() != 0)
 	{
 		renderer.DrawAABB(GetGraphicsAabb(node->GetModelAABB()), aabbColor[2]);
-	}*/
+	}
 
 	if (node->leftNode == nullptr) return;
 

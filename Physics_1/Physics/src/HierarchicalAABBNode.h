@@ -22,7 +22,7 @@ public:
 	std::vector<int> triangleIndices;
 
 	HierarchicalAABBNode(const Aabb& aabb, const std::vector<Triangle>& triangles,
-		std::vector<int> triangleIndices, int nodeIndex, HierarchicalAABBNode* parentNode, Model* model);
+		std::vector<int> triangleIndices, int nodeIndex, HierarchicalAABBNode* parentNode, Model* model, int maxDepth);
 	~HierarchicalAABBNode(); 
 
 	void SplitNode(const std::vector<Triangle>& triangleList);

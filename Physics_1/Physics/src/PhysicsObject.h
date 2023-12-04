@@ -28,6 +28,7 @@ public:
 
 	bool isCollisionInvoke = false;
 	bool useBvh = true;
+	float maxDepth = 10;
 
 	PhysicsMode mode = PhysicsMode::STATIC;
 	PhysicsShape shape = PhysicsShape::SPHERE;

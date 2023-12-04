@@ -41,6 +41,7 @@ public:
 	Model* pumpkin;
 	Model* table;
 	Model* terrain;
+	Model* hogwarts;
 
 
 	PhysicsObject* spherePhy;
@@ -50,6 +51,8 @@ public:
 	PhysicsObject* pumpkinPhy;
 	PhysicsObject* tablePhy;
 	PhysicsObject* terrainPhy;
+	PhysicsObject* hogwartsPhy;
+
 
 	std::vector<PhysicsObject*> listOfPhyObjects;
 
