@@ -42,7 +42,7 @@ void PhysicsEngine::Update(float deltaTime)
 
 	if (timer >= fixedStepTime)
 	{
-		UpdatePhysics(deltaTime);
+		UpdatePhysics(fixedStepTime);
 
 		timer = 0;
 	}

@@ -60,7 +60,7 @@ void PhysicsApplication::SetUp()
 	//	
 	//}
 
-	/*plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
+	plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane->transform.SetPosition(glm::vec3(0, -5, 0));
 	plane->transform.SetRotation(glm::vec3(-90, 0, 0));
 	plane->isWireframe = true;
@@ -69,7 +69,7 @@ void PhysicsApplication::SetUp()
 	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(planePhy);
 	renderer.AddModel(plane, &defShader);
-	listOfPhyObjects.push_back(planePhy);*/
+	listOfPhyObjects.push_back(planePhy);
 
 	/*hogwarts = new Model("Assets/Models/Hogwarts_3ds_export (rotated and re-normalized).ply");
 	hogwarts->transform.SetPosition(glm::vec3(0, -5, 0));
@@ -118,15 +118,15 @@ void PhysicsApplication::SetUp()
 	renderer.AddModel(table, &defShader);*/
 	
 
-	terrain = new Model("Assets/Models/Terrain.ply");
-	terrain->transform.SetPosition(glm::vec3(0, -40, 0));
-	terrain->transform.SetRotation(glm::vec3(0, 0, 0));
-	renderer.AddModel(terrain, &defShader);
+	//terrain = new Model("Assets/Models/Terrain.ply");
+	//terrain->transform.SetPosition(glm::vec3(0, -40, 0));
+	//terrain->transform.SetRotation(glm::vec3(0, 0, 0));
+	//renderer.AddModel(terrain, &defShader);
 
-	terrainPhy = new PhysicsObject();
-	terrainPhy->Initialize(terrain, MESH_OF_TRIANGLES, STATIC);
-	physicsEngine.AddPhysicsObject(terrainPhy);
-	listOfPhyObjects.push_back(terrainPhy);
+	//terrainPhy = new PhysicsObject();
+	//terrainPhy->Initialize(terrain, MESH_OF_TRIANGLES, STATIC);
+	//physicsEngine.AddPhysicsObject(terrainPhy);
+	//listOfPhyObjects.push_back(terrainPhy);
 
 
 }

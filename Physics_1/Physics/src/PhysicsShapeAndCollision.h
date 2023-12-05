@@ -771,6 +771,9 @@ static bool CollisionTriangleVsTriangle(const Triangle& triangle1, const Triangl
 //	return false;
 //}
 
+
+
+
 static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 	const glm::mat4& transformMatrix,
 	const std::vector <Triangle>& triangles,
@@ -1049,6 +1052,30 @@ static bool RayCastMesh(const glm::vec3& rayOrigin, glm::vec3& rayDirection,
 			collisionNr = transformMatrix * glm::vec4(triangle.normal, 0.0f);
 			return true;
 		}
+	}
+
+	return false;
+}
+
+static bool CollisionTriangleVsTriangle(const Triangle& t1, const Triangle& t2)
+{
+	glm::vec3 unusedIntersectionPoint;
+	glm::vec3 dummyCollisionNormal;
+
+	glm::vec3 temp1 = glm::normalize(t1.v2 - t1.v1);
+	glm::vec3 temp2 = glm::normalize(t1.v3 - t1.v2);
+	glm::vec3 temp3 = glm::normalize(t1.v1 - t1.v3);
+	glm::vec3 temp4 = glm::normalize(t2.v2 - t2.v1);
+	glm::vec3 temp5 = glm::normalize(t2.v3 - t2.v2);
+	glm::vec3 temp6 = glm::normalize(t2.v1 - t2.v3);
+
+	if (RayCastTriangle(t1.v1, temp1, std::numeric_limits<float>::max(), t2, unusedIntersectionPoint, dummyCollisionNormal) ||
+		RayCastTriangle(t1.v2, temp2, std::numeric_limits<float>::max(), t2, unusedIntersectionPoint, dummyCollisionNormal) ||
+		RayCastTriangle(t1.v3, temp3, std::numeric_limits<float>::max(), t2, unusedIntersectionPoint, dummyCollisionNormal) ||
+		RayCastTriangle(t2.v1, temp4, std::numeric_limits<float>::max(), t1, unusedIntersectionPoint, dummyCollisionNormal) ||
+		RayCastTriangle(t2.v2, temp5, std::numeric_limits<float>::max(), t1, unusedIntersectionPoint, dummyCollisionNormal) ||
+		RayCastTriangle(t2.v3, temp6, std::numeric_limits<float>::max(), t1, unusedIntersectionPoint, dummyCollisionNormal)) {
+		return true;
 	}
 
 	return false;

@@ -157,7 +157,7 @@ bool CollisionMeshVsMesh(HierarchicalAABBNode* mesh1, HierarchicalAABBNode* mesh
 			triangle2.normal = transformMatrix2 * glm::vec4(triangle2.normal, 0.0f);
 
 			glm::vec3 collPt;
-			if (CollisionTriangleVsTriangle(triangle1, triangle2, collPt))
+			if (CollisionTriangleVsTriangle(triangle1, triangle2))
 			{
 				collisionPoints.push_back(collPt);
 				collisionNormals.push_back(triangle2.normal);
