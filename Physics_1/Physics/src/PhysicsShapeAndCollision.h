@@ -233,6 +233,14 @@ static bool IsPointInsideAABB(const glm::vec3& point, const Aabb& aabb)
 		);
 }
 
+static bool IsPointInisideSphere(const glm::vec3& point, const Sphere& sphere)
+{
+	glm::vec3 diff = sphere.position - point;
+	float sqDist = glm::dot(diff, diff);
+
+	return sqDist <= sphere.radius * sphere.radius;
+}
+
 static bool IsTriangleInsideAABB(const Triangle& triangle, const Aabb& aabb)
 {
 	if (IsPointInsideAABB(triangle.v1, aabb)) return true;
@@ -830,11 +838,14 @@ static bool CollisionSphereVsMeshOfTriangles(Sphere* sphere,
 	return false;
 }
 
-extern  void CollisionAABBvsHAABB(const Aabb& sphereAabb, HierarchicalAABBNode* rootNode, std::set<int>& triangleIndices);
+extern  void CollisionAABBvsHAABB(const Aabb& sphereAabb, 
+	HierarchicalAABBNode* rootNode, std::set<int>& triangleIndices, std::vector<Aabb>& collisionAabbs);
+
 extern  bool CollisionSphereVsMeshOfTriangles(const Aabb& sphereAabb, Sphere* sphere, HierarchicalAABBNode* rootNode,
 	const glm::mat4 transformMatrix, const std::vector <Triangle>& triangles,
 	std::vector<glm::vec3>& collisionPoints,
-	std::vector<glm::vec3>& collisionNormals);
+	std::vector<glm::vec3>& collisionNormals,
+	std::vector<Aabb>& collisionAabbs);
 
 static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 	const glm::mat4& transformMatrix,
@@ -899,7 +910,8 @@ static bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb,
 extern bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb, HierarchicalAABBNode* rootNode,
 	const glm::mat4 transformMatrix, const std::vector <Triangle>& triangles,
 	std::vector<glm::vec3>& collisionPoints,
-	std::vector<glm::vec3>& collisionNormals);
+	std::vector<glm::vec3>& collisionNormals,
+	std::vector<Aabb>& collisionAabbs);
 
 extern bool CollisionMeshVsMesh(HierarchicalAABBNode* mesh1, HierarchicalAABBNode* mesh2,
 	const glm::mat4 transformMatrix1, const glm::mat4 transformMatrix2,

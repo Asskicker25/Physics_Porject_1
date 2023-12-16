@@ -61,6 +61,8 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 {
 	for (PhysicsObject* iteratorObject : physicsObjects)
 	{
+		if (iteratorObject->isEnabled == false)
+			continue;
 
 		if (iteratorObject->mode == PhysicsMode::STATIC)
 			continue;
@@ -94,7 +96,13 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 		for (PhysicsObject* otherObject : physicsObjects)
 		{
+			if (otherObject->isEnabled == false)
+				continue;
+
 			if (iteratorObject == otherObject)
+				continue;
+			
+			if (iteratorObject->CheckIfExcluding(otherObject)) 
 				continue;
 
 

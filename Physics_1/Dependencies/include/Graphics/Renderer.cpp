@@ -195,7 +195,7 @@ void Renderer::DrawOutline()
 
 void Renderer::SortBlendModels()
 {
-	CompareDistances compareDistance(camera->cameraPos);
+	CompareDistances compareDistance(camera->transform.position);
 	std::sort(blendModelAndShaders.begin(), blendModelAndShaders.end(), compareDistance);
 }
 
@@ -209,12 +209,22 @@ void Renderer::SetNormalsLineScale(const glm::vec3& scale)
 	this->normalsScale = scale;
 }
 
-void Renderer::DrawAABB(const modelAABB& aabb, glm::vec4 color)
+void Renderer::DrawAABB(const modelAABB& aabb, glm::vec4 color, bool drawFromModel)
 {
 	glm::vec3 targetExtents = 0.5f * (aabb.max - aabb.min);
 	glm::vec3 center = 0.5f * (aabb.max + aabb.min);
 
-	Model* cube = debugCubes->DrawDebugModel();
+	Model* cube;
+
+	if(drawFromModel)
+	{
+		cube = debugCubesModel->DrawDebugModel();
+	}
+	else
+	{
+		cube = debugCubesData->DrawDebugModel();
+	}
+	
 	cube->SetRenderer(this);
 	cube->transform.SetPosition(center);
 	cube->transform.SetRotation(glm::vec3(0));
@@ -222,9 +232,18 @@ void Renderer::DrawAABB(const modelAABB& aabb, glm::vec4 color)
 	cube->DrawWireframe(color);
 }
 
-void Renderer::DrawCube(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale, const glm::vec4 color)
+void Renderer::DrawCube(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale, const glm::vec4 color, bool drawFromModel)
 {
-	Model* cube = debugCubes->DrawDebugModel();
+	Model* cube;
+
+	if (drawFromModel)
+	{
+		cube = debugCubesModel->DrawDebugModel();
+	}
+	else
+	{
+		cube = debugCubesData->DrawDebugModel();
+	}
 	cube->SetRenderer(this);
 	cube->transform.SetPosition(pos);
 	cube->transform.SetRotation(rot);

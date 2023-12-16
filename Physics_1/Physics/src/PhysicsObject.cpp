@@ -55,12 +55,22 @@ const std::vector<glm::vec3>& PhysicsObject::GetCollisionNormals()
 	return collisionNormals;
 }
 
+const std::vector<Aabb>& PhysicsObject::GetCollisionAabbs()
+{
+	return collisionAabbs;
+}
+
 void PhysicsObject::SetCollisionPoints(const std::vector<glm::vec3>& collisionPoints)
 {
 	this->collisionPoints = collisionPoints;
 }
 
 void PhysicsObject::SetCollisionNormals(const std::vector<glm::vec3>& collisionNormals)
+{
+	this->collisionNormals = collisionNormals;
+}
+
+void PhysicsObject::SetCollisionAabbs(const std::vector<Aabb>& collisionAabs)
 {
 	this->collisionNormals = collisionNormals;
 }
@@ -175,6 +185,23 @@ Aabb PhysicsObject::GetAABB()
 	return aabb;
 }
 
+void PhysicsObject::AddExludingPhyObj(PhysicsObject* phyObj)
+{
+	listOfExcludingPhyObjects.push_back(phyObj);
+}
+
+bool PhysicsObject::CheckIfExcluding(PhysicsObject* phyObj)
+{
+	for (PhysicsObject* phy : listOfExcludingPhyObjects)
+	{
+		if (phy == phyObj)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void PhysicsObject::CalculatePhysicsShape()
 {
 	aabb = CalculateModelAABB();
@@ -183,8 +210,10 @@ void PhysicsObject::CalculatePhysicsShape()
 	if (shape == SPHERE)
 	{
 		glm::vec3 position = (aabb.min + aabb.max) * 0.5f;
+		position += properties.offset;
 		glm::vec3 sideLengths = aabb.max - aabb.min;
 		float radius = 0.5f * glm::max(sideLengths.x, glm::max(sideLengths.y, sideLengths.z));
+		radius *= properties.colliderScale;
 		physicsShape = new Sphere(position, radius);
 		transformedPhysicsShape = new Sphere();
 	}
@@ -281,7 +310,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 				return CollisionSphereVsMeshOfTriangles(GetModelAABB(),
 					dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
 						other->hierarchialAABB->rootNode, other->model->transform.GetTransformMatrix(),
-						other->GetTriangleList(), collisionPoints, collisionNormals
+						other->GetTriangleList(), collisionPoints, collisionNormals,collisionAabbs
 						);
 			}
 
@@ -313,7 +342,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 			{
 				return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
 					other->hierarchialAABB->rootNode, other->model->transform.GetTransformMatrix(),
-					other->GetTriangleList(), collisionPoints, collisionNormals);
+					other->GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs);
 			}
 			return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
 				other->model->transform.GetTransformMatrix(),
@@ -332,7 +361,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 			{
 				return CollisionAABBVsMeshOfTriangles(other->GetModelAABB(),
 					hierarchialAABB->rootNode, model->transform.GetTransformMatrix(),
-					GetTriangleList(), collisionPoints, collisionNormals);
+					GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs);
 			}
 			return CollisionAABBVsMeshOfTriangles(other->GetModelAABB(),
 				model->transform.GetTransformMatrix(),
@@ -345,7 +374,7 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 				return CollisionSphereVsMeshOfTriangles(other->GetModelAABB(),
 					dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()),
 					hierarchialAABB->rootNode, model->transform.GetTransformMatrix(),
-					GetTriangleList(), collisionPoints, collisionNormals
+					GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs
 				);
 			}
 

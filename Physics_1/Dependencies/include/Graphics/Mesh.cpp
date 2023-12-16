@@ -80,7 +80,7 @@ void Mesh::DrawNormals(Shader* shader, glm::vec3 color, glm::mat4 transformMatri
 
 	for (int i = 0; i < triangles.size(); i++)
 	{
-		Model* model = renderer->debugCubes->DrawDebugModel();
+		Model* model = renderer->debugCubesModel->DrawDebugModel();
 
 		model->transform.SetScale(renderer->GetNormalsScale());
 

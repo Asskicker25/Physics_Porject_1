@@ -1,16 +1,19 @@
 #include "PhysicsShapeAndCollision.h"
 #include "HierarchicalAABBNode.h"
 
-void CollisionAABBvsHAABB(const Aabb& sphereAabb, HierarchicalAABBNode* rootNode, std::set<int>& triangleIndices)
+void CollisionAABBvsHAABB(const Aabb& sphereAabb, HierarchicalAABBNode* rootNode, 
+	std::set<int>& triangleIndices, std::vector<Aabb>& collisionAabbs)
 {
 	if (CollisionAABBvsAABB(sphereAabb, rootNode->GetModelAABB()))
 	{
+		collisionAabbs.push_back(rootNode->GetModelAABB());
+
 		if (rootNode->triangleIndices.empty())
 		{
 			if (rootNode->leftNode != nullptr)
 			{
-				CollisionAABBvsHAABB(sphereAabb, rootNode->leftNode, triangleIndices);
-				CollisionAABBvsHAABB(sphereAabb, rootNode->rightNode, triangleIndices);
+				CollisionAABBvsHAABB(sphereAabb, rootNode->leftNode, triangleIndices, collisionAabbs);
+				CollisionAABBvsHAABB(sphereAabb, rootNode->rightNode, triangleIndices, collisionAabbs);
 			}
 		}
 		else
@@ -23,14 +26,15 @@ void CollisionAABBvsHAABB(const Aabb& sphereAabb, HierarchicalAABBNode* rootNode
 bool CollisionSphereVsMeshOfTriangles(const Aabb& sphereAabb, Sphere* sphere, HierarchicalAABBNode* rootNode, 
 	const glm::mat4 transformMatrix, const std::vector<Triangle>& triangles,
 	std::vector<glm::vec3>& collisionPoints,
-	std::vector<glm::vec3>& collisionNormals)
+	std::vector<glm::vec3>& collisionNormals,
+	std::vector<Aabb>& collisionAabbs)
 	
 
 {
-
+	collisionAabbs.clear();
 	std::set<int> triangleIndices;
 
-	CollisionAABBvsHAABB(sphereAabb, rootNode, triangleIndices);
+	CollisionAABBvsHAABB(sphereAabb, rootNode, triangleIndices, collisionAabbs);
 
 	if (triangleIndices.empty()) return false;
 
@@ -56,12 +60,17 @@ bool CollisionSphereVsMeshOfTriangles(const Aabb& sphereAabb, Sphere* sphere, Hi
 
 }
 
-bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb, HierarchicalAABBNode* rootNode, const glm::mat4 transformMatrix, const std::vector<Triangle>& triangles, std::vector<glm::vec3>& collisionPoints, std::vector<glm::vec3>& collisionNormals)
+bool CollisionAABBVsMeshOfTriangles(const Aabb& aabb, HierarchicalAABBNode* rootNode, 
+	const glm::mat4 transformMatrix,
+	const std::vector<Triangle>& triangles, 
+	std::vector<glm::vec3>& collisionPoints, 
+	std::vector<glm::vec3>& collisionNormals,
+	std::vector<Aabb>& collisionAabbs)
 {
 
 	std::set<int> triangleIndices;
 
-	CollisionAABBvsHAABB(aabb, rootNode, triangleIndices);
+	CollisionAABBvsHAABB(aabb, rootNode, triangleIndices, collisionAabbs);
 
 	if (triangleIndices.empty()) return false;
 

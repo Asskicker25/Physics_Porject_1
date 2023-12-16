@@ -9,6 +9,16 @@ DebugModels::DebugModels(const std::string& path)
 	Initialize();
 }
 
+DebugModels::DebugModels(MeshDataHolder& meshData)
+{
+	this->meshData = meshData;
+	placeHolder = new Model();
+	placeHolder->LoadModel(meshData,false);
+	placeHolder->isActive = false;
+
+	Initialize();
+}
+
 void DebugModels::Initialize()
 {
 	GrowList();

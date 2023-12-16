@@ -65,6 +65,7 @@ public:
 	void MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods) override;
 
 	void DrawAABBRecursive(HierarchicalAABBNode* node);
+	void DrawCollisionAabb(PhysicsObject* phyObj);
 
 };
 

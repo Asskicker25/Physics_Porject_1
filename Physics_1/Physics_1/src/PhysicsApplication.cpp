@@ -12,7 +12,7 @@ void PhysicsApplication::SetUp()
 	physicsEngine.fixedStepTime = 0.01f;
 	renderer.wireframeMaterial->SetBaseColor(glm::vec4(0));
 
-	camera->cameraPos.z = 10;
+	camera->transform.position.z = 10;
 	camera->InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 300.0f, 60.0f);
 
 	Model* lightModel = new Model("res/Models/DefaultSphere.fbx");
@@ -28,7 +28,7 @@ void PhysicsApplication::SetUp()
 	sphere->transform.SetScale(glm::vec3(1));
 	spherePhy = new PhysicsObject();
 	spherePhy->maxDepth = 10;
-	spherePhy->Initialize(sphere, MESH_OF_TRIANGLES, DYNAMIC);
+	spherePhy->Initialize(sphere, SPHERE, DYNAMIC);
 	physicsEngine.AddPhysicsObject(spherePhy);
 	renderer.AddModel(sphere, &defShader);
 	listOfPhyObjects.push_back(spherePhy);
@@ -133,12 +133,13 @@ void PhysicsApplication::SetUp()
 
 void PhysicsApplication::PreRender()
 {
-
 }
 
 void PhysicsApplication::PostRender()
 {
-	physicsEngine.Update(deltaTime);
+	physicsEngine.Update(Timer::GetInstance().deltaTime);
+	DrawCollisionAabb(spherePhy);
+
 
 	/*Sphere* sphere1 = dynamic_cast<Sphere*>(planePhy->GetTransformedPhysicsShape());
 	Sphere* sphere2 = dynamic_cast<Sphere*>(planePhy2->GetTransformedPhysicsShape());
@@ -231,5 +232,15 @@ void PhysicsApplication::DrawAABBRecursive(HierarchicalAABBNode* node)
 	DrawAABBRecursive(node->leftNode);
 	DrawAABBRecursive(node->rightNode);
 
+}
+
+void PhysicsApplication::DrawCollisionAabb(PhysicsObject* phyObj)
+{
+	std::vector<Aabb> collisionAabs = phyObj->GetCollisionAabbs();
+
+	for (Aabb aabb : collisionAabs)
+	{
+		renderer.DrawAABB(GetGraphicsAabb(aabb), aabbColor[1]);
+	}
 }
 

@@ -21,11 +21,14 @@ private:
 	std::vector <Sphere*>  triangleSpheres;
 	std::vector <glm::vec3> collisionPoints;
 	std::vector <glm::vec3> collisionNormals;
+	std::vector<Aabb> collisionAabbs;
+	std::vector<PhysicsObject*> listOfExcludingPhyObjects;
 
 	std::function<void(PhysicsObject*)> collisionCallback = nullptr;
 
 public:
 
+	bool isEnabled = true;
 	bool isCollisionInvoke = false;
 	bool useBvh = true;
 	float maxDepth = 10;
@@ -63,6 +66,9 @@ public:
 	Aabb GetModelAABB();
 	Aabb GetAABB();
 
+	void AddExludingPhyObj(PhysicsObject* phyObj);
+	bool CheckIfExcluding(PhysicsObject* phyObj);
+
 	void CalculatePhysicsShape();
 	iShape* GetTransformedPhysicsShape();
 
@@ -76,8 +82,10 @@ public:
 	const std::vector < Sphere* >& GetSphereList();
 	const std::vector <glm::vec3>& GetCollisionPoints();
 	const std::vector <glm::vec3>& GetCollisionNormals();
+	const std::vector<Aabb>& GetCollisionAabbs();
 	void SetCollisionPoints(const std::vector <glm::vec3>& collisionPoints);
 	void SetCollisionNormals(const std::vector <glm::vec3>& collisionNormals);
+	void SetCollisionAabbs(const std::vector <Aabb>& collisionAabs);
 
 	// Inherited via iPhysicsTransformable
 	glm::vec3 GetPosition() override;
