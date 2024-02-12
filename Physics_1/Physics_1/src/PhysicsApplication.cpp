@@ -29,7 +29,7 @@ void PhysicsApplication::SetUp()
 	sphere->transform.SetPosition(glm::vec3(0, 3, 0));
 	sphere->transform.SetScale(glm::vec3(0.5));
 
-	Model* plane = new Model("Assets/Models/Plane/Plane.fbx");
+	Model* plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
 	plane->name = "Plane";
 	plane->transform.SetPosition(glm::vec3(0, -1.5, 0));
 	plane->transform.SetRotation(glm::vec3(-90.0f,0,0));
@@ -40,7 +40,7 @@ void PhysicsApplication::SetUp()
 	physicsEngine.AddPhysicsObject(spherePhy);
 
 	planePhy = new PhysicsObject();
-	planePhy->Initialize(plane, AABB, STATIC);
+	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
 	physicsEngine.AddPhysicsObject(planePhy);
 
 	physicsEngine.gravity.y = -9.8f / 3.0f;
@@ -61,6 +61,9 @@ void PhysicsApplication::Render()
 
 	Renderer::GetInstance().DrawSphere(sphere->position, sphere->radius, glm::vec4(0, 1, 0, 1));
 	Renderer::GetInstance().DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), glm::vec4(1, 0, 0, 1), false);
+
+	//DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
+	DrawCollisionAabb(spherePhy);
 }
 
 
