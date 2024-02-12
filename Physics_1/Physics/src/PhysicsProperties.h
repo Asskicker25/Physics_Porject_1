@@ -16,6 +16,6 @@ public:
 	float colliderScale = 1;
 
 	glm::vec3 gravityScale = glm::vec3(1.0f);
-	glm::vec3 offset = glm::vec3(1.0f);
+	glm::vec3 offset = glm::vec3(0.0f);
 };
 

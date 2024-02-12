@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Physics\src;$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)\Dependencies\lib\Graphics\Debug;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Physics\src;$(ProjectDir)Dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(ProjectDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(ProjectDir)\Dependencies\lib\Graphics\Debug;$(ProjectDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)Physics\src;$(SolutionDir)Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(SolutionDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(SolutionDir)Dependencies\lib\Graphics\Release;$(SolutionDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Physics\src;$(ProjectDir)Dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(ProjectDir)\Dependencies\lib\glfw\$(Configuration)_x64;$(ProjectDir)Dependencies\lib\Graphics\Release;$(ProjectDir)\Dependencies\lib\Debug_assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -138,10 +138,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Dependencies\include\imgui\ImCurveEdit.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\ImGradient.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\ImGuizmo.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Dependencies\include\imgui\ImSequencer.cpp" />
     <ClCompile Include="src\PhysicsApplication.cpp" />
     <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Dependencies\include\imgui\imconfig.h" />
+    <ClInclude Include="Dependencies\include\imgui\ImCurveEdit.h" />
+    <ClInclude Include="Dependencies\include\imgui\ImGradient.h" />
+    <ClInclude Include="Dependencies\include\imgui\imgui.h" />
+    <ClInclude Include="Dependencies\include\imgui\ImGuizmo.h" />
+    <ClInclude Include="Dependencies\include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Dependencies\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Dependencies\include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Dependencies\include\imgui\imgui_internal.h" />
+    <ClInclude Include="Dependencies\include\imgui\ImSequencer.h" />
+    <ClInclude Include="Dependencies\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Dependencies\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="Dependencies\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="Dependencies\include\imgui\ImZoomSlider.h" />
+    <ClInclude Include="src\AppSettings.h" />
     <ClInclude Include="src\PhysicsApplication.h" />
     <ClInclude Include="src\Utilities\Random.h" />
     <ClInclude Include="src\Utilities\Remap.h" />

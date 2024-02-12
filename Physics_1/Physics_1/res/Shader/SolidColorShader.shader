@@ -14,6 +14,8 @@ uniform mat4 model;
 uniform mat4 inverseModel;
 
 out vec3 Normal;
+out vec4 VertexColor;
+out vec2 TexCoord;
 
 void main()
 {
@@ -21,6 +23,8 @@ void main()
 	
 	vec4 worlNormal = inverseModel * vec4(normal, 1.0f);
 	Normal = normalize(worlNormal.xyz);
+	VertexColor = vertexColor;
+	TexCoord = texCoord;
 };
 
 
@@ -29,12 +33,26 @@ void main()
 #version 330 core
 
 out vec4 color;
+
+in vec4 VertexColor;
 in vec3 Normal;
+in vec2 TexCoord;
 
-uniform vec3 solidColor;
+uniform float alphaCutoffThreshold;
 
+uniform vec4 solidColor;
+
+uniform sampler2D texture_opacity;
 
 void main()
 {
+
+	float alphaCutOut = texture(texture_opacity, TexCoord).r;
+
+	if(alphaCutOut < alphaCutoffThreshold)
+	{
+		discard;
+	}
+
     color = vec4(solidColor.xyz, 1.0);
 };
