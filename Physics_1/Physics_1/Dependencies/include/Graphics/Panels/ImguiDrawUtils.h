@@ -4,5 +4,11 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui.h>
 
-
-extern void DrawVector3ImGui(std::string label, glm::vec3& values, float resetValue, float& columnWidth);
+namespace ImGuiUtils
+{
+	extern bool DrawVector3ImGui(std::string label, glm::vec3& values, float resetValue, float& columnWidth);
+	extern bool DrawVector2ImGui(std::string label, glm::vec2& values, float resetValue, float columnWidth);
+	extern bool DrawDropDown(std::string label, int& currentItem, const char* const* items, int size);
+	extern bool DrawFloat(std::string label, float& value);
+	extern bool DrawBool(std::string label, bool& value);
+}

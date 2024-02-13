@@ -1,5 +1,7 @@
 #include "Bloom.h"
 #include "../Renderer.h"
+#include "../Panels/ImguiDrawUtils.h"
+
 
 using namespace PostProcessing_v1;
 
@@ -12,16 +14,17 @@ void Bloom::OnPropertyDraw()
 	}
 
 
-	ImGui::Columns(2);
+	ImGuiUtils::DrawFloat("Amount", mAmount);
+	/*ImGui::Columns(2);
 	ImGui::SetColumnWidth(0, 150);
 	ImGui::Text("Amount");
 	ImGui::NextColumn();
 
 	ImGui::InputFloat("###BloomAmount", &mAmount,0,0,"%.2f");
 
-	ImGui::TreePop();
-	ImGui::Columns(1);
+	ImGui::Columns(1);*/
 
+	ImGui::TreePop();
 }
 
 void Bloom::OnSceneDraw()

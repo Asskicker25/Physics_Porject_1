@@ -1,5 +1,7 @@
 #include "PhysicsObject.h"
 #include <Graphics/Triangle.h>
+#include <Graphics/Panels/ImguiDrawUtils.h>
+
 
 PhysicsObject::PhysicsObject()
 {
@@ -17,22 +19,22 @@ PhysicsObject::~PhysicsObject()
 
 glm::vec3 PhysicsObject::GetPosition()
 {
-	return model->transform.position;
+	return transform.position;
 }
 
 glm::vec3 PhysicsObject::GetRotation()
 {
-	return model->transform.rotation;
+	return transform.rotation;
 }
 
 void PhysicsObject::SetPosition(const glm::vec3& newPosition)
 {
-	model->transform.position = newPosition;
+	transform.position = newPosition;
 }
 
 void PhysicsObject::SetDrawOrientation(const glm::vec3& newOrientation)
 {
-	model->transform.rotation = newOrientation;
+	transform.rotation = newOrientation;
 }
 
 const std::vector<Triangle>& PhysicsObject::GetTriangleList()
@@ -77,22 +79,126 @@ void PhysicsObject::SetCollisionAabbs(const std::vector<Aabb>& collisionAabs)
 
 void PhysicsObject::SetVisible(bool activeSelf)
 {
-	model->isActive = activeSelf;
+	isActive = activeSelf;
 }
 
 bool PhysicsObject::GetVisible()
 {
-	return model->isActive;
+	return isActive;
 }
 
-void PhysicsObject::Initialize(Model* model, PhysicsShape shape, PhysicsMode mode,
+void PhysicsObject::DrawPhysicsShape()
+{
+	switch (shape)
+	{
+	case SPHERE:
+		Renderer::GetInstance().DrawSphere(((Sphere*)GetTransformedPhysicsShape())->position,
+			((Sphere*)GetTransformedPhysicsShape())->radius, shapeColor);
+
+		Renderer::GetInstance().DrawAABB(GetGraphicsAabb(GetModelAABB()), shapeColor);
+
+		break;
+	case PLANE:
+		break;
+	case TRIANGLE:
+		break;
+	case AABB:
+		Renderer::GetInstance().DrawAABB(GetGraphicsAabb(GetModelAABB()), shapeColor);
+		break;
+	case CAPSULE:
+		break;
+	case MESH_OF_TRIANGLES:
+		break;
+	default:
+		break;
+	}
+}
+
+void PhysicsObject::DrawPhysicsProperties()
+{
+	if (!ImGui::TreeNodeEx("PhyProperties", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		return;
+	}
+
+	ImGuiUtils::DrawFloat("Mass", properties.mass);
+	ImGuiUtils::DrawFloat("Bounciness", properties.bounciness);
+
+	if (ImGuiUtils::DrawFloat("Collider Scale", properties.colliderScale))
+	{
+		//InitializePhysics(shape, mode, collisionMode, isCollisionInvoke);
+	}
+
+	float width = 150;
+	ImGuiUtils::DrawVector3ImGui("Gravity", properties.gravityScale, 0, width);
+
+
+	if (ImGuiUtils::DrawVector3ImGui("Offset", properties.offset, 0, width))
+	{
+		//InitializePhysics(shape, mode, collisionMode, isCollisionInvoke);
+	}
+
+	ImGui::TreePop();
+}
+
+void PhysicsObject::OnPropertyDraw()
+{
+	Model::OnPropertyDraw();
+
+
+	ImGui::Checkbox("PhyObjEnabled", &isEnabled);
+	ImGui::SameLine();
+	if (!ImGui::TreeNodeEx("Physics Object", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		return;
+	}
+
+	ImGuiUtils::DrawBool("InvokeCollision", isCollisionInvoke);
+	ImGuiUtils::DrawBool("UseBVH", useBvh);
+	ImGuiUtils::DrawFloat("BVH_Depth", maxDepth);
+
+	if (ImGuiUtils::DrawDropDown("Mode", modeInt, modeStrings, 2))
+	{
+		mode = PhysicsMode(modeInt);
+	};
+
+	if (ImGuiUtils::DrawDropDown("Shape", shapeInt, shapeStrings, 6))
+	{
+		shape = (PhysicsShape)shapeInt;
+		InitializePhysics(shape, mode, collisionMode, isCollisionInvoke);
+	};
+
+	if (ImGuiUtils::DrawDropDown("CollisionMode", collisionModeInt, collModeStrings, 2))
+	{
+		collisionMode = (CollisionMode)collisionModeInt;
+	};
+
+	DrawPhysicsProperties();
+
+	ImGui::TreePop();
+}
+
+void PhysicsObject::Render()
+{
+	Model::Render();
+
+	/*if (Renderer::GetInstance().selectedModel == this)
+	{
+	}*/
+	DrawPhysicsShape();
+}
+
+void PhysicsObject::InitializePhysics(PhysicsShape shape, PhysicsMode mode,
 	CollisionMode collisionMode, bool isCollisionInvoke)
 {
-	this->model = model;
 	this->shape = shape;
 	this->mode = mode;
 	this->collisionMode = collisionMode;
 	this->isCollisionInvoke = isCollisionInvoke;
+
+	modeInt = (int)mode;
+	shapeInt = (int)shape;
+	collisionModeInt = (int)collisionMode;
 
 	CalculatePhysicsShape();
 
@@ -103,10 +209,6 @@ void PhysicsObject::AssignCollisionCallback(const std::function<void(PhysicsObje
 	this->collisionCallback = collisionCallback;
 }
 
-Model* PhysicsObject::GetModel()
-{
-	return model;
-}
 
 const std::function<void(PhysicsObject*)>& PhysicsObject::GetCollisionCallback()
 {
@@ -115,17 +217,17 @@ const std::function<void(PhysicsObject*)>& PhysicsObject::GetCollisionCallback()
 
 Aabb PhysicsObject::CalculateModelAABB()
 {
-	if (model->meshes.empty())
+	if (meshes.empty())
 	{
 		return Aabb{ glm::vec3(0.0f), glm::vec3(0.0f) };
 	}
 
 	Aabb minMax;
 
-	minMax.min = model->meshes[0]->mesh->vertices[0].positions;
-	minMax.max = model->meshes[0]->mesh->vertices[0].positions;
+	minMax.min = meshes[0]->mesh->vertices[0].positions;
+	minMax.max = meshes[0]->mesh->vertices[0].positions;
 
-	for (MeshAndMaterial* mesh : model->meshes)
+	for (MeshAndMaterial* mesh : meshes)
 	{
 		Aabb temp = CalculateAABB(mesh->mesh->vertices);
 
@@ -143,7 +245,16 @@ Aabb PhysicsObject::CalculateModelAABB()
 
 Aabb PhysicsObject::GetModelAABB()
 {
-	glm::mat4 transformMatrix = model->transform.GetTransformMatrix();
+	//glm::mat4 transformMatrix = transform.GetTransformMatrix();
+
+	glm::mat4 transformMatrix = glm::mat4(1.0f);
+
+	transformMatrix = glm::translate(glm::mat4(1.0f), transform.position + properties.offset)
+		* glm::toMat4(transform.quaternionRotation)
+		* glm::scale(glm::mat4(1.0f), transform.scale * properties.colliderScale);
+
+	//transformMatrix = glm::translate(transformMatrix, glm::vec3(properties.offset));
+	//transformMatrix = glm::scale(transformMatrix,glm::vec3( properties.colliderScale));
 
 	if (cachedMatrix == transformMatrix)
 	{
@@ -210,10 +321,10 @@ void PhysicsObject::CalculatePhysicsShape()
 	if (shape == SPHERE)
 	{
 		glm::vec3 position = (aabb.min + aabb.max) * 0.5f;
-		position += properties.offset;
+		//position += properties.offset;
 		glm::vec3 sideLengths = aabb.max - aabb.min;
 		float radius = 0.5f * glm::max(sideLengths.x, glm::max(sideLengths.y, sideLengths.z));
-		radius *= properties.colliderScale;
+		//radius *= properties.colliderScale;
 		physicsShape = new Sphere(position, radius);
 		transformedPhysicsShape = new Sphere();
 	}
@@ -232,14 +343,17 @@ iShape* PhysicsObject::GetTransformedPhysicsShape()
 		Sphere* sphere = dynamic_cast<Sphere*>(physicsShape);
 
 		Sphere* temp = dynamic_cast<Sphere*> (transformedPhysicsShape);
-		temp->position = model->transform.GetTransformMatrix() * glm::vec4(sphere->position, 1.0f);
+		temp->position = transform.GetTransformMatrix() * glm::vec4(sphere->position, 1.0f);
+		temp->position += properties.offset;
 
 		/*temp->radius = sphere->radius * glm::length(model->transform.scale);*/
 
 		temp->radius = sphere->radius *
 			glm::max(
-				glm::max(model->transform.scale.x, model->transform.scale.y),
-				model->transform.scale.z);
+				glm::max(transform.scale.x, transform.scale.y),
+				transform.scale.z);
+
+		temp->radius *= properties.colliderScale;
 
 		return transformedPhysicsShape;
 	}
@@ -260,7 +374,7 @@ void PhysicsObject::CalculateTriangleSpheres()
 	triangles.clear();
 	triangleSpheres.clear();
 
-	for (MeshAndMaterial* mesh : model->meshes)
+	for (MeshAndMaterial* mesh : meshes)
 	{
 		for (const Triangles& triangle : mesh->mesh->triangles)
 		{
@@ -305,17 +419,17 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 		case CAPSULE:
 			break;
 		case MESH_OF_TRIANGLES:
-			if(other->useBvh)
+			if (other->useBvh)
 			{
 				return CollisionSphereVsMeshOfTriangles(GetModelAABB(),
 					dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
-						other->hierarchialAABB->rootNode, other->model->transform.GetTransformMatrix(),
-						other->GetTriangleList(), collisionPoints, collisionNormals,collisionAabbs
-						);
+					other->hierarchialAABB->rootNode, other->transform.GetTransformMatrix(),
+					other->GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs
+				);
 			}
 
 			return CollisionSphereVsMeshOfTriangles(dynamic_cast<Sphere*>(GetTransformedPhysicsShape()),
-				other->model->transform.GetTransformMatrix(),
+				other->transform.GetTransformMatrix(),
 				other->GetTriangleList(), other->GetSphereList(),
 				collisionPoints, collisionNormals);
 		}
@@ -341,11 +455,11 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 			if (other->useBvh)
 			{
 				return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
-					other->hierarchialAABB->rootNode, other->model->transform.GetTransformMatrix(),
+					other->hierarchialAABB->rootNode, other->transform.GetTransformMatrix(),
 					other->GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs);
 			}
 			return CollisionAABBVsMeshOfTriangles(GetModelAABB(),
-				other->model->transform.GetTransformMatrix(),
+				other->transform.GetTransformMatrix(),
 				other->GetTriangleList(), other->GetSphereList(),
 				collisionPoints, collisionNormals);
 		}
@@ -360,11 +474,11 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 			if (other->useBvh)
 			{
 				return CollisionAABBVsMeshOfTriangles(other->GetModelAABB(),
-					hierarchialAABB->rootNode, model->transform.GetTransformMatrix(),
+					hierarchialAABB->rootNode, transform.GetTransformMatrix(),
 					GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs);
 			}
 			return CollisionAABBVsMeshOfTriangles(other->GetModelAABB(),
-				model->transform.GetTransformMatrix(),
+				transform.GetTransformMatrix(),
 				GetTriangleList(), GetSphereList(),
 				collisionPoints, collisionNormals);
 
@@ -373,13 +487,13 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 			{
 				return CollisionSphereVsMeshOfTriangles(other->GetModelAABB(),
 					dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()),
-					hierarchialAABB->rootNode, model->transform.GetTransformMatrix(),
+					hierarchialAABB->rootNode, transform.GetTransformMatrix(),
 					GetTriangleList(), collisionPoints, collisionNormals, collisionAabbs
 				);
 			}
 
 			return CollisionSphereVsMeshOfTriangles(dynamic_cast<Sphere*>(other->GetTransformedPhysicsShape()),
-				model->transform.GetTransformMatrix(),
+				transform.GetTransformMatrix(),
 				GetTriangleList(), GetSphereList(),
 				collisionPoints, collisionNormals);
 		case TRIANGLE:
@@ -391,10 +505,10 @@ bool PhysicsObject::CheckCollision(PhysicsObject* other,
 		case MESH_OF_TRIANGLES:
 
 			return CollisionMeshVsMesh(hierarchialAABB->rootNode, other->hierarchialAABB->rootNode,
-				model->transform.GetTransformMatrix(), other->model->transform.GetTransformMatrix(),
+				transform.GetTransformMatrix(), other->transform.GetTransformMatrix(),
 				GetTriangleList(), other->GetTriangleList(), collisionPoints, collisionNormals);
 			break;
-			
+
 		}
 		break;
 #pragma endregion

@@ -8,10 +8,10 @@
 #include "PhysicsProperties.h"
 #include "HierarchicalAABB.h"
 
-class PhysicsObject : public iPhysicsTransformable
+
+class PhysicsObject : public Model, public iPhysicsTransformable
 {
 private:
-	Model* model = nullptr;
 
 	Aabb cachedAABB;
 	Aabb aabb;
@@ -25,6 +25,19 @@ private:
 	std::vector<PhysicsObject*> listOfExcludingPhyObjects;
 
 	std::function<void(PhysicsObject*)> collisionCallback = nullptr;
+
+	int modeInt = 0;
+	int shapeInt = 0;
+	int collisionModeInt = 0;
+
+	const char* modeStrings[2] = { "Static", "Dynamic" };
+	const char* shapeStrings[6] = { "Sphere", "Plane",  "Triangle", "AABB", "Capsule", "Mesh"};
+	const char* collModeStrings[6] = { "Solid", "Trigger"};
+
+	glm::vec4 shapeColor = glm::vec4(0, 1, 0, 1);
+
+	void DrawPhysicsShape();
+	void DrawPhysicsProperties();
 
 public:
 
@@ -54,12 +67,10 @@ public:
 	PhysicsObject();
 	~PhysicsObject();
 
-	//void Initialize(Model* model,PhysicsShape shape, PhysicsMode mode = STATIC);
-	void Initialize(Model* model, PhysicsShape shape, PhysicsMode mode = STATIC,
+	void InitializePhysics(PhysicsShape shape, PhysicsMode mode = STATIC,
 		CollisionMode collisionMode = SOLID, bool isCollisionInvoke = false);
 
 	void AssignCollisionCallback(const std::function<void(PhysicsObject*)>& collisionCallback);
-	Model* GetModel();
 	const std::function<void(PhysicsObject*)>& GetCollisionCallback();
 
 	Aabb CalculateModelAABB();
@@ -95,6 +106,9 @@ public:
 	void SetVisible(bool activeSelf) override;
 
 	bool GetVisible() override;
+
+	virtual void OnPropertyDraw();
+	virtual void Render();
 
 };
 

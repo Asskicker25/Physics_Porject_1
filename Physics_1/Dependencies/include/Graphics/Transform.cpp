@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include <glm/gtx/euler_angles.hpp>
+#include "Panels/ImguiDrawUtils.h"
 
 Transform::Transform() : position{ glm::vec3(0) }, rotation{ glm::vec3(0) }, scale{ glm::vec3(1.0f) }
 {
@@ -154,9 +155,9 @@ void Transform::OnPropertyDraw()
 		return;
 	}
 
-	DrawVector3ImGui("Position", position,0, posXColumnWidth);
-	DrawVector3ImGui("Rotation", rotation,0, rotXColumnWidth);
-	DrawVector3ImGui("Scale", scale, 1 , scaleXColumnWidth);
+	ImGuiUtils::DrawVector3ImGui("Position", position,0, posXColumnWidth);
+	ImGuiUtils::DrawVector3ImGui("Rotation", rotation,0, rotXColumnWidth);
+	ImGuiUtils::DrawVector3ImGui("Scale", scale, 1 , scaleXColumnWidth);
 
 	SetRotation(rotation);
 

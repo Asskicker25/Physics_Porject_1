@@ -39,6 +39,7 @@ public:
 
 	virtual void OnPropertyDraw();
 	virtual void OnSceneDraw();
+	virtual void Render();
 
 	// Inherited via Entity
 	virtual void Start() override;
@@ -74,7 +75,6 @@ private:
 
 	void OnModelSelected();
 
-	// Inherited via Entity
-	void Render() override;
+	
 };
 

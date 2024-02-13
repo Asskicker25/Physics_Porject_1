@@ -86,7 +86,7 @@ void PhysicsApplication::SetUp()
 		newBall->transform.position.z = GetRandomNumber(-6, 6);
 
 		PhysicsObject* ballPhy = new PhysicsObject();
-		ballPhy->Initialize(newBall, SPHERE, DYNAMIC);
+		ballPhy->InitializePhysics(newBall, SPHERE, DYNAMIC);
 
 
 		renderer.AddModel(*newBall,defShader);
@@ -103,25 +103,25 @@ void PhysicsApplication::SetUp()
 
 #pragma region Physics
 
-	poolTablePhy.Initialize(&poolTable, AABB, STATIC);
+	poolTablePhy.InitializePhysics(&poolTable, AABB, STATIC);
 
 	PhysicsObject* rightCubePhy = new PhysicsObject();
-	rightCubePhy->Initialize(rightCube, AABB, STATIC);
+	rightCubePhy->InitializePhysics(rightCube, AABB, STATIC);
 
 	PhysicsObject* leftCubePhy = new PhysicsObject();
-	leftCubePhy->Initialize(leftCube, AABB, STATIC);
+	leftCubePhy->InitializePhysics(leftCube, AABB, STATIC);
 
 	PhysicsObject* frontCubePhy = new PhysicsObject();
-	frontCubePhy->Initialize(frontCube, AABB, STATIC);
+	frontCubePhy->InitializePhysics(frontCube, AABB, STATIC);
 
 	PhysicsObject* backCubePhy = new PhysicsObject();
-	backCubePhy->Initialize(backCube, AABB, STATIC);
+	backCubePhy->InitializePhysics(backCube, AABB, STATIC);
 
 	PhysicsObject* topCubePhy = new PhysicsObject();
-	topCubePhy->Initialize(topCube, AABB, STATIC);
+	topCubePhy->InitializePhysics(topCube, AABB, STATIC);
 
 	PhysicsObject* poolBallPhy = new PhysicsObject();
-	poolBallPhy->Initialize(poolBall, SPHERE, DYNAMIC);
+	poolBallPhy->InitializePhysics(poolBall, SPHERE, DYNAMIC);
 	//poolBallPhy.velocity = glm::vec3(20.5f, 0.0f, 0.0f);
 	poolBallPhy->velocity = glm::vec3(0.0f, 0.f, 0.0f);
 	poolBallPhy->properties.SetMass(1.0f);

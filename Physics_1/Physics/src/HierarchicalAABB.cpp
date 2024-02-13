@@ -11,5 +11,5 @@ HierarchicalAABB::HierarchicalAABB(PhysicsObject* phyObj, int maxDepth)
 void HierarchicalAABB::Construct()
 {
 	rootNode = new HierarchicalAABBNode(phyObj->GetAABB(), phyObj->GetTriangleList(), {}, 0, nullptr,
-		phyObj->GetModel(), maxDepth);
+		phyObj, maxDepth);
 }

@@ -2,6 +2,7 @@
 #include "Panels/EditorLayout.h"
 #include "Renderer.h"
 #include "UnlitColorMaterial.h"
+#include "Panels/ImguiDrawUtils.h"
 
 Camera::Camera()
 {
@@ -10,15 +11,15 @@ Camera::Camera()
 	this->farPlane = 100.0f;
 	this->fov = 45.0f;
 	this->name = "Camera";
-	
+
 	isGizmoItem = true;
 
 	transform.SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
 
-	transform.SetOrientationFromDirections(glm::vec3(0, 1, 0), glm::vec3(0,1,0));
+	transform.SetOrientationFromDirections(glm::vec3(0, 1, 0), glm::vec3(0, 1, 0));
 }
 
-void Camera::InitializeCamera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane, float _fov) 
+void Camera::InitializeCamera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane, float _fov)
 {
 	cameraType = _cameraType;
 	cameraWidth = _cameraWidth;
@@ -29,7 +30,7 @@ void Camera::InitializeCamera(ECameraType _cameraType, float _cameraWidth, float
 
 	item_current = cameraType == PERSPECTIVE ? 0 : 1;
 
-	Resize(cameraWidth,cameraHeight);
+	Resize(cameraWidth, cameraHeight);
 
 	postProcessing = new PostProcessing_v1::PostProcessing(cameraWidth, cameraHeight);
 
@@ -61,7 +62,7 @@ Camera::Camera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight,
 	isGizmoItem = true;
 }
 
-Camera::Camera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane) : 
+Camera::Camera(ECameraType _cameraType, float _cameraWidth, float _cameraHeight, float _nearPlane, float _farPlane) :
 	cameraType{ _cameraType }, cameraWidth{ _cameraWidth }, cameraHeight{ _cameraHeight }, nearPlane{ _nearPlane }, farPlane{ _farPlane }, fov{ 0 }
 {
 	Resize(cameraWidth, cameraHeight);
@@ -95,7 +96,7 @@ void Camera::ChangeCameraType(ECameraType type)
 {
 	cameraType = type;
 	item_current = cameraType == PERSPECTIVE ? 0 : 1;
-	Resize(cameraWidth,cameraHeight);
+	Resize(cameraWidth, cameraHeight);
 }
 
 bool Camera::IsOrthographic()
@@ -157,33 +158,38 @@ void Camera::OnPropertyDraw()
 		return;
 	}
 
-
-	ImGui::Columns(2);
-	ImGui::SetColumnWidth(0, 150);
-	ImGui::Text("Projection");
-	ImGui::NextColumn();
-
-	if (ImGui::Combo("###ProjectionType", &item_current, items, IM_ARRAYSIZE(items)))
+	if (ImGuiUtils::DrawDropDown("Projection", item_current, items, 2))
 	{
 		cameraType = ECameraType(item_current);
-		UpdateProjectionMatrix();
-	}
-
-	ImGui::Columns(1);
-
+			UpdateProjectionMatrix();
+	};
 	ImGui::TreePop();
 
-	ImGui::Checkbox("###EnablePostProcess", &applyPostProcessing);
-	ImGui::SameLine();
+		//ImGui::Columns(2);
+		//ImGui::SetColumnWidth(0, 150);
+		//ImGui::Text("Projection");
+		//ImGui::NextColumn();
 
-	if (!ImGui::TreeNodeEx("PostProcessing", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		return;
-	}
+		//if (ImGui::Combo("###ProjectionType", &item_current, items, IM_ARRAYSIZE(items)))
+		//{
+		//	cameraType = ECameraType(item_current);
+		//	UpdateProjectionMatrix();
+		//}
 
-	postProcessing->OnPropertyDraw();
+		//ImGui::Columns(1);
 
-	ImGui::TreePop();
+
+		ImGui::Checkbox("###EnablePostProcess", &applyPostProcessing);
+		ImGui::SameLine();
+
+		if (!ImGui::TreeNodeEx("PostProcessing", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			return;
+		}
+
+		postProcessing->OnPropertyDraw();
+
+		ImGui::TreePop();
 }
 
 void Camera::OnSceneDraw()

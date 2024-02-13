@@ -3,7 +3,6 @@
 #include "Debugger.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
-#include "Panels/ImguiDrawUtils.h"
 
 class Object
 {

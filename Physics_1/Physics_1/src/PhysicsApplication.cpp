@@ -24,23 +24,25 @@ void PhysicsApplication::SetUp()
 	dirLight->transform.SetPosition(glm::vec3(0, 0, 3));
 	dirLight->InitializeLight(Directional);
 
-	Model* sphere = new Model("res/Models/DefaultSphere.fbx");
-	sphere->name = "Sphere";
-	sphere->transform.SetPosition(glm::vec3(0, 3, 0));
-	sphere->transform.SetScale(glm::vec3(0.5));
-
-	Model* plane = new Model("Assets/Models/Plane/PlaneWithTex.fbx");
-	plane->name = "Plane";
-	plane->transform.SetPosition(glm::vec3(0, -1.5, 0));
-	plane->transform.SetRotation(glm::vec3(-90.0f,0,0));
-	plane->transform.SetScale(glm::vec3(5.5));
-
 	spherePhy = new PhysicsObject();
-	spherePhy->Initialize(sphere, SPHERE,DYNAMIC);
+	spherePhy->name = "Sphere";
+	spherePhy->LoadModel("res/Models/DefaultSphere.fbx");
+	spherePhy->InitializePhysics(SPHERE,DYNAMIC);
+	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));
+	spherePhy->transform.SetScale(glm::vec3(0.5));
+	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));
+
 	physicsEngine.AddPhysicsObject(spherePhy);
 
+
 	planePhy = new PhysicsObject();
-	planePhy->Initialize(plane, MESH_OF_TRIANGLES, STATIC);
+	planePhy->name = "Plane";
+	planePhy->LoadModel("Assets/Models/Plane/Plane.fbx");
+	planePhy->InitializePhysics(MESH_OF_TRIANGLES, STATIC);
+	planePhy->transform.SetPosition(glm::vec3(0, -1.5, 0));
+	planePhy->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	planePhy->transform.SetScale(glm::vec3(5.5));
+
 	physicsEngine.AddPhysicsObject(planePhy);
 
 	physicsEngine.gravity.y = -9.8f / 3.0f;
@@ -57,10 +59,10 @@ void PhysicsApplication::Render()
 {
 	//Renderer::GetInstance().DrawAABB(GetGraphicsAabb(spherePhy->GetModelAABB()), glm::vec4(0, 1, 0, 1), false);
 	
-	Sphere* sphere = (Sphere*)spherePhy->GetTransformedPhysicsShape();
+	/*Sphere* sphere = (Sphere*)spherePhy->GetTransformedPhysicsShape();
 
 	Renderer::GetInstance().DrawSphere(sphere->position, sphere->radius, glm::vec4(0, 1, 0, 1));
-	Renderer::GetInstance().DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), glm::vec4(1, 0, 0, 1), false);
+	Renderer::GetInstance().DrawAABB(GetGraphicsAabb(planePhy->GetModelAABB()), glm::vec4(1, 0, 0, 1), false);*/
 
 	//DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
 	DrawCollisionAabb(spherePhy);

@@ -67,7 +67,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 		if (iteratorObject->mode == PhysicsMode::STATIC)
 			continue;
 
-		if (iteratorObject->properties.inverse_mass < 0)
+		if (iteratorObject->properties.GetInverseMass() < 0)
 			continue;
 
 		collisionPoints.clear();
@@ -80,7 +80,7 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 				gravity.z * iteratorObject->properties.gravityScale.z);
 
 
-		glm::vec3 deltaAcceleration = iteratorGravity * deltaTime * iteratorObject->properties.inverse_mass;
+		glm::vec3 deltaAcceleration = iteratorGravity * deltaTime * iteratorObject->properties.GetInverseMass();
 
 		iteratorObject->velocity += deltaAcceleration;
 

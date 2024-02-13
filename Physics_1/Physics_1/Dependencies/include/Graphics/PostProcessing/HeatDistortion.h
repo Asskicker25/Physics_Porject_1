@@ -12,6 +12,8 @@ namespace PostProcessing_v1
 		// Inherited via SinglePassEffect
 		void OnPropertyDraw() override;
 		void SetShaderUniforms() override;
+
+		float mAmount = 1;
 	};
 }
 

@@ -8,25 +8,25 @@ class HierarchicalAABBNode;
 
 enum PhysicsShape
 {
-	SPHERE,
-	PLANE,
-	TRIANGLE,
-	AABB,
-	CAPSULE,
-	MESH_OF_TRIANGLES,
+	SPHERE = 0,
+	PLANE = 1,
+	TRIANGLE = 2,
+	AABB = 3,
+	CAPSULE = 4,
+	MESH_OF_TRIANGLES= 5,
 };
 
 enum PhysicsMode
 {
-	STATIC,
-	DYNAMIC,
-	KINEMATIC,
+	STATIC = 0,
+	DYNAMIC = 1,
+	KINEMATIC = 2,
 };
 
 enum CollisionMode
 {
-	TRIGGER,
-	SOLID
+	SOLID = 0,
+	TRIGGER = 1,
 };
 
 struct iShape

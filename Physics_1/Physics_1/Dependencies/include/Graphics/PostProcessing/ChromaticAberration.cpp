@@ -1,5 +1,6 @@
 #include "ChromaticAberration.h"
 #include "../Timer.h"
+#include "../Panels/ImguiDrawUtils.h"
 
 using namespace PostProcessing_v1;
 
@@ -17,16 +18,9 @@ void ChromaticAberration::OnPropertyDraw()
 		return;
 	}
 
-
-	ImGui::Columns(2);
-	ImGui::SetColumnWidth(0, 150);
-	ImGui::Text("Amount");
-	ImGui::NextColumn();
-
-	ImGui::InputFloat("###Chromatic amount", &mAmount);
+	ImGuiUtils::DrawFloat("Amount", mAmount);
 
 	ImGui::TreePop();
 
-	ImGui::Columns(1);
 }
 
