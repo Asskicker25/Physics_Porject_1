@@ -18,6 +18,12 @@ bool PhysicsEngine::PhysicsObjectExists(PhysicsObject* physicsObject)
 }
 
 
+PhysicsEngine& PhysicsEngine::GetInstance()
+{
+	static PhysicsEngine instance;
+	return instance;
+}
+
 void PhysicsEngine::AddPhysicsObject(PhysicsObject* physicsObject)
 {
 	if (!PhysicsObjectExists(physicsObject))

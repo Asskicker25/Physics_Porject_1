@@ -1,6 +1,7 @@
 #include "PhysicsObject.h"
 #include <Graphics/Triangle.h>
 #include <Graphics/Panels/ImguiDrawUtils.h>
+#include "PhysicsEngine.h"
 
 
 PhysicsObject::PhysicsObject()
@@ -108,6 +109,7 @@ void PhysicsObject::DrawPhysicsShape()
 	case CAPSULE:
 		break;
 	case MESH_OF_TRIANGLES:
+		Renderer::GetInstance().DrawAABB(GetGraphicsAabb(GetModelAABB()), shapeColor);
 		break;
 	default:
 		break;
@@ -201,6 +203,8 @@ void PhysicsObject::InitializePhysics(PhysicsShape shape, PhysicsMode mode,
 	collisionModeInt = (int)collisionMode;
 
 	CalculatePhysicsShape();
+
+	PhysicsEngine::GetInstance().AddPhysicsObject(this);
 
 }
 

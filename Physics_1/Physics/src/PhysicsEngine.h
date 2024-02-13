@@ -18,6 +18,8 @@ public:
 	float fixedStepTime = 0.2f;
 	glm::vec3 gravity = glm::vec3(0, -9.8f / 3.0f, 0);
 
+	static PhysicsEngine& GetInstance();
+
 	void AddPhysicsObject(PhysicsObject* physicsObject);
 	void RemovePhysicsObject(PhysicsObject* physicsObject);
 	bool PhysicsObjectExists(PhysicsObject* physicsObject);

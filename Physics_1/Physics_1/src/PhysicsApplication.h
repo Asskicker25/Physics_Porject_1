@@ -8,8 +8,6 @@ class PhysicsApplication : public ApplicationWindow
 {
 
 private:
-	PhysicsEngine physicsEngine;
-
 	int aabbDrawDepthIndex = 0;
 
 	int numberOfSpheres = 0;
