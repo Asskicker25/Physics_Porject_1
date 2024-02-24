@@ -17,4 +17,5 @@ void PostProcessing_v1::HeatDistortion::OnPropertyDraw()
 void PostProcessing_v1::HeatDistortion::SetShaderUniforms()
 {
 	shader->SetUniform1f("iTime", Timer::GetInstance().elapsedTime);
+	shader->SetUniform1f("amount", mAmount);
 }

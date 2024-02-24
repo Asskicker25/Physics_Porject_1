@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Softbody\SoftBody.h" />
     <ClInclude Include="src\HierarchicalAABBNode.h" />
     <ClInclude Include="src\HierarchicalAABB.h" />
     <ClInclude Include="src\PhysicsProperties.h" />
@@ -27,6 +28,7 @@
     <ClInclude Include="src\PhysicsShapeAndCollision.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Softbody\SoftBody.cpp" />
     <ClCompile Include="src\HierarchicalAABBNode.cpp" />
     <ClCompile Include="src\HierarchicalAABB.cpp" />
     <ClCompile Include="src\PhysicsProperties.cpp" />

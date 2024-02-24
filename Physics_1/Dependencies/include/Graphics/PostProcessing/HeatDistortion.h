@@ -13,7 +13,7 @@ namespace PostProcessing_v1
 		void OnPropertyDraw() override;
 		void SetShaderUniforms() override;
 
-		float mAmount = 1;
+		float mAmount = 2;
 	};
 }
 

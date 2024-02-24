@@ -1,5 +1,8 @@
 #include "PhysicsApplication.h"
 #include "Utilities/Random.h"
+#include <Softbody/SoftBody.h>
+
+using namespace Verlet;
 
 PhysicsObject* spherePhy;
 PhysicsObject* planePhy;
@@ -24,25 +27,29 @@ void PhysicsApplication::SetUp()
 	dirLight->transform.SetPosition(glm::vec3(0, 0, 3));
 	dirLight->InitializeLight(Directional);
 
-	spherePhy = new PhysicsObject();
+	/*spherePhy = new PhysicsObject();
 	spherePhy->name = "Sphere";
 	spherePhy->LoadModel("res/Models/DefaultSphere.fbx");
 	spherePhy->InitializePhysics(SPHERE,DYNAMIC);
 	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));
 	spherePhy->transform.SetScale(glm::vec3(0.5));
-	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));
+	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));*/
 
-	planePhy = new PhysicsObject();
+	/*planePhy = new PhysicsObject();
 	planePhy->name = "Plane";
 	planePhy->LoadModel("Assets/Models/Plane/Plane.fbx");
 	planePhy->InitializePhysics(MESH_OF_TRIANGLES, STATIC);
 	planePhy->transform.SetPosition(glm::vec3(0, -1.5, 0));
 	planePhy->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
-	planePhy->transform.SetScale(glm::vec3(5.5));
+	planePhy->transform.SetScale(glm::vec3(5.5));*/
 
 	PhysicsEngine::GetInstance().gravity.y = -9.8f / 3.0f;
 	PhysicsEngine::GetInstance().fixedStepTime = 0.01f;
 
+	
+	SoftBody* softbody = new SoftBody();
+	softbody->LoadModel("Assets/Models/Plane/Plane.fbx");
+	softbody->InitializeSoftBody();
 }
 
 void PhysicsApplication::Update()

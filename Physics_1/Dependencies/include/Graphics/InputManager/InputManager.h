@@ -38,7 +38,7 @@ public:
 
 	void OnKeyPressed(const int& key);
 	void OnKeyReleased(const int& key);
-	void OnKeyHeld(const int& key);
+	void OnKeyHeld();
 
 	float GetMouseX();
 	float GetMouseY();
@@ -50,5 +50,6 @@ public:
 	void SetMouseDelta(glm::vec2 delta);
 
 	void Update();
+	void Clear();
 };
 

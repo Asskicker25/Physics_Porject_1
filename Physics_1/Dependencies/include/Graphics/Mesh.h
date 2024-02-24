@@ -27,6 +27,8 @@ public:
 	void DrawNormals(Shader* shader, glm::vec3 color, glm::mat4 transformMatrix);
 
 	void UpdateVertices();
+	void UpdateVertices(std::vector<Vertex>& vertices, std::vector< unsigned int> indices);
+
 	VertexArray VAO;
 
 	std::string name;

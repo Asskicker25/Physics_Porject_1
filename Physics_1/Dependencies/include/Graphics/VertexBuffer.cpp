@@ -36,6 +36,6 @@ void VertexBuffer::Setup(unsigned int size, const void* data)
 void VertexBuffer::UpdateVertexData(unsigned int size, const void* data)
 {
 	Bind();
-	GLCALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+	GLCALL(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 

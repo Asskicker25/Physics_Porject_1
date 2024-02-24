@@ -134,7 +134,7 @@ namespace ImGuiUtils
 		ImGui::PopItemWidth();
 
 		ImGui::Columns(1);
-
+		ImGui::PopStyleVar();
 		ImGui::PopID();
 
 		return updated;
@@ -163,6 +163,53 @@ namespace ImGuiUtils
 		return updated;
 
 	}
+
+	bool DrawDragFloat(std::string label, float& value, float speed, float min, float max)
+	{
+		bool updated = false;
+
+		ImGui::PushID(label.c_str());
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 150);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		if (ImGui::DragFloat(("###" + label).c_str(),&value, speed,min,max,"%.2f"))
+		{
+			updated = true;
+		}
+
+		ImGui::Columns(1);
+
+		ImGui::PopID();
+
+		return updated;
+	}
+
+	bool DrawInt(std::string label, int& value)
+	{
+		bool updated = false;
+
+		ImGui::PushID(label.c_str());
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 150);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		if (ImGui::InputInt(("###" + label).c_str(), &value, 0, 0))
+		{
+			updated = true;
+		}
+
+		ImGui::Columns(1);
+
+		ImGui::PopID();
+
+		return updated;
+	}
+
 
 	bool DrawBool(std::string label, bool& value)
 	{

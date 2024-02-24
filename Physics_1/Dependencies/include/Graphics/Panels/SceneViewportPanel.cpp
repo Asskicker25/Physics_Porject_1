@@ -4,6 +4,8 @@
 #include "../MathUtils.h"
 #include "EditorLayout.h"
 
+using namespace MathUtilities;
+
 SceneViewportPanel::SceneViewportPanel()
 {
 	InputManager::GetInstance().AddListener(this);

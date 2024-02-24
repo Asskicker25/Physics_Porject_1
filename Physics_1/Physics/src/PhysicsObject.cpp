@@ -90,6 +90,8 @@ bool PhysicsObject::GetVisible()
 
 void PhysicsObject::DrawPhysicsShape()
 {
+	if (!initialized) return;
+
 	switch (shape)
 	{
 	case SPHERE:
@@ -148,7 +150,7 @@ void PhysicsObject::OnPropertyDraw()
 	Model::OnPropertyDraw();
 
 
-	ImGui::Checkbox("PhyObjEnabled", &isEnabled);
+	ImGui::Checkbox("###PhyObjEnabled", &isEnabled);
 	ImGui::SameLine();
 	if (!ImGui::TreeNodeEx("Physics Object", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -201,6 +203,8 @@ void PhysicsObject::InitializePhysics(PhysicsShape shape, PhysicsMode mode,
 	modeInt = (int)mode;
 	shapeInt = (int)shape;
 	collisionModeInt = (int)collisionMode;
+
+	initialized = true;
 
 	CalculatePhysicsShape();
 

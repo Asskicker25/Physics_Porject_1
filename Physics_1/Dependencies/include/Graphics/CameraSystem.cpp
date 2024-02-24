@@ -18,6 +18,16 @@ void CameraSystem::RemoveCamera(Camera* camera)
 		mListOfCameras.end());
 }
 
+void CameraSystem::ClearCameras()
+{
+	while (mListOfCameras.size() != 0)
+	{
+		delete mListOfCameras[0];
+	}
+
+	mListOfCameras.clear();
+}
+
 Camera* CameraSystem::GetMainCamera()
 {
 	Camera* camera = nullptr;

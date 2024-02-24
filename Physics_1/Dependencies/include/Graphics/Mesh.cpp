@@ -104,8 +104,17 @@ void Mesh::UpdateVertices()
 {
 	VAO.Bind();
 	VBO.UpdateVertexData(vertices.size() * sizeof(Vertex), &vertices[0]);
+	IBO.UpdateBuffer(indices.size(), &indices[0]);
 	VAO.AddBuffer(VBO, layout);
 	VAO.UnBind();
+}
+
+void Mesh::UpdateVertices(std::vector<Vertex>& vertices, std::vector<unsigned int> indices)
+{
+	this->vertices = vertices;
+	this->indices = indices;
+
+	UpdateVertices();
 }
 
 void Mesh::SetupMesh()

@@ -53,6 +53,8 @@ private :
 	glm::vec3 normalsScale = glm::vec3(0.001f, 0.1f, 0.001f);
 
 	float outlineScaleValue = 0.05f;
+	float gizmoScaleMultiplier = 1;
+	float gizmoScaleDownMultiplier = 0.3f;
 
 public:
 
@@ -86,6 +88,7 @@ public:
 	void Initialize();
 
 	void Clear();
+	void ClearModelList();
 	void AddModel(Model* model);
 	void AddModel(Model& model);
 	void RemoveModel(Model* model);

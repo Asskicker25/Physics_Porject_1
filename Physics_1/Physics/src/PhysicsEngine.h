@@ -15,7 +15,7 @@ private:
 	void UpdatePhysics(float deltaTime);
 
 public:
-	float fixedStepTime = 0.2f;
+	float fixedStepTime = 0.01f;
 	glm::vec3 gravity = glm::vec3(0, -9.8f / 3.0f, 0);
 
 	static PhysicsEngine& GetInstance();

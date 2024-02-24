@@ -184,11 +184,14 @@ void Model::DrawWireframe(const glm::vec3& color)
 
 }
 
-Model* Model::CopyFromModel(const Model& model)
+Model* Model::CopyFromModel(const Model& model, bool initialize)
 {
 	isActive = model.isActive;
 	directory = model.directory;
 	transform = model.transform;
+	shader = model.shader;
+	isGizmoItem = model.isGizmoItem;
+	applyGizmoScale = model.applyGizmoScale;
 	//material = model.material;
 
 	for (MeshAndMaterial* mesh : model.meshes)
@@ -200,6 +203,13 @@ Model* Model::CopyFromModel(const Model& model)
 
 		meshes.push_back(newMesh);
 	}
+
+	if (initialize)
+	{
+		InitializeEntity(this);
+		Renderer::GetInstance().AddModel(this);
+	}
+	
 
 	return this;
 }
