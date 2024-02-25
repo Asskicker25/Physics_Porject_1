@@ -57,6 +57,8 @@ namespace Verlet
 		virtual void Render();
 		virtual void OnPropertyDraw();
 
+		void AddForceToRandomNode(glm::vec3 velocity);
+
 		void AddLockNode(glm::vec3 posOffset, float radius);
 
 		bool showDebugModels = true;

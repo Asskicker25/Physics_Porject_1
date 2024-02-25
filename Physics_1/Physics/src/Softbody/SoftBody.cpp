@@ -2,7 +2,9 @@
 #include <Graphics/Panels/EditorLayout.h>
 #include <Graphics/Panels/ImguiDrawUtils.h>
 #include "SoftBody.h"
-#include <set>
+#include <Graphics/MathUtils.h>
+
+using namespace MathUtilities;
 
 namespace Verlet
 {
@@ -289,6 +291,13 @@ namespace Verlet
 	void SoftBody::AddLockNode(glm::vec3 posOffset, float radius)
 	{
 		mListOfLockNodes.push_back({ transform.position + posOffset , radius });
+	}
+
+	void SoftBody::AddForceToRandomNode(glm::vec3 velocity)
+	{
+		int index = MathUtils::GetRandomIntNumber(0, mListOfNodes.size() - 1);
+		
+		mListOfNodes[index]->velocity = velocity;
 	}
 
 }

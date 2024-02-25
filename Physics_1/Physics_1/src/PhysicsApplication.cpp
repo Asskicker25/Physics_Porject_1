@@ -8,6 +8,8 @@ PhysicsObject* spherePhy;
 PhysicsObject* planePhy;
 
 
+SoftBody* softbody;
+
 void PhysicsApplication::SetUp()
 {
 	viewportCamera->InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 100.0f, 45.0f);
@@ -48,21 +50,22 @@ void PhysicsApplication::SetUp()
 
 	EditorLayout::GetInstance().SetMaximizeState(false);
 	
-	SoftBody* softbody = new SoftBody();
-	//softbody->LoadModel("Assets/Models/Plane/Plane.ply");
-	softbody->LoadModel("Assets/Models/Wheel_15.ply");
+	softbody = new SoftBody();
+	softbody->LoadModel("Assets/Models/Plane/Plane.ply");
+	//softbody->LoadModel("Assets/Models/Wheel_15.ply");
 	//softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
 	//softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
 	//softbody->transform.SetScale(glm::vec3(0.01f));
-	//softbody->transform.SetScale(glm::vec3(60.0f));
-	softbody->transform.SetScale(glm::vec3(5));
+	softbody->transform.SetScale(glm::vec3(60.0f));
+	//softbody->transform.SetScale(glm::vec3(5));
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->mTightness = 1.0f;
 	//softbody->showDebugModels = false;
 	softbody->mNumOfIterations = 10;
 
 	softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
-	softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
+	//softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
+	//softbody->AddLockNode(glm::vec3(6,0,0), 2);
 
 	softbody->InitializeSoftBody();
 
@@ -106,6 +109,13 @@ void PhysicsApplication::ProcessInput(GLFWwindow* window)
 
 void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode, int& action, int& mods)
 {
+	if (action == GLFW_PRESS)
+	{
+		if (key == GLFW_KEY_SPACE)
+		{
+			softbody->AddForceToRandomNode(glm::vec3(0, 50, 0));
+		}
+	}
 }
 
 void PhysicsApplication::MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods)
