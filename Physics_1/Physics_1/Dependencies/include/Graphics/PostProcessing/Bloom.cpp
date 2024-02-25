@@ -33,8 +33,8 @@ void Bloom::OnSceneDraw()
 
 void Bloom::InitializeFrameBuffer(int width, int height)
 {
-	brightnessExtractShader = new Shader("res/Shader/PostProcessing/BrightnessExtractShader.shader", false, OPAQUE, false);
-	blurShader = new Shader("res/Shader/PostProcessing/BlurShader.shader",false, OPAQUE, false);
+	brightnessExtractShader = new Shader("res/Shader/PostProcessing/BrightnessExtractShader.shader", false, Shader::ALPHA_OPAQUE, false);
+	blurShader = new Shader("res/Shader/PostProcessing/BlurShader.shader",false, Shader::ALPHA_OPAQUE, false);
 
 
 	FrameBufferSpecification brightnessSpec;

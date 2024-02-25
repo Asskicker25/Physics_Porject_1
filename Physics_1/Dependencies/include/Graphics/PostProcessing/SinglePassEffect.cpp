@@ -6,7 +6,7 @@ using namespace PostProcessing_v1;
 
 void SinglePassEffect::InitializeEffect(const std::string& name, const std::string& shaderPath)
 {
-	shader = new Shader(shaderPath, false, OPAQUE, false);
+	shader = new Shader(shaderPath, false, Shader::ALPHA_OPAQUE, false);
 
 	FrameBufferSpecification specs;
 	specs.width = 1920;

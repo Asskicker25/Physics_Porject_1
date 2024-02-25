@@ -1,8 +1,9 @@
 #include <Graphics/Renderer.h>
 #include <Graphics/Panels/EditorLayout.h>
 #include <Graphics/Panels/ImguiDrawUtils.h>
-#include "SoftBody.h"
 #include <Graphics/MathUtils.h>
+#include "../PhysicsEngine.h"
+#include "SoftBody.h"
 
 using namespace MathUtilities;
 
@@ -61,6 +62,12 @@ namespace Verlet
 	{
 		name = "SoftBody";
 		InitializeEntity(this);
+		PhysicsEngine::GetInstance().AddSoftBodyObject(this);
+	}
+
+	SoftBody::~SoftBody()
+	{
+		PhysicsEngine::GetInstance().RemoveSoftBodyObject(this);
 	}
 
 	void SoftBody::InitializeSoftBody()
@@ -93,7 +100,7 @@ namespace Verlet
 		SetupSticks();
 	}
 
-	void SoftBody::Update(float deltaTine)
+	void SoftBody::UpdateSoftBody(float deltaTine)
 	{
 		UpdateNodePosition(deltaTine);
 		SatisfyConstraints(deltaTine);
@@ -333,10 +340,10 @@ namespace Verlet
 	{
 		if (!showDebugModels) return;
 
-	/*	for (Node* node : mListOfNodes)
+		for (Node* node : mListOfNodes)
 		{
 			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeDrawRadius, nodeColor);
-		}*/
+		}
 
 		for (LockNode& node : mListOfLockNodes)
 		{
@@ -344,10 +351,10 @@ namespace Verlet
 		}
 
 
-	/*	for (Stick* stick : mListOfSticks)
+		for (Stick* stick : mListOfSticks)
 		{
 			Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
-		}*/
+		}
 	}
 
 	void SoftBody::OnPropertyDraw()

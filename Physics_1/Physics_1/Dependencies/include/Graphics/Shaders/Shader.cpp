@@ -7,7 +7,7 @@ ShaderSource ParseShader(const std::string& path)
 	std::fstream file;
 	std::string line;
 	std::stringstream sstream[2];
-	ShaderType currentType = NONE;
+	Shader::ShaderType currentType = Shader::ShaderType::NONE;
 	file.open(path);
 
 	if (file.is_open())
@@ -20,15 +20,15 @@ ShaderSource ParseShader(const std::string& path)
 
 			if (line.find("#vertex") != std::string::npos)
 			{
-				currentType = VERTEX_SHADER;
+				currentType = Shader::ShaderType::VERTEX_SHADER;
 			}
 			else if (line.find("#fragment") != std::string::npos)
 			{
-				currentType = FRAGMENT_SHADER;
+				currentType = Shader::ShaderType::FRAGMENT_SHADER;
 			}
 			else
 			{
-				sstream[currentType] << line << std::endl;
+				sstream[(int)currentType] << line << std::endl;
 			}
 		}
 	}

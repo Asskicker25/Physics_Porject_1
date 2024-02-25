@@ -55,11 +55,11 @@ void Renderer::ClearModelList()
 
 void Renderer::AddModel(Model* model)
 {
-	if (model->shader->blendMode == OPAQUE || model->shader->blendMode == ALPHA_CUTOUT)
+	if (model->shader->blendMode == Shader::ALPHA_OPAQUE || model->shader->blendMode == Shader::ALPHA_CUTOUT)
 	{
 		nonBlendModelAndShaders.push_back(model);
 	}
-	else if (model->shader->blendMode == ALPHA_BLEND)
+	else if (model->shader->blendMode == Shader::ALPHA_BLEND)
 	{
 		blendModelAndShaders.push_back(model);
 	}
@@ -67,11 +67,11 @@ void Renderer::AddModel(Model* model)
 
 void Renderer::AddModel(Model& model)
 {
-	if (model.shader->blendMode == OPAQUE || model.shader->blendMode == ALPHA_CUTOUT)
+	if (model.shader->blendMode == Shader::ALPHA_OPAQUE || model.shader->blendMode == Shader::ALPHA_CUTOUT)
 	{
 		nonBlendModelAndShaders.push_back(&model);
 	}
-	else if (model.shader->blendMode == ALPHA_BLEND)
+	else if (model.shader->blendMode == Shader::ALPHA_BLEND)
 	{
 		blendModelAndShaders.push_back(&model);
 	}

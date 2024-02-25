@@ -42,6 +42,16 @@ void PhysicsEngine::RemovePhysicsObject(PhysicsObject* physicsObject)
 	}
 }
 
+void PhysicsEngine::AddSoftBodyObject(BaseSoftBody* softBody)
+{
+	listOfSoftBodies.push_back(softBody);
+}
+
+void PhysicsEngine::RemoveSoftBodyObject(BaseSoftBody* softBody)
+{
+	listOfSoftBodies.erase(std::remove(listOfSoftBodies.begin(), listOfSoftBodies.end(), softBody), listOfSoftBodies.end());
+}
+
 void PhysicsEngine::Update(float deltaTime)
 {
 	timer += deltaTime;
@@ -51,6 +61,14 @@ void PhysicsEngine::Update(float deltaTime)
 		UpdatePhysics(fixedStepTime);
 
 		timer = 0;
+	}
+}
+
+void PhysicsEngine::UpdateSoftBodies(float deltaTime)
+{
+	for (BaseSoftBody* softBody : listOfSoftBodies)
+	{
+		softBody->UpdateSoftBody(deltaTime);
 	}
 }
 

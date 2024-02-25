@@ -83,7 +83,7 @@ void Material::UpdateMaterial(Shader* shader)
 	shader->SetUniform1f("material.specularValue", this->GetSpecularValue());
 	shader->SetUniform1f("material.shininess", this->shininess);
 
-	shader->SetUniform3f("alphaCutOut", shader->blendMode, this->useMaskTexture, this->alphaCutoffThreshold);
+	shader->SetUniform3f("alphaCutOut", (float)shader->blendMode, this->useMaskTexture, this->alphaCutoffThreshold);
 
 	if (this->diffuseTexture != nullptr)
 	{

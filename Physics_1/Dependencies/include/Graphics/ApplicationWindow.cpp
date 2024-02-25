@@ -124,11 +124,11 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 		"res/Textures/SkyBox/Back.jpg",
 		});
 
-	skyboxShader.LoadShader("res/Shader/SkyBox.shader", OPAQUE, false);
+	skyboxShader.LoadShader("res/Shader/SkyBox.shader", Shader::ALPHA_OPAQUE, false);
 	skyboxShader.applyModel = false;
 	//Debugger::Print("SkyboxShader  Id : ", skyboxShader.GetShaderId());
 
-	solidColorShader.LoadShader("res/Shader/SolidColorShader.shader", OPAQUE, false);
+	solidColorShader.LoadShader("res/Shader/SolidColorShader.shader", Shader::ALPHA_OPAQUE, false);
 	//Debugger::Print("SolidColorShader  Id : ", solidColorShader.GetShaderId());
 
 	defShader.LoadShader("res/Shader/Shader.shader");
@@ -137,12 +137,12 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 
 	alphaBlendShader.LoadShader("res/Shader/Shader.shader");
 	//Debugger::Print("TranparentShader Shader Id : ", alphaBlendShader.GetShaderId());
-	alphaBlendShader.blendMode = ALPHA_BLEND;
+	alphaBlendShader.blendMode = Shader::ALPHA_BLEND;
 	alphaBlendShader.applyInverseModel = true;
 
 	alphaCutOutShader.LoadShader("res/Shader/Shader.shader");
 	//Debugger::Print("AlphaCutOutShader Shader Id : ", alphaCutOutShader.GetShaderId());
-	alphaCutOutShader.blendMode = ALPHA_CUTOUT;
+	alphaCutOutShader.blendMode = Shader::ALPHA_CUTOUT;
 	alphaCutOutShader.applyInverseModel = true;
 
 	Renderer::GetInstance().solidColorShader = &solidColorShader;

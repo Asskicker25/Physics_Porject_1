@@ -22,7 +22,7 @@ void PostProcessing::OnDestroy()
 
 PostProcessing::PostProcessing(int width, int height)
 {
-	combineEffectsShader = new Shader("res/Shader/PostProcessing/CombineEffectsShader.shader", false, OPAQUE, false);
+	combineEffectsShader = new Shader("res/Shader/PostProcessing/CombineEffectsShader.shader", false, Shader::ALPHA_OPAQUE, false);
 
 	bloom.InitializeFrameBuffer(width, height);
 	bloom.stackOrder = 0;

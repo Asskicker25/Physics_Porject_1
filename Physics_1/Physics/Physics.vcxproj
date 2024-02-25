@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Softbody\BaseSoftBody.h" />
     <ClInclude Include="src\Softbody\SoftBody.h" />
     <ClInclude Include="src\HierarchicalAABBNode.h" />
     <ClInclude Include="src\HierarchicalAABB.h" />
@@ -26,8 +27,11 @@
     <ClInclude Include="src\PhysicsEngine.h" />
     <ClInclude Include="src\PhysicsObject.h" />
     <ClInclude Include="src\PhysicsShapeAndCollision.h" />
+    <ClInclude Include="src\Thread\PhysicsEngineThread.h" />
+    <ClInclude Include="src\Thread\PhysicsEngineThreadInfo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Softbody\BaseSoftBody.cpp" />
     <ClCompile Include="src\Softbody\SoftBody.cpp" />
     <ClCompile Include="src\HierarchicalAABBNode.cpp" />
     <ClCompile Include="src\HierarchicalAABB.cpp" />
@@ -36,6 +40,7 @@
     <ClCompile Include="src\iPhysicsTransformable.h" />
     <ClCompile Include="src\PhysicsObject.cpp" />
     <ClCompile Include="src\PhysicsShapeAndCollision.cpp" />
+    <ClCompile Include="src\Thread\PhysicsEngineThread.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

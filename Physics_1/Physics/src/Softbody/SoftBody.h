@@ -1,10 +1,10 @@
 #pragma once
-#include <Graphics/Model.h>
+#include "BaseSoftBody.h"
 
 namespace Verlet
 {
 
-	class SoftBody : public Model
+	class SoftBody : public BaseSoftBody
 	{
 	public:
 		struct Node;
@@ -50,16 +50,19 @@ namespace Verlet
 
 
 		SoftBody();
+		~SoftBody();
 
 		void InitializeSoftBody();
 
-		virtual void Update(float deltaTine);
+		virtual void UpdateSoftBody(float deltaTine);
 		virtual void Render();
 		virtual void OnPropertyDraw();
 
 		void AddForceToRandomNode(glm::vec3 velocity);
 
 		void AddLockNode(glm::vec3 posOffset, float radius);
+		void UpdateModelData(float deltaTime);
+
 
 		bool showDebugModels = true;
 
@@ -71,6 +74,7 @@ namespace Verlet
 
 		unsigned int mNumOfIterations = 10;
 
+
 	private:
 		void SetupNodes();
 		void SetupSticks();
@@ -78,7 +82,6 @@ namespace Verlet
 		void UpdateNodePosition(float deltaTime);
 		void UpdatePositionByVerlet(Node* node, float deltaTime);
 		void SatisfyConstraints(float deltaTime);
-		void UpdateModelData(float deltaTime);
 
 		void UpdatModelVertices();
 		void UpdateModelNormals();

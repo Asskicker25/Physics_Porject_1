@@ -209,6 +209,7 @@ void PhysicsObject::InitializePhysics(PhysicsShape shape, PhysicsMode mode,
 	CalculatePhysicsShape();
 
 	PhysicsEngine::GetInstance().AddPhysicsObject(this);
+	std::cout << "Object Engine Address : " << &PhysicsEngine::GetInstance() << std::endl;
 
 }
 

@@ -3,19 +3,6 @@
 #include "../Object.h"
 
 
-enum ShaderType
-{
-	NONE = -1,
-	VERTEX_SHADER = 0,
-	FRAGMENT_SHADER = 1
-};
-
-enum BlendMode
-{
-	OPAQUE = 1,
-	ALPHA_BLEND = 2,
-	ALPHA_CUTOUT = 3
-};
 
 struct ShaderSource
 {
@@ -31,16 +18,31 @@ private:
 	int GetLocation(const std::string& property);
 
 public:
+
+	enum  ShaderType
+	{
+		NONE = -1,
+		VERTEX_SHADER = 0,
+		FRAGMENT_SHADER = 1
+	};
+
+	enum  BlendMode
+	{
+		ALPHA_OPAQUE = 1,
+		ALPHA_BLEND = 2,
+		ALPHA_CUTOUT = 3
+	};
+
 	BlendMode blendMode;
 
 	bool applyInverseModel = false;
 	bool applyModel = true;
 
 	Shader();
-	Shader(const std::string& path, bool addToSystem = true, BlendMode transparentMode = OPAQUE, bool useLightCalculation = true);
+	Shader(const std::string& path, bool addToSystem = true, BlendMode transparentMode = BlendMode::ALPHA_OPAQUE, bool useLightCalculation = true);
 	~Shader();
 
-	void LoadShader(const std::string& path, BlendMode transparentMode = OPAQUE, bool useLightCalculation = true);
+	void LoadShader(const std::string& path, BlendMode transparentMode = BlendMode::ALPHA_OPAQUE, bool useLightCalculation = true);
 	void Bind();
 	void Unbind();
 	unsigned int GetShaderId();

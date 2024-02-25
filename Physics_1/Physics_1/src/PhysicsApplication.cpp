@@ -1,17 +1,21 @@
 #include "PhysicsApplication.h"
 #include "Utilities/Random.h"
 #include <Softbody/SoftBody.h>
+#include <Thread/PhysicsEngineThread.h>
 
 using namespace Verlet;
 
 PhysicsObject* spherePhy;
 PhysicsObject* planePhy;
 
-
 SoftBody* softbody;
+
+PhysicsEngineThreadInfo* physicsThread;
 
 void PhysicsApplication::SetUp()
 {
+	physicsThread = InitializePhysicsThread(0.01f);
+
 	viewportCamera->InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 100.0f, 45.0f);
 	viewportCamera->transform.SetPosition(glm::vec3(0, 0, 30));
 
@@ -27,7 +31,7 @@ void PhysicsApplication::SetUp()
 	Light* dirLight = new Light();
 	dirLight->transform.SetScale(glm::vec3(0.1f));
 	dirLight->transform.SetPosition(glm::vec3(0, 5, 3));
-	dirLight->InitializeLight(Spot);
+	dirLight->InitializeLight(Directional);
 	dirLight->intensity = 2;
 	dirLight->attenuation = glm::vec4(1, 0.1, 0.01, 0.02);
 
@@ -37,9 +41,9 @@ void PhysicsApplication::SetUp()
 	spherePhy->InitializePhysics(SPHERE,DYNAMIC);
 	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));
 	spherePhy->transform.SetScale(glm::vec3(0.5));
-	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));*/
+	spherePhy->transform.SetPosition(glm::vec3(0, 3, 0));
 
-	/*planePhy = new PhysicsObject();
+	planePhy = new PhysicsObject();
 	planePhy->name = "Plane";
 	planePhy->LoadModel("Assets/Models/Plane/Plane.fbx");
 	planePhy->InitializePhysics(MESH_OF_TRIANGLES, STATIC);
@@ -48,11 +52,11 @@ void PhysicsApplication::SetUp()
 	planePhy->transform.SetScale(glm::vec3(5.5));*/
 
 	PhysicsEngine::GetInstance().gravity.y = -9.8f / 3.0f;
-	PhysicsEngine::GetInstance().fixedStepTime = 0.01f;
+	PhysicsEngine::GetInstance().fixedStepTime = 1.0f;
 
 	EditorLayout::GetInstance().SetMaximizeState(false);
 	
-	/*
+	
 	softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Plane.ply");
 	//softbody->LoadModel("Assets/Models/Wheel_15.ply");
@@ -71,8 +75,8 @@ void PhysicsApplication::SetUp()
 	softbody->AddLockNode(glm::vec3(6,0,0), 2);
 
 	softbody->InitializeSoftBody();
-
-	*/
+	
+	
 	/*
 	softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Grid_50x50.ply");
@@ -83,14 +87,14 @@ void PhysicsApplication::SetUp()
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->InitializeSoftBody();*/
 
-	softbody = new SoftBody();
+	/*softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
 	softbody->transform.SetScale(glm::vec3(0.01f));
 	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
 	softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->showDebugModels = false;
-	softbody->InitializeSoftBody(); 
+	softbody->InitializeSoftBody(); */
 
 
 
@@ -105,11 +109,16 @@ void PhysicsApplication::SetUp()
 	//softbody2->AddLockNode(glm::vec3(0), 4.0f);
 
 	//softbody2->InitializeSoftBody();
+
+	physicsThread->isRunning = true;
 }
 
 void PhysicsApplication::Update()
 {
 	PhysicsEngine::GetInstance().Update(Timer::GetInstance().deltaTime);
+
+	//softbody->UpdateSoftBody(Timer::GetInstance().deltaTime);
+	//Debugger::Print("SpherePos : ", spherePhy->transform.position);
 }
 
 void PhysicsApplication::Render()
