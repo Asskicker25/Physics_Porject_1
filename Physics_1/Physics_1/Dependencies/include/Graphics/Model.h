@@ -27,7 +27,7 @@ public:
 	void Draw(Shader* shader);
 	void DrawSolidColor(Shader* shader, glm::vec3 color);
 	void SetModelParent(Model* model);
-	Model* CopyFromModel(const Model& model);
+	Model* CopyFromModel(const Model& model, bool initialize = false);
 	//Material material;
 
 	Transform* GetTransform();
@@ -50,6 +50,7 @@ public:
 	bool isActive = true;
 	bool isWireframe = false;
 	bool isGizmoItem = false;
+	bool applyGizmoScale = true;
 
 	std::vector<MeshAndMaterial*> meshes;
 	std::vector<Texture*> texturesLoaded;

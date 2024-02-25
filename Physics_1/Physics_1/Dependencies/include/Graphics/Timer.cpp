@@ -12,6 +12,8 @@ void Timer::SetCurrentTime(float currentTime)
 
     deltaTime = currentTime - lastFrameTime;
 
+    if (deltaTime > MAX_DELTATIME) { deltaTime = MAX_DELTATIME; }
+
     elapsedTime += deltaTime;
 
     lastFrameTime = currentTime;

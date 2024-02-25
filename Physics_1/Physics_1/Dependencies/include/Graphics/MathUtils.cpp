@@ -1,8 +1,10 @@
 #include "MathUtils.h"
 
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/vector_angle.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
-bool MathUtils::DecomposeTransform(const glm::mat4& transform, glm::vec3& pos, glm::vec3& rotation, glm::vec3& scale)
+bool MathUtilities::MathUtils::DecomposeTransform(const glm::mat4& transform, glm::vec3& pos, glm::vec3& rotation, glm::vec3& scale)
 {
 	// From glm::decompose in matrix_decompose.inl
 
@@ -72,4 +74,75 @@ bool MathUtils::DecomposeTransform(const glm::mat4& transform, glm::vec3& pos, g
 
 
 	return true;
+}
+
+float MathUtilities::MathUtils::Remap(float value, float inputMin, float inputMax, float outputMin, float outputMax)
+{
+	if (value < inputMin) value = inputMin;
+	if (value > inputMax) value = inputMax;
+
+	float normalizedValue = (value - inputMin) / (inputMax - inputMin);
+
+	float remapValue = outputMin + normalizedValue * (outputMax - outputMin);
+
+	return remapValue;
+}
+
+const float MathUtilities::MathUtils::GetRandomFloatNumber(float minValue, float maxValue)
+{
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = maxValue - minValue;
+	float r = random * diff;
+	return minValue + r;
+}
+
+const int MathUtilities::MathUtils::GetRandomIntNumber(int minValue, int maxValue)
+{
+	unsigned int output = minValue + (rand() % static_cast<unsigned int>(maxValue - minValue + 1));
+
+	return output;
+}
+
+const glm::vec3 MathUtilities::MathUtils::GetRandomVec3(glm::vec3 min, glm::vec3 max)
+{
+	glm::vec3 randPoint;
+	randPoint.x = GetRandomFloatNumber(min.x, max.x);
+	randPoint.y = GetRandomFloatNumber(min.y, max.y);
+	randPoint.z = GetRandomFloatNumber(min.z, max.z);
+
+	return randPoint;
+}
+
+glm::vec3 MathUtilities::MathUtils::Lerp(const glm::vec3& start, const glm::vec3& end, float t)
+{
+	t = glm::clamp(t, 0.0f, 1.0f);
+
+	return start + t * (end - start);
+}
+
+float MathUtilities::MathUtils::Lerp(const float& start, const float& end, float t)
+{
+	t = glm::clamp(t, 0.0f, 1.0f);
+
+	return start + t * (end - start);
+}
+
+double MathUtilities::MathUtils::CalculateTForSpeed(double currentT, double deltaTime, double lerpSpeed)
+{
+	double step = lerpSpeed * deltaTime;
+
+	return glm::clamp(currentT + step, 0.0, 1.0);
+}
+
+glm::vec3 MathUtilities::MathUtils::GetRandomDirOnUnitCircle()
+{
+	float angle = GetRandomFloatNumber(0, glm::two_pi<float>());
+	return glm::normalize(glm::vec3(glm::cos(angle), 0.0f, glm::sin(angle)));
+}
+
+glm::vec3 MathUtilities::MathUtils::GetRandomDirOnUnitCircle(glm::vec3& up)
+{
+	glm::vec3 random2D = GetRandomDirOnUnitCircle();
+
+	return glm::normalize(glm::rotate(random2D, glm::orientedAngle(glm::vec3(0, 0, 1), up, glm::vec3(1, 0, 0)), up));
 }

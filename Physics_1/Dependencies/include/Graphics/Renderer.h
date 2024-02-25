@@ -71,6 +71,7 @@ public:
 	Material* normalsMaterial;
 
 	Model* skyBox;
+	Model* line;
 
 	DebugModels* debugCubesModel;
 	DebugModels* debugCubesData;

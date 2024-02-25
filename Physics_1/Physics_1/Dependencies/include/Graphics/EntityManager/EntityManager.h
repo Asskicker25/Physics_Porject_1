@@ -23,5 +23,6 @@ public:
 	void Update(float deltaTime);
 	void Render();
 	void Destroy(Entity* entity);
+	void Clear();
 };
 

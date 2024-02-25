@@ -1,7 +1,20 @@
+#include <Graphics/Renderer.h>
+#include <Graphics/Panels/EditorLayout.h>
+#include <Graphics/Panels/ImguiDrawUtils.h>
 #include "SoftBody.h"
+#include <set>
 
 namespace Verlet
 {
+	struct Vec3Comparator {
+		bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+			// Define your comparison logic here
+			// For example, you can compare individual components
+			if (a.x != b.x) return a.x < b.x;
+			if (a.y != b.y) return a.y < b.y;
+			return a.z < b.z;
+		}
+	};
 
 	struct SoftBody::Node
 	{
@@ -18,6 +31,8 @@ namespace Verlet
 
 		glm::vec3 mCurrentPosition = glm::vec3(0);
 		glm::vec3 mOldPositionm = glm::vec3(0);
+
+		glm::vec3 velocity = glm::vec3(0);
 
 		Vertex* mPointerToVertex = nullptr;
 	};
@@ -40,24 +55,47 @@ namespace Verlet
 		Node* mNodeB = nullptr;
 	};
 
+	SoftBody::SoftBody()
+	{
+		name = "SoftBody";
+		InitializeEntity(this);
+	}
+
 	void SoftBody::InitializeSoftBody()
 	{
+		glm::mat4 transformMatrix = transform.GetTransformMatrix();
+		/*glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0))
+			* glm::mat4(transform.quaternionRotation)
+			* glm::scale(glm::mat4(1.0f), transform.scale);*/
+		
+		int i = 0;
+		int prevSize = 0;
+
 		for (MeshAndMaterial* mesh : meshes)
 		{
+			prevSize = mListOfVertices.size();
 
 			for (Vertex& vertexInMesh : mesh->mesh->vertices)
 			{
-				mListOfVertices.push_back(vertexInMesh);
+				mListOfVertices.push_back({ vertexInMesh, transformMatrix });
 			}
-
 			for (unsigned int& indexInMesh : mesh->mesh->indices)
 			{
-				mListOfIndices.push_back(indexInMesh);
+				mListOfIndices.push_back({ indexInMesh, prevSize });
 			}
+
+			i++;
 		}
 
 		SetupNodes();
 		SetupSticks();
+	}
+
+	void SoftBody::Update(float deltaTine)
+	{
+		UpdateNodePosition(deltaTine);
+		SatisfyConstraints(deltaTine);
+		UpdateModelData(deltaTine);
 	}
 
 	void SoftBody::SetupNodes()
@@ -66,7 +104,11 @@ namespace Verlet
 
 		for (PointerToVertex& pos : mListOfVertices)
 		{
-			mListOfNodes.push_back(new Node(pos));
+			Node* node = new Node(pos);
+
+			node->mIsLocked = IsNodeLocked(node);
+
+			mListOfNodes.push_back(node);
 		}
 	}
 
@@ -87,4 +129,166 @@ namespace Verlet
 			mListOfSticks.push_back(new Stick(node3, node1));
 		}
 	}
+
+	void SoftBody::UpdateNodePosition(float deltaTime)
+	{
+		for (Node* node : mListOfNodes)
+		{
+			if (node->mIsLocked) continue;
+
+			//Handling force
+
+			node->velocity += mGravity * deltaTime;
+			//node->mCurrentPosition += node->velocity * deltaTime;
+
+			UpdatePositionByVerlet(node, deltaTime);
+		}
+	}
+
+	void SoftBody::UpdatePositionByVerlet(Node* node, float deltaTime)
+	{
+		glm::vec3 posBeforUpdate = node->mCurrentPosition;
+
+		node->mCurrentPosition += (posBeforUpdate - node->mOldPositionm) + (node->velocity * (deltaTime * deltaTime));
+		node->mOldPositionm = posBeforUpdate;
+
+		CleanZeros(node->mCurrentPosition);
+		CleanZeros(node->mOldPositionm);
+	}
+
+	void SoftBody::SatisfyConstraints(float deltaTime)
+	{
+
+		for (unsigned int i = 0; i < mNumOfIterations; i++)
+		{
+			for (Stick* stick : mListOfSticks)
+			{
+				if (!stick->isConnected) continue;
+
+				Node* nodeA = stick->mNodeA;
+				Node* nodeB = stick->mNodeB;
+
+				glm::vec3 delta = nodeB->mCurrentPosition - nodeA->mCurrentPosition;
+				float length = glm::length(delta);
+
+				float diff = (length - stick->mRestLength) / length;
+
+				if (!nodeA->mIsLocked)
+				{
+					nodeA->mCurrentPosition += delta * 0.5f * diff * mTightness;
+				}
+
+				if (!nodeB->mIsLocked)
+				{
+					nodeB->mCurrentPosition -= delta * 0.5f * diff * mTightness;
+				}
+
+				/*glm::vec3 stickCenter = (nodeA->mCurrentPosition + nodeB->mCurrentPosition) / 2.0f;
+				glm::vec3 stickDir = glm::normalize((nodeA->mCurrentPosition - nodeB->mCurrentPosition));
+
+				if (!nodeA->mIsLocked)
+				{
+					nodeA->mCurrentPosition = stickCenter + stickDir * stick->mRestLength * 0.5f;
+				}
+
+				if (!nodeB->mIsLocked)
+				{
+					nodeB->mCurrentPosition = stickCenter - stickDir * stick->mRestLength * 0.5f;
+				}*/
+
+				CleanZeros(nodeA->mCurrentPosition);
+				CleanZeros(nodeB->mCurrentPosition);
+			}
+		}
+	}
+
+
+	void SoftBody::UpdateModelData(float deltaTime)
+	{
+		for (Node* node : mListOfNodes)
+		{
+			node->mPointerToVertex->positions = glm::inverse(transform.GetTransformMatrix()) *  glm::vec4(node->mCurrentPosition ,1.0f);
+		}
+
+		for (MeshAndMaterial* mesh : meshes)
+		{
+			mesh->mesh->UpdateVertices();
+		}
+	}
+
+	void SoftBody::CleanZeros(glm::vec3& value)
+	{
+		const float minFloat = 1.192092896e-07f;
+		if ((value.x < minFloat) && (value.x > -minFloat))
+		{
+			value.x = 0.0f;
+		}
+		if ((value.y < minFloat) && (value.y > -minFloat))
+		{
+			value.y = 0.0f;
+		}
+		if ((value.z < minFloat) && (value.z > -minFloat))
+		{
+			value.z = 0.0f;
+		}
+	}
+
+
+	bool SoftBody::IsNodeLocked(Node* node)
+	{
+		for (LockNode& lockNode : mListOfLockNodes)
+		{
+			float length = glm::length(node->mCurrentPosition - lockNode.center);
+
+			if (length > lockNode.radius) continue;
+
+			return true;
+
+		}
+
+		return false;
+	}
+
+
+	void SoftBody::Render()
+	{
+		if (!showDebugModels) return;
+
+		for (Node* node : mListOfNodes)
+		{
+			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeDrawRadius, nodeColor);
+		}
+
+		for (LockNode& node : mListOfLockNodes)
+		{
+			Renderer::GetInstance().DrawSphere(node.center, node.radius, lockNodeColor);
+		}
+
+
+		for (Stick* stick : mListOfSticks)
+		{
+			Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
+		}
+	}
+
+	void SoftBody::OnPropertyDraw()
+	{
+		Model::OnPropertyDraw();
+
+		if (!ImGui::TreeNodeEx("SoftBody", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			return;
+		}
+
+		ImGuiUtils::DrawBool("ShowDebug", showDebugModels);
+
+		ImGui::TreePop();
+
+	}
+
+	void SoftBody::AddLockNode(glm::vec3 posOffset, float radius)
+	{
+		mListOfLockNodes.push_back({ transform.position + posOffset , radius });
+	}
+
 }

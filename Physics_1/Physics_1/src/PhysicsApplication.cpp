@@ -11,7 +11,7 @@ PhysicsObject* planePhy;
 void PhysicsApplication::SetUp()
 {
 	viewportCamera->InitializeCamera(PERSPECTIVE, windowWidth, windowHeight, 0.1f, 100.0f, 45.0f);
-	viewportCamera->transform.SetPosition(glm::vec3(0, 0, 10));
+	viewportCamera->transform.SetPosition(glm::vec3(0, 0, 30));
 
 	Renderer::GetInstance().renderMode = SHADED;
 
@@ -46,10 +46,39 @@ void PhysicsApplication::SetUp()
 	PhysicsEngine::GetInstance().gravity.y = -9.8f / 3.0f;
 	PhysicsEngine::GetInstance().fixedStepTime = 0.01f;
 
+	EditorLayout::GetInstance().SetMaximizeState(false);
 	
 	SoftBody* softbody = new SoftBody();
-	softbody->LoadModel("Assets/Models/Plane/Plane.fbx");
+	//softbody->LoadModel("Assets/Models/Plane/Plane.ply");
+	softbody->LoadModel("Assets/Models/Wheel_15.ply");
+	//softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
+	//softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	//softbody->transform.SetScale(glm::vec3(0.01f));
+	//softbody->transform.SetScale(glm::vec3(60.0f));
+	softbody->transform.SetScale(glm::vec3(5));
+	softbody->mGravity = glm::vec3(0, -1, 0);
+	softbody->mTightness = 1.0f;
+	//softbody->showDebugModels = false;
+	softbody->mNumOfIterations = 10;
+
+	softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
+	softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
+
 	softbody->InitializeSoftBody();
+
+
+
+	//SoftBody* softbody2 = new SoftBody();
+	//softbody2->isActive = false;
+	//softbody2->LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");
+	//softbody2->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	//softbody2->transform.SetPosition(glm::vec3(0.0f, -4.0f, 0));
+	//softbody2->mGravity = glm::vec3(0, -1, 0);
+	//softbody2->showDebugModels = false;
+
+	//softbody2->AddLockNode(glm::vec3(0), 4.0f);
+
+	//softbody2->InitializeSoftBody();
 }
 
 void PhysicsApplication::Update()

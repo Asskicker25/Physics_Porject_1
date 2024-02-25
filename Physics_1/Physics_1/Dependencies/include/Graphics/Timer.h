@@ -12,5 +12,7 @@ public:
 
 	void SetCurrentTime(float currentTime);
 
+	const float MAX_DELTATIME = 1.0f / 60.0f;
+
 };
 

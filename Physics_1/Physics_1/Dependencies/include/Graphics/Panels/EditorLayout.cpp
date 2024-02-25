@@ -65,6 +65,11 @@ bool EditorLayout::IsGameMaximized()
 	return IsApplicationPlaying() && toolPanel->isMaximizedPressed;
 }
 
+void EditorLayout::SetMaximizeState(bool state)
+{
+	toolPanel->isMaximizedPressed = state;
+}
+
 void EditorLayout::SetApplicationPlayState(bool state)
 {
 	application->applicationPlay = state;

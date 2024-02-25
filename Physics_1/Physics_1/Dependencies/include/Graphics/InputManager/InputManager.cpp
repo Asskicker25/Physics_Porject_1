@@ -21,6 +21,7 @@ void InputManager::Pimpl::RemoveKeyHeld(const int& key)
 	keysHeld.erase(key);
 }
 
+
 InputManager::InputManager() : pimpl { new Pimpl() }
 {
 }
@@ -100,11 +101,11 @@ void InputManager::OnKeyReleased(const int& key)
 	}
 }
 
-void InputManager::OnKeyHeld(const int& key)
+void InputManager::OnKeyHeld()
 {
 	for (iInputListener* listener : inputListeners)
 	{
-		if (pimpl->keysHeld.find(key) != pimpl->keysHeld.end())
+		for (auto& key : pimpl->keysHeld)
 		{
 			listener->OnKeyHeld(key);
 		}
@@ -150,6 +151,12 @@ void InputManager::SetMouseDelta(glm::vec2 delta)
 void InputManager::Update()
 {
 	CalculateAxis();
+	OnKeyHeld();
+}
+
+void InputManager::Clear()
+{
+	inputListeners.clear();
 }
 
 

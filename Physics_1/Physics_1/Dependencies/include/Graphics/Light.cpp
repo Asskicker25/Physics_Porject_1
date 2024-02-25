@@ -29,9 +29,6 @@ Light::Light() : lightType{ Point }
 	material.SetBaseColor(glm::vec4(1));
 }
 
-Light::~Light()
-{
-}
 
 void Light::InitializeLight(LightType lightType)
 {

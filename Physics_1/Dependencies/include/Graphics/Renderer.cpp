@@ -29,6 +29,13 @@ void Renderer::Initialize()
 	wireframeMaterial->SetBaseColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	normalsMaterial->SetBaseColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
+	line = new Model();
+
+	DebugLineData lineData;
+	lineData.SetStartPoint(glm::vec3(0));
+	lineData.SetEndPoint(glm::vec3(1));
+
+	line->LoadModel(lineData, true);
 }
 
 void Renderer::Clear()
@@ -334,15 +341,13 @@ void Renderer::DrawSphere(const glm::vec3 center, float radius, glm::vec4 color)
 
 void Renderer::DrawLine(const glm::vec3 startPoint, const glm::vec3 endPoint, glm::vec4 color)
 {
-	Model line;
+	line->meshes[0]->mesh->vertices[0].positions = startPoint;
+	line->meshes[0]->mesh->vertices[1].positions = endPoint;
+	line->meshes[0]->mesh->vertices[2].positions = endPoint;
 
-	DebugLineData lineData;
-	lineData.SetStartPoint(startPoint);
-	lineData.SetEndPoint(endPoint);
+	line->meshes[0]->mesh->UpdateVertices();
 
-	line.LoadModel(lineData, true);
-
-	line.DrawWireframe(color);
+	line->DrawWireframe(color);
 
 }
 

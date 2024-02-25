@@ -4,11 +4,13 @@
 #include "Shaders/ShaderSystem.h"
 #include "CameraSystem.h"
 
+using namespace System_Particle;
+
 ApplicationWindow::ApplicationWindow()
 {
 	viewportCamera = new Camera();
 	viewportCamera->isViewPortCamera = true;
-
+	CameraSystem::GetInstance().viewportCamera = viewportCamera;
 }
 
 ApplicationWindow::~ApplicationWindow()
@@ -189,10 +191,13 @@ void ApplicationWindow::EngineUpdate()
 	MoveCameraKeyBoard(window);
 	ProcessInput(window);
 
+	Scene::SceneManager::GetInstance().Update();
+
 	if (applicationPlay)
 	{
 		EntityManager::GetInstance().Update(Timer::GetInstance().deltaTime);
 		InputManager::GetInstance().Update();
+		ParticleSystemManager::GetInstance().Update(Timer::GetInstance().deltaTime);
 	}
 
 	Update();
@@ -240,14 +245,13 @@ void ApplicationWindow::EngineRender()
 
 void ApplicationWindow::MainLoop()
 {
-	SetUp();
-
-	EditorLayout::GetInstance().application = this;
-
 	if (imGuiPanelEnable)
 	{
+		EditorLayout::GetInstance().application = this;
 		EditorLayout::GetInstance().InitializeLayout();
 	}
+
+	SetUp();
 
 	Timer::GetInstance().lastFrameTime = glfwGetTime();
 
@@ -274,6 +278,8 @@ void ApplicationWindow::MainLoop()
 
 void ApplicationWindow::RenderForCamera(Camera* camera, FrameBuffer* frameBuffer, bool viewport)
 {
+	if (camera == nullptr) return;
+
 	frameBuffer->Bind();
 
 	Renderer::GetInstance().Clear();
@@ -297,8 +303,12 @@ void ApplicationWindow::RenderForCamera(Camera* camera, FrameBuffer* frameBuffer
 		EntityManager::GetInstance().Render();
 		Render();
 	}
+
+
+	Scene::SceneManager::GetInstance().Render();
 	Renderer::GetInstance().Draw(viewport);
 
+	ParticleSystemManager::GetInstance().Render();
 
 	if (camera->applyPostProcessing)
 	{
@@ -471,7 +481,6 @@ void ApplicationWindow::InputCallback(GLFWwindow* window, int& key, int& scancod
 	}
 	else if (action == GLFW_REPEAT)
 	{
-		InputManager::GetInstance().OnKeyHeld(key);
 	}
 }
 

@@ -147,3 +147,14 @@ void LightManager::RenderLight()
 	}
 
 }
+
+void LightManager::Clear()
+{
+	while (lights.size() != 0)
+	{
+		delete lights[0];
+		lights.erase(lights.begin());
+	}
+
+	lights.clear();
+}

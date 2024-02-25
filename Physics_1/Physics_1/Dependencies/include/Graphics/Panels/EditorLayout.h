@@ -25,6 +25,7 @@ public:
 	bool IsApplicationPlaying();
 	bool IsGameMaximized();
 
+	void SetMaximizeState(bool state);
 	void SetApplicationPlayState(bool state);
 
 	ApplicationWindow* application;

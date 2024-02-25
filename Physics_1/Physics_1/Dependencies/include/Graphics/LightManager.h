@@ -31,5 +31,7 @@ public:
 	std::vector<Light*> GetListOfLights();
 
 	void RenderLight();
+
+	void Clear();
 };
 

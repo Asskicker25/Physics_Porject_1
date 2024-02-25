@@ -75,12 +75,12 @@ void Mesh::DrawNormals(Shader* shader, glm::vec3 color, glm::mat4 transformMatri
 
 	for (int i = 0; i < triangles.size(); i+=10)
 	{
-		Model* model = Renderer::GetInstance().debugCubesModel->DrawDebugModel();
+		glm::vec3 transformedCenter = transformMatrix * glm::vec4(triangles[i].center, 1.0f);
+		glm::vec3 transformedNormal =glm::normalize( transformMatrix * glm::vec4(triangles[i].normal,0));
+		/*Model* model = Renderer::GetInstance().debugCubesModel->DrawDebugModel();
 
 		model->transform.SetScale(Renderer::GetInstance().GetNormalsScale());
 
-		glm::vec3 transformedCenter = transformMatrix * glm::vec4(triangles[i].center, 1.0f);
-		glm::vec3 transformedNormal =glm::normalize( transformMatrix * glm::vec4(triangles[i].normal,0));
 		glm::vec3 pos = transformedCenter + (transformedNormal * model->transform.scale.y * normalScale);
 
 		model->transform.SetPosition(pos); 
@@ -89,10 +89,10 @@ void Mesh::DrawNormals(Shader* shader, glm::vec3 color, glm::mat4 transformMatri
 			transformMatrix * glm::vec4(triangles[i].tangent,0.0f));
 
 		
-		model->DrawSolidColor(shader, color);
+		model->DrawSolidColor(shader, color);*/
 
-		/*Renderer::GetInstance().DrawLine(transformedCenter, (transformedCenter +
-			(transformedNormal * normalScale)), glm::vec4(color,1));*/
+		Renderer::GetInstance().DrawLine(transformedCenter, (transformedCenter +
+			(transformedNormal * normalScale)), glm::vec4(color,1));
 
 		//Renderer::GetInstance().DrawLine(glm::vec3(0), glm::vec3(10,0,0), glm::vec4(color, 1));
 		//model->Draw(shader);
@@ -104,8 +104,17 @@ void Mesh::UpdateVertices()
 {
 	VAO.Bind();
 	VBO.UpdateVertexData(vertices.size() * sizeof(Vertex), &vertices[0]);
+	IBO.UpdateBuffer(indices.size(), &indices[0]);
 	VAO.AddBuffer(VBO, layout);
 	VAO.UnBind();
+}
+
+void Mesh::UpdateVertices(std::vector<Vertex>& vertices, std::vector<unsigned int> indices)
+{
+	this->vertices = vertices;
+	this->indices = indices;
+
+	UpdateVertices();
 }
 
 void Mesh::SetupMesh()

@@ -30,7 +30,6 @@ public:
 
 	Light(LightType lightType);
 	Light();
-	~Light();
 
 	void InitializeLight(LightType lightType);
 
