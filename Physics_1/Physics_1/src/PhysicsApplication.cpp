@@ -26,8 +26,10 @@ void PhysicsApplication::SetUp()
 
 	Light* dirLight = new Light();
 	dirLight->transform.SetScale(glm::vec3(0.1f));
-	dirLight->transform.SetPosition(glm::vec3(0, 0, 3));
-	dirLight->InitializeLight(Directional);
+	dirLight->transform.SetPosition(glm::vec3(0, 5, 3));
+	dirLight->InitializeLight(Spot);
+	dirLight->intensity = 2;
+	dirLight->attenuation = glm::vec4(1, 0.1, 0.01, 0.02);
 
 	/*spherePhy = new PhysicsObject();
 	spherePhy->name = "Sphere";
@@ -63,9 +65,9 @@ void PhysicsApplication::SetUp()
 	//softbody->showDebugModels = false;
 	softbody->mNumOfIterations = 10;
 
-	softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
+	//softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
 	//softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
-	//softbody->AddLockNode(glm::vec3(6,0,0), 2);
+	softbody->AddLockNode(glm::vec3(6,0,0), 2);
 
 	softbody->InitializeSoftBody();
 

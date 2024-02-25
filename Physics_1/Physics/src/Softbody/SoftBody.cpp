@@ -69,7 +69,7 @@ namespace Verlet
 		/*glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0))
 			* glm::mat4(transform.quaternionRotation)
 			* glm::scale(glm::mat4(1.0f), transform.scale);*/
-		
+
 		int i = 0;
 		int prevSize = 0;
 
@@ -108,7 +108,13 @@ namespace Verlet
 		{
 			Node* node = new Node(pos);
 
-			node->mIsLocked = IsNodeLocked(node);
+
+			if (IsNodeLocked(node))
+			{
+				node->mIsLocked = true;
+
+				mListOfLockedNodes.push_back(node);
+			}
 
 			mListOfNodes.push_back(node);
 		}
@@ -130,6 +136,26 @@ namespace Verlet
 			mListOfSticks.push_back(new Stick(node2, node3));
 			mListOfSticks.push_back(new Stick(node3, node1));
 		}
+
+
+		for (Node* node : mListOfNodes)
+		{
+			for (Node* otherNode : mListOfLockedNodes)
+			{
+				if (node == otherNode) continue;
+
+				float magnitude = glm::dot(otherNode->mCurrentPosition, node->mCurrentPosition);
+
+
+				if (magnitude * magnitude < mLockAffectDisatance * mLockAffectDisatance)
+				{
+					mListOfSticks.push_back(new Stick(node, otherNode));
+				}
+			}
+		}
+
+
+
 	}
 
 	void SoftBody::UpdateNodePosition(float deltaTime)
@@ -207,14 +233,63 @@ namespace Verlet
 
 	void SoftBody::UpdateModelData(float deltaTime)
 	{
-		for (Node* node : mListOfNodes)
-		{
-			node->mPointerToVertex->positions = glm::inverse(transform.GetTransformMatrix()) *  glm::vec4(node->mCurrentPosition ,1.0f);
-		}
-
+		UpdatModelVertices();
+		UpdateModelNormals();
 		for (MeshAndMaterial* mesh : meshes)
 		{
 			mesh->mesh->UpdateVertices();
+		}
+	}
+
+	void SoftBody::UpdatModelVertices()
+	{
+		for (Node* node : mListOfNodes)
+		{
+			node->mPointerToVertex->positions = glm::inverse(transform.GetTransformMatrix()) * glm::vec4(node->mCurrentPosition, 1.0f);
+		}
+	}
+
+	void SoftBody::UpdateModelNormals()
+	{
+		for (PointerToVertex& vertex : mListOfVertices)
+		{
+			vertex.mPointerToVertex->normals = glm::vec3(0);
+		}
+
+		for (MeshAndMaterial* meshAndMat : meshes)
+		{
+			std::shared_ptr<Mesh>& mesh = meshAndMat->mesh;
+			std::vector<Triangles>& listOfTriangles = mesh->triangles;
+
+			int size = listOfTriangles.size();
+
+			for (int i = 0; i < size; i+=3)
+			{
+				unsigned int vertIndexA = mesh->indices[i];
+				unsigned int vertIndexB = mesh->indices[i + 1];
+				unsigned int vertIndexC = mesh->indices[i + 2];
+
+				Vertex& vertA = mesh->vertices[vertIndexA];
+				Vertex& vertB = mesh->vertices[vertIndexB];
+				Vertex& vertC = mesh->vertices[vertIndexC];
+
+				glm::vec3 edgeAB = vertB.positions - vertA.positions;
+				glm::vec3 edgeAC = vertC.positions - vertA.positions;
+
+				glm::vec3 normal = glm::normalize(glm::cross(edgeAB, edgeAC));
+
+				CleanZeros(normal);
+				
+				vertA.normals += normal;
+				vertB.normals += normal;
+				vertC.normals += normal;
+
+			}
+		}
+
+		for (PointerToVertex& vertex : mListOfVertices)
+		{
+			vertex.mPointerToVertex->normals = glm::normalize(vertex.mPointerToVertex->normals);
 		}
 	}
 
@@ -250,6 +325,8 @@ namespace Verlet
 
 		return false;
 	}
+
+	
 
 
 	void SoftBody::Render()
@@ -296,7 +373,7 @@ namespace Verlet
 	void SoftBody::AddForceToRandomNode(glm::vec3 velocity)
 	{
 		int index = MathUtils::GetRandomIntNumber(0, mListOfNodes.size() - 1);
-		
+
 		mListOfNodes[index]->velocity = velocity;
 	}
 

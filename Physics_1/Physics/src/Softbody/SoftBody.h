@@ -67,6 +67,7 @@ namespace Verlet
 
 		float mNodeDrawRadius = 0.1f;
 		float mTightness = 1.0f;
+		float mLockAffectDisatance = 0.0f;
 
 		unsigned int mNumOfIterations = 10;
 
@@ -78,6 +79,9 @@ namespace Verlet
 		void UpdatePositionByVerlet(Node* node, float deltaTime);
 		void SatisfyConstraints(float deltaTime);
 		void UpdateModelData(float deltaTime);
+
+		void UpdatModelVertices();
+		void UpdateModelNormals();
 
 		bool IsNodeLocked(Node* node);
 		void CleanZeros(glm::vec3& value);
@@ -93,6 +97,7 @@ namespace Verlet
 
 		std::vector<Node*> mListOfNodes;
 		std::vector<Stick*> mListOfSticks;
+		std::vector<Node*> mListOfLockedNodes;
 
 	};
 
