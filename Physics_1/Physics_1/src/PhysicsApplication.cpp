@@ -52,6 +52,7 @@ void PhysicsApplication::SetUp()
 
 	EditorLayout::GetInstance().SetMaximizeState(false);
 	
+	/*
 	softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Plane.ply");
 	//softbody->LoadModel("Assets/Models/Wheel_15.ply");
@@ -70,6 +71,26 @@ void PhysicsApplication::SetUp()
 	softbody->AddLockNode(glm::vec3(6,0,0), 2);
 
 	softbody->InitializeSoftBody();
+
+	*/
+	/*
+	softbody = new SoftBody();
+	softbody->LoadModel("Assets/Models/Plane/Grid_50x50.ply");
+	softbody->transform.SetScale(glm::vec3(60.0f));
+	softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
+	softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
+	softbody->mGravity = glm::vec3(0, -1, 0);
+	softbody->InitializeSoftBody();*/
+
+	softbody = new SoftBody();
+	softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
+	softbody->transform.SetScale(glm::vec3(0.01f));
+	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
+	softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
+	softbody->mGravity = glm::vec3(0, -1, 0);
+	softbody->showDebugModels = false;
+	softbody->InitializeSoftBody(); 
 
 
 

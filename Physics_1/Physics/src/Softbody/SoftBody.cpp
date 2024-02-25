@@ -263,7 +263,7 @@ namespace Verlet
 
 			int size = listOfTriangles.size();
 
-			for (int i = 0; i < size; i+=3)
+			for (int i = 0; i < size; i += 3)
 			{
 				unsigned int vertIndexA = mesh->indices[i];
 				unsigned int vertIndexB = mesh->indices[i + 1];
@@ -279,7 +279,7 @@ namespace Verlet
 				glm::vec3 normal = glm::normalize(glm::cross(edgeAB, edgeAC));
 
 				CleanZeros(normal);
-				
+
 				vertA.normals += normal;
 				vertB.normals += normal;
 				vertC.normals += normal;
@@ -326,17 +326,17 @@ namespace Verlet
 		return false;
 	}
 
-	
+
 
 
 	void SoftBody::Render()
 	{
 		if (!showDebugModels) return;
 
-		for (Node* node : mListOfNodes)
+	/*	for (Node* node : mListOfNodes)
 		{
 			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeDrawRadius, nodeColor);
-		}
+		}*/
 
 		for (LockNode& node : mListOfLockNodes)
 		{
@@ -344,10 +344,10 @@ namespace Verlet
 		}
 
 
-		for (Stick* stick : mListOfSticks)
+	/*	for (Stick* stick : mListOfSticks)
 		{
 			Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
-		}
+		}*/
 	}
 
 	void SoftBody::OnPropertyDraw()
