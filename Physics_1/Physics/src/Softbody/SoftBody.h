@@ -54,7 +54,7 @@ namespace Verlet
 
 		void InitializeSoftBody();
 
-		virtual void UpdateSoftBody(float deltaTine);
+		virtual void UpdateSoftBody(float deltaTine, CRITICAL_SECTION& criticalSection);
 		virtual void Render();
 		virtual void OnPropertyDraw();
 
@@ -62,6 +62,7 @@ namespace Verlet
 
 		void AddLockNode(glm::vec3 posOffset, float radius);
 		void UpdateModelData(float deltaTime);
+		void UpdateBufferData() override;
 
 
 		bool showDebugModels = true;
@@ -73,6 +74,8 @@ namespace Verlet
 		float mLockAffectDisatance = 0.0f;
 
 		unsigned int mNumOfIterations = 10;
+
+		CRITICAL_SECTION* mCriticalSection;
 
 
 	private:

@@ -27,7 +27,7 @@ DWORD UpdatePhysicsEngine(LPVOID lpParameter)
 			{
 				timeStep = 0;
 
-				threadInfo->physicsEngine->UpdateSoftBodies(deltaTime);
+				threadInfo->physicsEngine->UpdateSoftBodies(deltaTime, threadInfo->softBodyUpdateModelData);
 			}
 
 			Sleep(threadInfo->sleepTime);
@@ -47,8 +47,8 @@ PhysicsEngineThreadInfo* InitializePhysicsThread(float fixedStepTime)
 	threadInfo->isAlive = true;
 	threadInfo->sleepTime = 1;
 
-	std::cout << "Thread Address : " << &PhysicsEngine::GetInstance() << std::endl;
-
+	InitializeCriticalSection(&threadInfo->softBodyUpdateModelData);
+	
 
 	threadInfo->threadHandle = CreateThread(
 		NULL,						// lpThreadAttributes,

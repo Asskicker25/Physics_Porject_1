@@ -10,7 +10,7 @@ PhysicsObject* planePhy;
 
 SoftBody* softbody;
 
-PhysicsEngineThreadInfo* physicsThread;
+PhysicsEngineThreadInfo* physicsThread = nullptr;
 
 void PhysicsApplication::SetUp()
 {
@@ -57,26 +57,27 @@ void PhysicsApplication::SetUp()
 	EditorLayout::GetInstance().SetMaximizeState(false);
 	
 	
-	softbody = new SoftBody();
-	softbody->LoadModel("Assets/Models/Plane/Plane.ply");
-	//softbody->LoadModel("Assets/Models/Wheel_15.ply");
-	//softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
-	//softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
-	//softbody->transform.SetScale(glm::vec3(0.01f));
-	softbody->transform.SetScale(glm::vec3(60.0f));
-	//softbody->transform.SetScale(glm::vec3(5));
-	softbody->mGravity = glm::vec3(0, -1, 0);
-	softbody->mTightness = 1.0f;
-	//softbody->showDebugModels = false;
-	softbody->mNumOfIterations = 10;
+	//softbody = new SoftBody();
+	//softbody->LoadModel("Assets/Models/Plane/Plane.ply");
+	////softbody->LoadModel("Assets/Models/Wheel_15.ply");
+	////softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
+	////softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	////softbody->transform.SetScale(glm::vec3(0.01f));
+	//softbody->transform.SetScale(glm::vec3(60.0f));
+	////softbody->transform.SetScale(glm::vec3(5));
+	//softbody->mGravity = glm::vec3(0, -1, 0);
+	//softbody->mTightness = 1.0f;
+	////softbody->showDebugModels = false;
+	//softbody->mNumOfIterations = 10;
 
-	//softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
-	//softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
-	softbody->AddLockNode(glm::vec3(6,0,0), 2);
+	////softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
+	////softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
+	//softbody->AddLockNode(glm::vec3(6,0,0), 2);
 
-	softbody->InitializeSoftBody();
+	//softbody->InitializeSoftBody();
 	
 	
+
 	/*
 	softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Grid_50x50.ply");
@@ -87,14 +88,14 @@ void PhysicsApplication::SetUp()
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->InitializeSoftBody();*/
 
-	/*softbody = new SoftBody();
+	softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
 	softbody->transform.SetScale(glm::vec3(0.01f));
 	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
 	softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->showDebugModels = false;
-	softbody->InitializeSoftBody(); */
+	softbody->InitializeSoftBody(); 
 
 
 
@@ -117,8 +118,18 @@ void PhysicsApplication::Update()
 {
 	PhysicsEngine::GetInstance().Update(Timer::GetInstance().deltaTime);
 
-	//softbody->UpdateSoftBody(Timer::GetInstance().deltaTime);
+	/*CRITICAL_SECTION empty;
+	softbody->UpdateSoftBody(Timer::GetInstance().deltaTime, empty);
+	softbody->UpdateBufferData();*/
+
+
+	//softbody->UpdateSoftBody(Timer::GetInstance().deltaTime, nullptr);
+	//softbody->UpdateModelData(Timer::GetInstance().deltaTime);
+	float fps = 1.0f / Timer::GetInstance().deltaTime;
+	std::cout << "FPS : " << fps << std::endl;
+
 	//Debugger::Print("SpherePos : ", spherePhy->transform.position);
+
 }
 
 void PhysicsApplication::Render()
@@ -132,6 +143,18 @@ void PhysicsApplication::Render()
 
 	//DrawAABBRecursive(planePhy->hierarchialAABB->rootNode);
 	//DrawCollisionAabb(spherePhy);
+}
+
+void PhysicsApplication::Shutdown()
+{
+	if (physicsThread != nullptr)
+	{
+		physicsThread->isAlive = false;
+		WaitForSingleObject(physicsThread->threadHandle, INFINITE);
+		CloseHandle(physicsThread->threadHandle);
+		DeleteCriticalSection(&physicsThread->softBodyUpdateModelData);
+	}
+
 }
 
 

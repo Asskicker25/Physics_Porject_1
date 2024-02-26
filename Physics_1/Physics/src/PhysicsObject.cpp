@@ -209,8 +209,6 @@ void PhysicsObject::InitializePhysics(PhysicsShape shape, PhysicsMode mode,
 	CalculatePhysicsShape();
 
 	PhysicsEngine::GetInstance().AddPhysicsObject(this);
-	std::cout << "Object Engine Address : " << &PhysicsEngine::GetInstance() << std::endl;
-
 }
 
 void PhysicsObject::AssignCollisionCallback(const std::function<void(PhysicsObject*)>& collisionCallback)

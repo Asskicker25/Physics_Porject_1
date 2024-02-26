@@ -3,6 +3,7 @@
 #include <Graphics/Panels/ImguiDrawUtils.h>
 #include <Graphics/MathUtils.h>
 #include "../PhysicsEngine.h"
+#include <Windows.h>
 #include "SoftBody.h"
 
 using namespace MathUtilities;
@@ -98,10 +99,13 @@ namespace Verlet
 
 		SetupNodes();
 		SetupSticks();
+
 	}
 
-	void SoftBody::UpdateSoftBody(float deltaTine)
+	void SoftBody::UpdateSoftBody(float deltaTine, CRITICAL_SECTION& criticalSection)
 	{
+		mCriticalSection = &criticalSection;
+
 		UpdateNodePosition(deltaTine);
 		SatisfyConstraints(deltaTine);
 		UpdateModelData(deltaTine);
@@ -242,6 +246,10 @@ namespace Verlet
 	{
 		UpdatModelVertices();
 		UpdateModelNormals();
+	}
+	
+	void SoftBody::UpdateBufferData()
+	{
 		for (MeshAndMaterial* mesh : meshes)
 		{
 			mesh->mesh->UpdateVertices();
@@ -250,18 +258,27 @@ namespace Verlet
 
 	void SoftBody::UpdatModelVertices()
 	{
+		EnterCriticalSection(mCriticalSection);
+
 		for (Node* node : mListOfNodes)
 		{
 			node->mPointerToVertex->positions = glm::inverse(transform.GetTransformMatrix()) * glm::vec4(node->mCurrentPosition, 1.0f);
 		}
+		
+		LeaveCriticalSection(mCriticalSection);
+
 	}
 
 	void SoftBody::UpdateModelNormals()
 	{
+		EnterCriticalSection(mCriticalSection);
+
 		for (PointerToVertex& vertex : mListOfVertices)
 		{
 			vertex.mPointerToVertex->normals = glm::vec3(0);
 		}
+
+		LeaveCriticalSection(mCriticalSection);
 
 		for (MeshAndMaterial* meshAndMat : meshes)
 		{
@@ -294,10 +311,15 @@ namespace Verlet
 			}
 		}
 
+	
+		EnterCriticalSection(mCriticalSection);
+
 		for (PointerToVertex& vertex : mListOfVertices)
 		{
 			vertex.mPointerToVertex->normals = glm::normalize(vertex.mPointerToVertex->normals);
 		}
+		LeaveCriticalSection(mCriticalSection);
+
 	}
 
 	void SoftBody::CleanZeros(glm::vec3& value)

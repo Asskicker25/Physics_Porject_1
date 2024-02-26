@@ -56,6 +56,8 @@ void PhysicsEngine::Update(float deltaTime)
 {
 	timer += deltaTime;
 
+	UpdateSoftBodyBufferData();
+
 	if (timer >= fixedStepTime)
 	{
 		UpdatePhysics(fixedStepTime);
@@ -64,11 +66,20 @@ void PhysicsEngine::Update(float deltaTime)
 	}
 }
 
-void PhysicsEngine::UpdateSoftBodies(float deltaTime)
+void PhysicsEngine::UpdateSoftBodies(float deltaTime, CRITICAL_SECTION& criticalSection)
+{
+
+	for (BaseSoftBody* softBody : listOfSoftBodies)
+	{
+		softBody->UpdateSoftBody(deltaTime, criticalSection);
+	}
+}
+
+void PhysicsEngine::UpdateSoftBodyBufferData()
 {
 	for (BaseSoftBody* softBody : listOfSoftBodies)
 	{
-		softBody->UpdateSoftBody(deltaTime);
+		softBody->UpdateBufferData();
 	}
 }
 
@@ -83,6 +94,7 @@ void PhysicsEngine::SetDebugSpheres(Model* model, int count)
 
 void PhysicsEngine::UpdatePhysics(float deltaTime)
 {
+
 	for (PhysicsObject* iteratorObject : physicsObjects)
 	{
 		if (iteratorObject->isEnabled == false)

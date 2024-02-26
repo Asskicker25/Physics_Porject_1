@@ -28,8 +28,8 @@ public:
 
 	// Inherited via ApplicationWindow
 	virtual void Update();
-
 	virtual void Render();
+	virtual void Shutdown();
 
 };
 

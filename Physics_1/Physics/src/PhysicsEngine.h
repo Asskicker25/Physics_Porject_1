@@ -2,6 +2,7 @@
 
 #include "PhysicsObject.h"
 #include "Softbody/BaseSoftBody.h"
+#include <Windows.h>
 
 class PhysicsEngine
 {
@@ -34,7 +35,8 @@ public:
 	void RemoveSoftBodyObject(BaseSoftBody* softBody);
 
 	void Update(float deltaTime);
-	void UpdateSoftBodies(float deltaTime);
+	void UpdateSoftBodies(float deltaTime, CRITICAL_SECTION& criticalSection);
+	void UpdateSoftBodyBufferData();
 	void SetDebugSpheres(Model* model, int count);
 };
 
