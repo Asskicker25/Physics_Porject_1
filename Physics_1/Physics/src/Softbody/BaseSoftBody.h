@@ -1,5 +1,8 @@
 #pragma once
 #include <Graphics/Model.h>
+#include "../PhysicsObject.h"
+
+#define NOMINMAX
 #include <Windows.h>
 
 class BaseSoftBody : public Model
@@ -50,9 +53,10 @@ public:
 	glm::vec3 mGravity = glm::vec3(0);
 	unsigned int mNumOfIterations = 10;
 
-	float mNodeDrawRadius = 0.1f;
+	float mNodeRadius = 0.1f;
 	float mTightness = 1.0f;
 
+	std::vector<PhysicsObject*> mListOfCollidersToCheck;
 
 protected:
 	void CleanZeros(glm::vec3& value);

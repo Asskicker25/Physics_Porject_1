@@ -344,7 +344,7 @@ namespace Verlet
 
 		for (Node* node : mListOfNodes)
 		{
-			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeDrawRadius, nodeColor);
+			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeRadius, nodeColor);
 		}
 
 		for (LockNode& node : mListOfLockNodes)

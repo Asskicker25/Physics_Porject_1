@@ -61,6 +61,7 @@ void PhysicsEngine::Update(float deltaTime)
 	if (timer >= fixedStepTime)
 	{
 		UpdatePhysics(fixedStepTime);
+		UpdateSoftBodyPhysics(fixedStepTime);
 
 		timer = 0;
 	}
@@ -227,12 +228,32 @@ bool PhysicsEngine::HandleCollision(PhysicsObject* first, PhysicsObject* second,
 {
 	if (first->CheckCollision(second, collisionPoints, collisionNormal))
 	{
-		//first->SetVisible(false);
-		//Debugger::Print("Collision Point Count : ",(int) collisionNormal.size());
 		return true;
-		//std::cout << "COLLLLLLIIISSSSION" << std::endl;
 	}
 
 	return false;
 }
 
+
+
+void PhysicsEngine::UpdateSoftBodyPhysics(float deltaTime)
+{
+	for (BaseSoftBody* softBody : listOfSoftBodies)
+	{
+		for (PhysicsObject* phyObj : softBody->mListOfCollidersToCheck)
+		{
+			if (HandleSoftBodyCollision(softBody, phyObj))
+			{
+				Debugger::Print("Colliding");
+			}
+
+		}
+	}
+}
+
+
+bool PhysicsEngine::HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj)
+{
+
+	return false;
+}

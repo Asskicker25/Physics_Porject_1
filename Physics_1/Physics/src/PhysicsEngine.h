@@ -16,6 +16,7 @@ private:
 	std::vector<BaseSoftBody*> listOfSoftBodies;
 
 	void UpdatePhysics(float deltaTime);
+	void UpdateSoftBodyPhysics(float deltaTime);
  	
 public:
 	float fixedStepTime = 0.01f;
@@ -30,6 +31,7 @@ public:
 		std::vector<glm::vec3>& collisionPoint,
 		std::vector<glm::vec3>& collisionNormal);
 
+	bool HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj);
 
 	void AddSoftBodyObject(BaseSoftBody* softBody);
 	void RemoveSoftBodyObject(BaseSoftBody* softBody);

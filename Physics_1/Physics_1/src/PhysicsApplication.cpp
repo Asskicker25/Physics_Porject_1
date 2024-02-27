@@ -101,12 +101,13 @@ void PhysicsApplication::SetUp()
 
 	softbodyMesh = new SoftBodyForMeshes();
 	softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
+	softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 90));
 	softbodyMesh->transform.SetScale(glm::vec3(1.0f));
 	softbodyMesh->mGravity = glm::vec3(0, -30, 0);
 	softbodyMesh->showDebugModels = false;
-	softbodyMesh->InitializeLockNodes({0,3});
+	//softbodyMesh->InitializeLockNodes({0});
 	softbodyMesh->InitializeSoftBody();
-
+	softbodyMesh->LockNodeAtIndex(0);
 
 
 	//SoftBody* softbody2 = new SoftBody();
@@ -178,7 +179,7 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 	{
 		if (key == GLFW_KEY_SPACE)
 		{
-			softbody->AddForceToRandomNode(glm::vec3(0, 50, 0));
+			softbodyMesh->AddForceToRandomNode(glm::vec3(0, 50, 0));
 		}
 	}
 }
