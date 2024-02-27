@@ -8,6 +8,8 @@
 #include "PhysicsProperties.h"
 #include "HierarchicalAABB.h"
 
+#define NOMINMAX
+
 
 class PhysicsObject : public Model, public iPhysicsTransformable
 {

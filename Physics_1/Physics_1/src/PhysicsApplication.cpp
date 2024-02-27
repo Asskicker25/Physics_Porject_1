@@ -1,6 +1,7 @@
 #include "PhysicsApplication.h"
 #include "Utilities/Random.h"
-#include <Softbody/SoftBody.h>
+#include <Softbody/SoftBodyForVertex.h>
+#include <Softbody/SoftBodyForMeshes.h>
 #include <Thread/PhysicsEngineThread.h>
 
 using namespace Verlet;
@@ -8,7 +9,8 @@ using namespace Verlet;
 PhysicsObject* spherePhy;
 PhysicsObject* planePhy;
 
-SoftBody* softbody;
+SoftBodyForVertex* softbody;
+SoftBodyForMeshes* softbodyMesh;
 
 PhysicsEngineThreadInfo* physicsThread = nullptr;
 
@@ -32,7 +34,7 @@ void PhysicsApplication::SetUp()
 	dirLight->transform.SetScale(glm::vec3(0.1f));
 	dirLight->transform.SetPosition(glm::vec3(0, 5, 3));
 	dirLight->InitializeLight(Directional);
-	dirLight->intensity = 2;
+	dirLight->intensity = 0.7;
 	dirLight->attenuation = glm::vec4(1, 0.1, 0.01, 0.02);
 
 	/*spherePhy = new PhysicsObject();
@@ -88,14 +90,21 @@ void PhysicsApplication::SetUp()
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->InitializeSoftBody();*/
 
-	softbody = new SoftBody();
+	/*softbody = new SoftBody();
 	softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
 	softbody->transform.SetScale(glm::vec3(0.01f));
 	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
 	softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
 	softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->showDebugModels = false;
-	softbody->InitializeSoftBody(); 
+	softbody->InitializeSoftBody(); */
+
+	softbodyMesh = new SoftBodyForMeshes();
+	softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
+	softbodyMesh->transform.SetScale(glm::vec3(1.0f));
+	softbodyMesh->mGravity = glm::vec3(0, -1, 0);
+	softbodyMesh->showDebugModels = false;
+	softbodyMesh->InitializeSoftBody();
 
 
 
@@ -125,8 +134,8 @@ void PhysicsApplication::Update()
 
 	//softbody->UpdateSoftBody(Timer::GetInstance().deltaTime, nullptr);
 	//softbody->UpdateModelData(Timer::GetInstance().deltaTime);
-	float fps = 1.0f / Timer::GetInstance().deltaTime;
-	std::cout << "FPS : " << fps << std::endl;
+	/*float fps = 1.0f / Timer::GetInstance().deltaTime;
+	std::cout << "FPS : " << fps << std::endl;*/
 
 	//Debugger::Print("SpherePos : ", spherePhy->transform.position);
 

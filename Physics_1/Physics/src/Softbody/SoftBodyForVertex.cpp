@@ -3,8 +3,10 @@
 #include <Graphics/Panels/ImguiDrawUtils.h>
 #include <Graphics/MathUtils.h>
 #include "../PhysicsEngine.h"
+
 #include <Windows.h>
-#include "SoftBody.h"
+
+#include "SoftBodyForVertex.h"
 
 using namespace MathUtilities;
 
@@ -20,7 +22,7 @@ namespace Verlet
 		}
 	};
 
-	struct SoftBody::Node
+	struct SoftBodyForVertex::Node
 	{
 		Node(PointerToVertex& vertex, bool isLocked = false)
 		{
@@ -41,7 +43,7 @@ namespace Verlet
 		Vertex* mPointerToVertex = nullptr;
 	};
 
-	struct  SoftBody::Stick
+	struct  SoftBodyForVertex::Stick
 	{
 		Stick(Node* nodeA, Node* nodeB)
 		{
@@ -59,19 +61,19 @@ namespace Verlet
 		Node* mNodeB = nullptr;
 	};
 
-	SoftBody::SoftBody()
+	SoftBodyForVertex::SoftBodyForVertex()
 	{
-		name = "SoftBody";
+		name = "SoftBodyVertex";
 		InitializeEntity(this);
 		PhysicsEngine::GetInstance().AddSoftBodyObject(this);
 	}
 
-	SoftBody::~SoftBody()
+	SoftBodyForVertex::~SoftBodyForVertex()
 	{
 		PhysicsEngine::GetInstance().RemoveSoftBodyObject(this);
 	}
 
-	void SoftBody::InitializeSoftBody()
+	void SoftBodyForVertex::InitializeSoftBody()
 	{
 		glm::mat4 transformMatrix = transform.GetTransformMatrix();
 		/*glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0))
@@ -102,7 +104,7 @@ namespace Verlet
 
 	}
 
-	void SoftBody::UpdateSoftBody(float deltaTine, CRITICAL_SECTION& criticalSection)
+	void SoftBodyForVertex::UpdateSoftBody(float deltaTine, CRITICAL_SECTION& criticalSection)
 	{
 		mCriticalSection = &criticalSection;
 
@@ -111,7 +113,7 @@ namespace Verlet
 		UpdateModelData(deltaTine);
 	}
 
-	void SoftBody::SetupNodes()
+	void SoftBodyForVertex::SetupNodes()
 	{
 		mListOfNodes.reserve(mListOfVertices.size());
 
@@ -131,7 +133,7 @@ namespace Verlet
 		}
 	}
 
-	void SoftBody::SetupSticks()
+	void SoftBodyForVertex::SetupSticks()
 	{
 
 		for (unsigned int i = 0; i < mListOfIndices.size(); i += 3)
@@ -169,7 +171,7 @@ namespace Verlet
 
 	}
 
-	void SoftBody::UpdateNodePosition(float deltaTime)
+	void SoftBodyForVertex::UpdateNodePosition(float deltaTime)
 	{
 		for (Node* node : mListOfNodes)
 		{
@@ -184,7 +186,7 @@ namespace Verlet
 		}
 	}
 
-	void SoftBody::UpdatePositionByVerlet(Node* node, float deltaTime)
+	void SoftBodyForVertex::UpdatePositionByVerlet(Node* node, float deltaTime)
 	{
 		glm::vec3 posBeforUpdate = node->mCurrentPosition;
 
@@ -195,7 +197,7 @@ namespace Verlet
 		CleanZeros(node->mOldPositionm);
 	}
 
-	void SoftBody::SatisfyConstraints(float deltaTime)
+	void SoftBodyForVertex::SatisfyConstraints(float deltaTime)
 	{
 
 		for (unsigned int i = 0; i < mNumOfIterations; i++)
@@ -242,13 +244,13 @@ namespace Verlet
 	}
 
 
-	void SoftBody::UpdateModelData(float deltaTime)
+	void SoftBodyForVertex::UpdateModelData(float deltaTime)
 	{
 		UpdatModelVertices();
 		UpdateModelNormals();
 	}
 	
-	void SoftBody::UpdateBufferData()
+	void SoftBodyForVertex::UpdateBufferData()
 	{
 		for (MeshAndMaterial* mesh : meshes)
 		{
@@ -256,7 +258,7 @@ namespace Verlet
 		}
 	}
 
-	void SoftBody::UpdatModelVertices()
+	void SoftBodyForVertex::UpdatModelVertices()
 	{
 		EnterCriticalSection(mCriticalSection);
 
@@ -269,7 +271,7 @@ namespace Verlet
 
 	}
 
-	void SoftBody::UpdateModelNormals()
+	void SoftBodyForVertex::UpdateModelNormals()
 	{
 		EnterCriticalSection(mCriticalSection);
 
@@ -322,25 +324,7 @@ namespace Verlet
 
 	}
 
-	void SoftBody::CleanZeros(glm::vec3& value)
-	{
-		const float minFloat = 1.192092896e-07f;
-		if ((value.x < minFloat) && (value.x > -minFloat))
-		{
-			value.x = 0.0f;
-		}
-		if ((value.y < minFloat) && (value.y > -minFloat))
-		{
-			value.y = 0.0f;
-		}
-		if ((value.z < minFloat) && (value.z > -minFloat))
-		{
-			value.z = 0.0f;
-		}
-	}
-
-
-	bool SoftBody::IsNodeLocked(Node* node)
+	bool SoftBodyForVertex::IsNodeLocked(Node* node)
 	{
 		for (LockNode& lockNode : mListOfLockNodes)
 		{
@@ -356,9 +340,7 @@ namespace Verlet
 	}
 
 
-
-
-	void SoftBody::Render()
+	void SoftBodyForVertex::Render()
 	{
 		if (!showDebugModels) return;
 
@@ -379,7 +361,7 @@ namespace Verlet
 		}
 	}
 
-	void SoftBody::OnPropertyDraw()
+	void SoftBodyForVertex::OnPropertyDraw()
 	{
 		Model::OnPropertyDraw();
 
@@ -394,12 +376,12 @@ namespace Verlet
 
 	}
 
-	void SoftBody::AddLockNode(glm::vec3 posOffset, float radius)
+	void SoftBodyForVertex::AddLockNode(glm::vec3 posOffset, float radius)
 	{
 		mListOfLockNodes.push_back({ transform.position + posOffset , radius });
 	}
 
-	void SoftBody::AddForceToRandomNode(glm::vec3 velocity)
+	void SoftBodyForVertex::AddForceToRandomNode(glm::vec3 velocity)
 	{
 		int index = MathUtils::GetRandomIntNumber(0, mListOfNodes.size() - 1);
 

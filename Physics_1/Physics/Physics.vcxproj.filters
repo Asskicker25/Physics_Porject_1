@@ -33,7 +33,7 @@
     <ClInclude Include="src\HierarchicalAABBNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Softbody\SoftBody.h">
+    <ClInclude Include="src\Softbody\SoftBodyForVertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Thread\PhysicsEngineThreadInfo.h">
@@ -43,6 +43,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Softbody\BaseSoftBody.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Softbody\SoftBodyForMeshes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,13 +71,16 @@
     <ClCompile Include="src\PhysicsShapeAndCollision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Softbody\SoftBody.cpp">
+    <ClCompile Include="src\Softbody\SoftBodyForVertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Thread\PhysicsEngineThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Softbody\BaseSoftBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Softbody\SoftBodyForMeshes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

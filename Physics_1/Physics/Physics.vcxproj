@@ -19,8 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Softbody\SoftBodyForMeshes.h" />
     <ClInclude Include="src\Softbody\BaseSoftBody.h" />
-    <ClInclude Include="src\Softbody\SoftBody.h" />
+    <ClInclude Include="src\Softbody\SoftBodyForVertex.h" />
     <ClInclude Include="src\HierarchicalAABBNode.h" />
     <ClInclude Include="src\HierarchicalAABB.h" />
     <ClInclude Include="src\PhysicsProperties.h" />
@@ -31,8 +32,9 @@
     <ClInclude Include="src\Thread\PhysicsEngineThreadInfo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Softbody\SoftBodyForMeshes.cpp" />
     <ClCompile Include="src\Softbody\BaseSoftBody.cpp" />
-    <ClCompile Include="src\Softbody\SoftBody.cpp" />
+    <ClCompile Include="src\Softbody\SoftBodyForVertex.cpp" />
     <ClCompile Include="src\HierarchicalAABBNode.cpp" />
     <ClCompile Include="src\HierarchicalAABB.cpp" />
     <ClCompile Include="src\PhysicsProperties.cpp" />
