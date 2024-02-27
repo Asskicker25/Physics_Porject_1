@@ -1,5 +1,6 @@
 #include "BaseSoftBody.h"
 #include <Graphics/Renderer.h>
+#include <Graphics/Panels/ImguiDrawUtils.h>
 
 void BaseSoftBody::CleanZeros(glm::vec3& value)
 {
@@ -18,4 +19,35 @@ void BaseSoftBody::CleanZeros(glm::vec3& value)
 	}
 }
 
+
+void BaseSoftBody::Render()
+{
+	if (!showDebugModels) return;
+
+	for (Node* node : mListOfNodes)
+	{
+		Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeRadius, nodeColor);
+	}
+
+
+	for (Stick* stick : mListOfSticks)
+	{
+		Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
+	}
+}
+
+void BaseSoftBody::OnPropertyDraw()
+{
+	Model::OnPropertyDraw();
+
+	if (!ImGui::TreeNodeEx("SoftBody", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		return;
+	}
+
+	ImGuiUtils::DrawBool("ShowDebug", showDebugModels);
+
+	ImGui::TreePop();
+
+}
 

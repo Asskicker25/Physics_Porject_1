@@ -59,7 +59,7 @@ void PhysicsApplication::SetUp()
 	EditorLayout::GetInstance().SetMaximizeState(false);
 	
 	
-	//softbody = new SoftBody();
+	//softbody = new SoftBodyForVertex();
 	//softbody->LoadModel("Assets/Models/Plane/Plane.ply");
 	////softbody->LoadModel("Assets/Models/Wheel_15.ply");
 	////softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
@@ -101,7 +101,7 @@ void PhysicsApplication::SetUp()
 
 	softbodyMesh = new SoftBodyForMeshes();
 	softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
-	softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 90));
+	//softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 90));
 	softbodyMesh->transform.SetScale(glm::vec3(1.0f));
 	softbodyMesh->mGravity = glm::vec3(0, -30, 0);
 	softbodyMesh->showDebugModels = false;

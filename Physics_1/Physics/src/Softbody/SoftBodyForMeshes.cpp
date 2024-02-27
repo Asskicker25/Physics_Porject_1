@@ -12,80 +12,7 @@ using namespace MathUtilities;
 
 namespace Verlet
 {
-	struct SoftBodyForMeshes::Node
-	{
-
-	private:
-
-		glm::vec3 CalculatePosition(std::vector<PointerToVertex>& vertex)
-		{
-			glm::vec3 pos = glm::vec3(0);
-
-			int i = 0;
-
-			for (PointerToVertex& vert : vertex)
-			{
-				pos += vert.mPointerToVertex->positions;
-				i++;
-			}
-
-			pos /= (float)i;
-
-			return pos;
-		}
-
-
-		void InitializeVertexPointer(std::vector<PointerToVertex>& vertex, glm::vec3& center)
-		{
-			mPointerToVertices.reserve(vertex.size());
-
-			for (PointerToVertex& vert : vertex)
-			{
-				vert.mOffsetFromCenter = vert.mPointerToVertex->positions - center;
-				mPointerToVertices.push_back(vert);
-			}
-		}
-
-	public:
-
-		Node(std::vector<PointerToVertex>& vertex, glm::mat4& transformMat,
-			bool isLocked = false)
-		{
-			mIsLocked = isLocked;
-
-			mCurrentPosition = CalculatePosition(vertex);
-			InitializeVertexPointer(vertex, mCurrentPosition);
-
-			mCurrentPosition = transformMat * glm::vec4(mCurrentPosition, 1.0f);
-			mOldPositionm = mCurrentPosition;
-		}
-
-		bool mIsLocked = false;
-		glm::vec3 mCurrentPosition = glm::vec3(0);
-		glm::vec3 mOldPositionm = glm::vec3(0);
-		glm::vec3 velocity = glm::vec3(0);
-
-		std::vector<PointerToVertex> mPointerToVertices;
-
-	};
-
-	struct SoftBodyForMeshes::Stick
-	{
-		Stick(Node* nodeA, Node* nodeB)
-		{
-			mNodeA = nodeA;
-			mNodeB = nodeB;
-
-			mRestLength = glm::distance(nodeA->mCurrentPosition, nodeB->mCurrentPosition);
-		};
-
-		bool isConnected = true;
-		float mRestLength = 0;
-
-		Node* mNodeA = nullptr;
-		Node* mNodeB = nullptr;
-	};
-
+	
 	SoftBodyForMeshes::SoftBodyForMeshes()
 	{
 		name = "SoftBodyMesh";
@@ -172,6 +99,7 @@ namespace Verlet
 		if (mListOfNodes.size() == 0) return;
 
 		mListOfNodes[index]->mIsLocked = true;
+		mListOfLockedNodes.push_back(mListOfNodes[index]);
 	}
 
 	bool SoftBodyForMeshes::IsNodeLocked(unsigned int& currentIndex)
@@ -346,32 +274,12 @@ namespace Verlet
 
 	void SoftBodyForMeshes::Render()
 	{
-		if (!showDebugModels) return;
-
-		for (Node* node : mListOfNodes)
-		{
-			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeRadius, nodeColor);
-		}
-
-
-		for (Stick* stick : mListOfSticks)
-		{
-			Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
-		}
+		BaseSoftBody::Render();
 	}
 
 	void SoftBodyForMeshes::OnPropertyDraw()
 	{
-		Model::OnPropertyDraw();
-
-		if (!ImGui::TreeNodeEx("SoftBody", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			return;
-		}
-
-		ImGuiUtils::DrawBool("ShowDebug", showDebugModels);
-
-		ImGui::TreePop();
+		BaseSoftBody::OnPropertyDraw();
 
 	}
 

@@ -22,45 +22,6 @@ namespace Verlet
 		}
 	};
 
-	struct SoftBodyForVertex::Node
-	{
-		Node(PointerToVertex& vertex, bool isLocked = false)
-		{
-			mIsLocked = isLocked;
-
-			mCurrentPosition = vertex.mLocalVertex.positions;
-			mOldPositionm = mCurrentPosition;
-			mPointerToVertex = vertex.mPointerToVertex;
-		};
-
-		bool mIsLocked = false;
-
-		glm::vec3 mCurrentPosition = glm::vec3(0);
-		glm::vec3 mOldPositionm = glm::vec3(0);
-
-		glm::vec3 velocity = glm::vec3(0);
-
-		Vertex* mPointerToVertex = nullptr;
-	};
-
-	struct  SoftBodyForVertex::Stick
-	{
-		Stick(Node* nodeA, Node* nodeB)
-		{
-			mNodeA = nodeA;
-			mNodeB = nodeB;
-
-			mRestLength = glm::distance(nodeA->mCurrentPosition, nodeB->mCurrentPosition);
-		};
-
-		bool isConnected = true;
-		float mRestLength = 0;
-		unsigned int mNumOfIterations = 1;
-
-		Node* mNodeA = nullptr;
-		Node* mNodeB = nullptr;
-	};
-
 	SoftBodyForVertex::SoftBodyForVertex()
 	{
 		name = "SoftBodyVertex";
@@ -116,10 +77,14 @@ namespace Verlet
 	void SoftBodyForVertex::SetupNodes()
 	{
 		mListOfNodes.reserve(mListOfVertices.size());
+		glm::mat4 transformMat = transform.GetTransformMatrix();
 
 		for (PointerToVertex& pos : mListOfVertices)
 		{
-			Node* node = new Node(pos);
+			std::vector<PointerToVertex> posVector;
+			posVector.push_back(pos);
+
+			Node* node = new Node(posVector, transformMat);
 
 
 			if (IsNodeLocked(node))
@@ -262,7 +227,8 @@ namespace Verlet
 
 		for (Node* node : mListOfNodes)
 		{
-			node->mPointerToVertex->positions = glm::inverse(transform.GetTransformMatrix()) * glm::vec4(node->mCurrentPosition, 1.0f);
+			node->mPointerToVertices[0].mPointerToVertex->positions = 
+				glm::inverse(transform.GetTransformMatrix()) * glm::vec4(node->mCurrentPosition, 1.0f);
 		}
 		
 		LeaveCriticalSection(mCriticalSection);
@@ -342,36 +308,18 @@ namespace Verlet
 	{
 		if (!showDebugModels) return;
 
-		for (Node* node : mListOfNodes)
-		{
-			Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeRadius, nodeColor);
-		}
+		BaseSoftBody::Render();
 
 		for (LockNode& node : mListOfLockNodes)
 		{
 			Renderer::GetInstance().DrawSphere(node.center, node.radius, lockNodeColor);
 		}
 
-
-		for (Stick* stick : mListOfSticks)
-		{
-			Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
-		}
 	}
 
 	void SoftBodyForVertex::OnPropertyDraw()
 	{
-		Model::OnPropertyDraw();
-
-		if (!ImGui::TreeNodeEx("SoftBody", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			return;
-		}
-
-		ImGuiUtils::DrawBool("ShowDebug", showDebugModels);
-
-		ImGui::TreePop();
-
+		BaseSoftBody::OnPropertyDraw();
 	}
 
 	void SoftBodyForVertex::AddLockNode(glm::vec3 posOffset, float radius)

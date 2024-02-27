@@ -7,9 +7,6 @@ namespace Verlet
 	class SoftBodyForVertex : public BaseSoftBody
 	{
 	public:
-		struct Node;
-		struct Stick;
-
 		struct LockNode
 		{
 			LockNode(glm::vec3 center, float radius)
@@ -56,17 +53,12 @@ namespace Verlet
 
 		bool IsNodeLocked(Node* node);
 
-
-		const glm::vec4 nodeColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-		const glm::vec4 stickColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		const glm::vec4 lockNodeColor = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 
 		std::vector<PointerToVertex> mListOfVertices;
 		std::vector<PointerToIndex> mListOfIndices;
 		std::vector<LockNode> mListOfLockNodes;				//Position Offset from center that calculates which nodes to lock based on radius
-
-		std::vector<Node*> mListOfNodes;
-		std::vector<Stick*> mListOfSticks;
+		
 		std::vector<Node*> mListOfLockedNodes;
 
 	};
