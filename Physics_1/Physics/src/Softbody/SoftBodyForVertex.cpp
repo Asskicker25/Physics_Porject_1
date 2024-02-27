@@ -177,8 +177,6 @@ namespace Verlet
 		{
 			if (node->mIsLocked) continue;
 
-			//Handling force
-
 			node->velocity += mGravity * deltaTime;
 			//node->mCurrentPosition += node->velocity * deltaTime;
 
@@ -280,7 +278,7 @@ namespace Verlet
 			vertex.mPointerToVertex->normals = glm::vec3(0);
 		}
 
-		LeaveCriticalSection(mCriticalSection);
+		//LeaveCriticalSection(mCriticalSection);
 
 		for (MeshAndMaterial* meshAndMat : meshes)
 		{
@@ -314,7 +312,7 @@ namespace Verlet
 		}
 
 	
-		EnterCriticalSection(mCriticalSection);
+		//EnterCriticalSection(mCriticalSection);
 
 		for (PointerToVertex& vertex : mListOfVertices)
 		{

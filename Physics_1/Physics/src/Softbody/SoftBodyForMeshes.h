@@ -22,17 +22,21 @@ namespace Verlet
 
 		void UpdateModelData(float deltaTime);
 		void UpdateBufferData() override;
+
+		void AddStickBetweenNodeIndex(unsigned int nodeA, unsigned int nodeB);
 	
 		//After Initialized
 		void LockNodeAtIndex(int index);
 		void InitializeLockNodes(std::vector<unsigned int> indexToLock);
+
+		CRITICAL_SECTION* mCriticalSection;
 
 	private:
 		void SetupNodes();
 		void SetupSticks();
 
 		void UpdateNodePosition(float deltaTime);
-		void UpdatePositionsByVerlet(Node*, float deltaTime);
+		void UpdatePositionByVerlet(Node*, float deltaTime);
 		void SatisfyConstraints(float deltaTime);
 
 		void UpdateModelVertices();

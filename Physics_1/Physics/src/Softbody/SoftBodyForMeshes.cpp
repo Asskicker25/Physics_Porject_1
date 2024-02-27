@@ -8,7 +8,7 @@
 #define NOMINMAX
 #include <Windows.h>
 
-
+using namespace MathUtilities;
 
 namespace Verlet
 {
@@ -71,7 +71,19 @@ namespace Verlet
 
 	struct SoftBodyForMeshes::Stick
 	{
+		Stick(Node* nodeA, Node* nodeB)
+		{
+			mNodeA = nodeA;
+			mNodeB = nodeB;
 
+			mRestLength = glm::distance(nodeA->mCurrentPosition, nodeB->mCurrentPosition);
+		};
+
+		bool isConnected = true;
+		float mRestLength = 0;
+
+		Node* mNodeA = nullptr;
+		Node* mNodeB = nullptr;
 	};
 
 	SoftBodyForMeshes::SoftBodyForMeshes()
@@ -118,18 +130,11 @@ namespace Verlet
 
 	void SoftBodyForMeshes::UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection)
 	{
-	}
+		mCriticalSection = &criticalSection;
 
-	void SoftBodyForMeshes::AddForceToRandomNode(glm::vec3 velocity)
-	{
-	}
-
-	void SoftBodyForMeshes::UpdateModelData(float deltaTime)
-	{
-	}
-
-	void SoftBodyForMeshes::UpdateBufferData()
-	{
+		UpdateNodePosition(deltaTime);
+		SatisfyConstraints(deltaTime);
+		UpdateModelData(deltaTime);
 	}
 
 	void SoftBodyForMeshes::SetupNodes()
@@ -151,6 +156,10 @@ namespace Verlet
 
 	void SoftBodyForMeshes::SetupSticks()
 	{
+		for (int i = 0; i < mListOfNodes.size() - 1; i++)
+		{
+			AddStickBetweenNodeIndex(i, i + 1);
+		}
 	}
 
 	void SoftBodyForMeshes::InitializeLockNodes(std::vector<unsigned int> indexToLock)
@@ -175,26 +184,165 @@ namespace Verlet
 		return false;
 	}
 
-	void SoftBodyForMeshes::UpdateNodePosition(float deltaTime)
+	void SoftBodyForMeshes::AddStickBetweenNodeIndex(unsigned int nodeAIndex, unsigned int nodeBIndex)
 	{
+		Node* nodeA = mListOfNodes[nodeAIndex];
+		Node* nodeB = mListOfNodes[nodeBIndex];
+
+		mListOfSticks.push_back(new Stick(nodeA, nodeB));
 	}
 
-	void SoftBodyForMeshes::UpdatePositionsByVerlet(Node*, float deltaTime)
+	void SoftBodyForMeshes::UpdateNodePosition(float deltaTime)
 	{
+		for (Node* node : mListOfNodes)
+		{
+			if (node->mIsLocked) continue;
+
+			node->velocity += mGravity * deltaTime;
+
+			UpdatePositionByVerlet(node, deltaTime);
+		}
+	}
+
+	void SoftBodyForMeshes::UpdatePositionByVerlet(Node* node, float deltaTime)
+	{
+		glm::vec3 posBeforUpdate = node->mCurrentPosition;
+
+		node->mCurrentPosition += (posBeforUpdate - node->mOldPositionm) + (node->velocity * (deltaTime * deltaTime));
+		node->mOldPositionm = posBeforUpdate;
+
+		CleanZeros(node->mCurrentPosition);
+		CleanZeros(node->mOldPositionm);
 	}
 
 	void SoftBodyForMeshes::SatisfyConstraints(float deltaTime)
 	{
+		for (unsigned int i = 0; i < mNumOfIterations; i++)
+		{
+			for (Stick* stick : mListOfSticks)
+			{
+				if (!stick->isConnected) continue;
+
+				Node* nodeA = stick->mNodeA;
+				Node* nodeB = stick->mNodeB;
+
+				glm::vec3 delta = nodeB->mCurrentPosition - nodeA->mCurrentPosition;
+				float length = glm::length(delta);
+
+				float diff = (length - stick->mRestLength) / length;
+
+				if (!nodeA->mIsLocked)
+				{
+					nodeA->mCurrentPosition += delta * 0.5f * diff * mTightness;
+				}
+
+				if (!nodeB->mIsLocked)
+				{
+					nodeB->mCurrentPosition -= delta * 0.5f * diff * mTightness;
+				}
+
+				CleanZeros(nodeA->mCurrentPosition);
+				CleanZeros(nodeB->mCurrentPosition);
+			}
+		}
+	}
+
+	void SoftBodyForMeshes::UpdateModelData(float deltaTime)
+	{
+		UpdateModelVertices();
+		UpdateModelVertices();
+	}
+
+	void SoftBodyForMeshes::UpdateBufferData()
+	{
+		for (MeshAndMaterial* mesh : meshes)
+		{
+			mesh->mesh->UpdateVertices();
+		}
 	}
 
 	void SoftBodyForMeshes::UpdateModelVertices()
 	{
+		EnterCriticalSection(mCriticalSection);
+
+		glm::vec3 pos;
+
+		for (Node* node : mListOfNodes)
+		{
+
+			for (PointerToVertex& pointerToVertex : node->mPointerToVertices)
+			{
+				pos = glm::inverse(transform.GetTransformMatrix()) * glm::vec4(node->mCurrentPosition, 1.0f);
+				pos += pointerToVertex.mOffsetFromCenter;
+				pointerToVertex.mPointerToVertex->positions = pos;
+			}
+		}
+
+		LeaveCriticalSection(mCriticalSection);
 	}
 
 	void SoftBodyForMeshes::UpdateModelNormals()
 	{
+		EnterCriticalSection(mCriticalSection);
+
+		for (MeshHolder& mesh : mListOfMeshes)
+		{
+			for (PointerToVertex& vertex : mesh.mListOfVertices)
+			{
+				vertex.mPointerToVertex->normals = glm::vec3(0);
+			}
+		}
+
+		for (MeshAndMaterial* meshAndMat : meshes)
+		{
+			std::shared_ptr<Mesh>& mesh = meshAndMat->mesh;
+			std::vector<Triangles>& listOfTriangles = mesh->triangles;
+
+			int size = listOfTriangles.size();
+
+			for (int i = 0; i < size; i += 3)
+			{
+				unsigned int vertIndexA = mesh->indices[i];
+				unsigned int vertIndexB = mesh->indices[i + 1];
+				unsigned int vertIndexC = mesh->indices[i + 2];
+
+				Vertex& vertA = mesh->vertices[vertIndexA];
+				Vertex& vertB = mesh->vertices[vertIndexB];
+				Vertex& vertC = mesh->vertices[vertIndexC];
+
+				glm::vec3 edgeAB = vertB.positions - vertA.positions;
+				glm::vec3 edgeAC = vertC.positions - vertA.positions;
+
+				glm::vec3 normal = glm::normalize(glm::cross(edgeAB, edgeAC));
+
+				CleanZeros(normal);
+
+				vertA.normals += normal;
+				vertB.normals += normal;
+				vertC.normals += normal;
+
+			}
+		}
+
+
+		for (MeshHolder& mesh : mListOfMeshes)
+		{
+			for (PointerToVertex& vertex : mesh.mListOfVertices)
+			{
+				vertex.mPointerToVertex->normals = glm::normalize(vertex.mPointerToVertex->normals);
+
+			}
+		}
+
+		LeaveCriticalSection(mCriticalSection);
 	}
 
+	void SoftBodyForMeshes::AddForceToRandomNode(glm::vec3 velocity)
+	{
+		int index = MathUtils::GetRandomIntNumber(0, mListOfNodes.size() - 1);
+
+		mListOfNodes[index]->velocity = velocity;
+	}
 
 	void SoftBodyForMeshes::Render()
 	{
@@ -206,10 +354,10 @@ namespace Verlet
 		}
 
 
-		/*for (Stick* stick : mListOfSticks)
+		for (Stick* stick : mListOfSticks)
 		{
 			Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
-		}*/
+		}
 	}
 
 	void SoftBodyForMeshes::OnPropertyDraw()

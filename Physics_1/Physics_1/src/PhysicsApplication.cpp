@@ -102,8 +102,9 @@ void PhysicsApplication::SetUp()
 	softbodyMesh = new SoftBodyForMeshes();
 	softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
 	softbodyMesh->transform.SetScale(glm::vec3(1.0f));
-	softbodyMesh->mGravity = glm::vec3(0, -1, 0);
+	softbodyMesh->mGravity = glm::vec3(0, -30, 0);
 	softbodyMesh->showDebugModels = false;
+	softbodyMesh->InitializeLockNodes({0,3});
 	softbodyMesh->InitializeSoftBody();
 
 
