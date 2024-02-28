@@ -117,9 +117,9 @@ namespace Verlet
 			Node* node2 = mListOfNodes[mListOfIndices[(index2)].mLocalIndex];
 			Node* node3 = mListOfNodes[mListOfIndices[(index3)].mLocalIndex];
 
-			node1->mListOfIndexes.push_back(mListOfIndices[i]);
-			node2->mListOfIndexes.push_back(mListOfIndices[index2]);
-			node3->mListOfIndexes.push_back(mListOfIndices[index3]);
+			node1->mListOfIndexes.push_back(i);
+			node2->mListOfIndexes.push_back(index2);
+			node3->mListOfIndexes.push_back(index3);
 
 			mListOfSticks.push_back(new Stick(node1, node2));
 			mListOfSticks.push_back(new Stick(node2, node3));
