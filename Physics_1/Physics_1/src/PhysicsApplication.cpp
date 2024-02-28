@@ -199,9 +199,9 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 		}
 		else if (key == GLFW_KEY_ENTER)
 		{
-			delete softbody->mListOfNodes[0];
-			softbody->mListOfNodes.erase(softbody->mListOfNodes.begin());
-			//softbody->mGravity = glm::vec3(0, -1, 0);
+			//delete softbody->mListOfNodes[0];
+			//softbody->mListOfNodes.erase(softbody->mListOfNodes.begin());
+			softbody->mGravity = glm::vec3(0, -1, 0);
 		}
 	}
 
