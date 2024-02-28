@@ -35,6 +35,8 @@ public:
 		unsigned int* mPointerToIndex = nullptr;
 	};
 
+	struct Stick;
+
 	struct Node
 	{
 
@@ -84,6 +86,12 @@ public:
 			mOldPositionm = mCurrentPosition;
 		}
 
+		~Node()
+		{
+			mListOfConnectedSticks.clear();
+			mPointerToVertices.clear();
+		}
+
 		bool mIsLocked = false;
 		float mRadius = 0;
 
@@ -92,8 +100,9 @@ public:
 		glm::vec3 velocity = glm::vec3(0);
 
 		std::vector<PointerToVertex> mPointerToVertices;
-
+		std::vector<Stick*> mListOfConnectedSticks;
 	};
+
 
 	struct Stick
 	{
@@ -103,7 +112,16 @@ public:
 			mNodeB = nodeB;
 
 			mRestLength = glm::distance(nodeA->mCurrentPosition, nodeB->mCurrentPosition);
+
+			nodeA->mListOfConnectedSticks.push_back(this);
+			nodeB->mListOfConnectedSticks.push_back(this);
 		};
+
+		~Stick()
+		{
+			mNodeA = nullptr;
+			mNodeB = nullptr;
+		}
 
 		bool isConnected = true;
 		float mRestLength = 0;
@@ -111,6 +129,8 @@ public:
 		Node* mNodeA = nullptr;
 		Node* mNodeB = nullptr;
 	};
+
+	
 
 	struct MeshHolder
 	{
@@ -132,6 +152,8 @@ public:
 	virtual void AddCollidersToCheck(PhysicsObject* phyObj);
 	virtual void SetNodeRadius(int index, float radius);
 
+	virtual void DisconnectStick(Stick* stick);
+
 	bool showDebugModels = true;
 	glm::vec3 mGravity = glm::vec3(0);
 	unsigned int mNumOfIterations = 10;
@@ -139,6 +161,8 @@ public:
 	float mNodeRadius = 0.1f;
 	float mTightness = 1.0f;
 	float mBounceFactor = 1.0f;
+
+	glm::vec3 mNodeMaxVelocity = glm::vec3(10);
 
 	std::vector<PhysicsObject*> mListOfCollidersToCheck;
 

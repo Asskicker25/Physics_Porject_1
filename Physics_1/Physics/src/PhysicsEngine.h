@@ -15,6 +15,8 @@ private:
 
 	std::vector<BaseSoftBody*> listOfSoftBodies;
 
+	CRITICAL_SECTION* softBody_CritSection = nullptr;
+
 	void UpdatePhysics(float deltaTime);
 	void UpdateSoftBodyPhysics(float deltaTime);
  	

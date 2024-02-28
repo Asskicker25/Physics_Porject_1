@@ -36,6 +36,13 @@ namespace Verlet
 
 	void SoftBodyForVertex::InitializeSoftBody()
 	{
+		mListOfVertices.clear();
+		mListOfIndices.clear();
+		mListOfNodes.clear();
+		mListOfSticks.clear();
+		mListOfCollidersToCheck.clear();
+		mListOfLockedNodes.clear();
+
 		glm::mat4 transformMatrix = transform.GetTransformMatrix();
 		/*glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0))
 			* glm::mat4(transform.quaternionRotation)
@@ -142,7 +149,16 @@ namespace Verlet
 		{
 			if (node->mIsLocked) continue;
 
-			node->velocity += mGravity * deltaTime;
+
+			if (ShouldApplyGravity(node))
+			{
+				node->velocity = mGravity;
+			}
+
+			/*if (node->velocity.x > mNodeMaxVelocity.x) { node->velocity.x = mNodeMaxVelocity.x; }
+			if (node->velocity.y > mNodeMaxVelocity.y) { node->velocity.y = mNodeMaxVelocity.y; }
+			if (node->velocity.z > mNodeMaxVelocity.z) { node->velocity.z = mNodeMaxVelocity.z; }*/
+
 			//node->mCurrentPosition += node->velocity * deltaTime;
 
 			UpdatePositionByVerlet(node, deltaTime);
@@ -212,7 +228,7 @@ namespace Verlet
 		UpdatModelVertices();
 		UpdateModelNormals();
 	}
-	
+
 	void SoftBodyForVertex::UpdateBufferData()
 	{
 		for (MeshAndMaterial* mesh : meshes)
@@ -227,10 +243,10 @@ namespace Verlet
 
 		for (Node* node : mListOfNodes)
 		{
-			node->mPointerToVertices[0].mPointerToVertex->positions = 
+			node->mPointerToVertices[0].mPointerToVertex->positions =
 				glm::inverse(transform.GetTransformMatrix()) * glm::vec4(node->mCurrentPosition, 1.0f);
 		}
-		
+
 		LeaveCriticalSection(mCriticalSection);
 
 	}
@@ -277,7 +293,7 @@ namespace Verlet
 			}
 		}
 
-	
+
 		//EnterCriticalSection(mCriticalSection);
 
 		for (PointerToVertex& vertex : mListOfVertices)
@@ -301,6 +317,19 @@ namespace Verlet
 		}
 
 		return false;
+	}
+
+	bool SoftBodyForVertex::ShouldApplyGravity(Node* node)
+	{
+		for (Node* noGravNode : mListOfNonGravityNodes)
+		{
+			if (node == noGravNode)
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 
@@ -332,6 +361,22 @@ namespace Verlet
 		int index = MathUtils::GetRandomIntNumber(0, mListOfNodes.size() - 1);
 
 		mListOfNodes[index]->velocity = velocity;
+	}
+
+	void SoftBodyForVertex::DisconnectRandomStick()
+	{
+		Stick* stick = mListOfSticks[MathUtils::GetRandomIntNumber(0, mListOfSticks.size())];
+		DisconnectStick(stick);
+	}
+
+	void SoftBodyForVertex::DisconnectRandomNode()
+	{
+		Node* node = mListOfNodes[MathUtils::GetRandomIntNumber(0, mListOfNodes.size())];
+		
+		for (Stick* stick : node->mListOfConnectedSticks)
+		{
+			DisconnectStick(stick);
+		}
 	}
 
 }

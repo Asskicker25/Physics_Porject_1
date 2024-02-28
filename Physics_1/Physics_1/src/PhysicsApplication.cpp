@@ -75,7 +75,7 @@ void PhysicsApplication::SetUp()
 	//softbody->transform.SetScale(glm::vec3(0.01f));
 	softbody->transform.SetScale(glm::vec3(60.0f));
 	//softbody->transform.SetScale(glm::vec3(5));
-	softbody->mGravity = glm::vec3(0, -1, 0);
+	//softbody->mGravity = glm::vec3(0, -1, 0);
 	softbody->mTightness = 1.0f;
 	//softbody->showDebugModels = false;
 	softbody->mNumOfIterations = 10;
@@ -90,17 +90,16 @@ void PhysicsApplication::SetUp()
 	
 	
 
-	/*
-	softbody = new SoftBody();
-	softbody->LoadModel("Assets/Models/Plane/Grid_50x50.ply");
-	softbody->transform.SetScale(glm::vec3(60.0f));
-	softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
-	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
-	softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
-	softbody->mGravity = glm::vec3(0, -1, 0);
-	softbody->InitializeSoftBody();*/
+	//softbody = new SoftBodyForVertex();
+	//softbody->LoadModel("Assets/Models/Plane/Grid_50x50.ply");
+	//softbody->transform.SetScale(glm::vec3(60.0f));
+	//softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	//softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
+	//softbody->AddLockNode(glm::vec3(-6, 0, 0), 2);
+	////softbody->mGravity = glm::vec3(0, -1, 0);
+	//softbody->InitializeSoftBody();
 
-	/*softbody = new SoftBody();
+	/*softbody = new SoftBodyForVertex();
 	softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
 	softbody->transform.SetScale(glm::vec3(0.01f));
 	softbody->transform.SetPosition(glm::vec3(14.0f, 0, 13));
@@ -195,9 +194,15 @@ void PhysicsApplication::KeyCallBack(GLFWwindow* window, int& key, int& scancode
 	{
 		if (key == GLFW_KEY_SPACE)
 		{
-			softbodyMesh->AddForceToRandomNode(glm::vec3(0, 50, 0));
+			softbody->DisconnectRandomNode();
+			//softbodyMesh->AddForceToRandomNode(glm::vec3(0, 50, 0));
+		}
+		else if (key == GLFW_KEY_ENTER)
+		{
+			softbody->mGravity = glm::vec3(0, -1, 0);
 		}
 	}
+
 }
 
 void PhysicsApplication::MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods)

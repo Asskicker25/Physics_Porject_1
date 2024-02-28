@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <Graphics/Renderer.h>
 
+#define NOMINMAX
+
 class HierarchicalAABBNode;
 
 enum PhysicsShape

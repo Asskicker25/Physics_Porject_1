@@ -57,7 +57,12 @@ void PhysicsEngine::Update(float deltaTime)
 {
 	timer += deltaTime;
 
-	UpdateSoftBodyBufferData();
+	if (softBody_CritSection != nullptr)
+	{
+		EnterCriticalSection(softBody_CritSection);
+		UpdateSoftBodyBufferData();
+		LeaveCriticalSection(softBody_CritSection);
+	}
 
 	if (timer >= fixedStepTime)
 	{
@@ -70,7 +75,7 @@ void PhysicsEngine::Update(float deltaTime)
 
 void PhysicsEngine::UpdateSoftBodies(float deltaTime, CRITICAL_SECTION& criticalSection)
 {
-
+	softBody_CritSection = &criticalSection;
 	for (BaseSoftBody* softBody : listOfSoftBodies)
 	{
 		softBody->UpdateSoftBody(deltaTime, criticalSection);
@@ -79,6 +84,7 @@ void PhysicsEngine::UpdateSoftBodies(float deltaTime, CRITICAL_SECTION& critical
 
 void PhysicsEngine::UpdateSoftBodyBufferData()
 {
+
 	for (BaseSoftBody* softBody : listOfSoftBodies)
 	{
 		softBody->UpdateBufferData();
@@ -289,11 +295,11 @@ bool PhysicsEngine::HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObjec
 			collisionPt = collisionPt / (float)collisionPoints.size();
 
 			glm::vec3 reflected = glm::reflect(glm::normalize(node->velocity), normal);
-			node->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(node->velocity)) ;
+			node->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(node->velocity));
 			node->velocity *= softBody->mBounceFactor;
 		}
 
-		
+
 	}
 
 	return numOfCollisions != 0;

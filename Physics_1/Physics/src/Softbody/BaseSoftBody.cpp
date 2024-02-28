@@ -32,6 +32,8 @@ void BaseSoftBody::Render()
 
 	for (Stick* stick : mListOfSticks)
 	{
+		if (!stick->isConnected) continue;
+
 		Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
 	}
 }
@@ -44,6 +46,11 @@ void BaseSoftBody::AddCollidersToCheck(PhysicsObject* phyObj)
 void BaseSoftBody::SetNodeRadius(int index, float radius)
 {
 	mListOfNodes[index]->mRadius = radius;
+}
+
+void BaseSoftBody::DisconnectStick(Stick* stick)
+{
+	stick->isConnected = false;
 }
 
 void BaseSoftBody::OnPropertyDraw()
