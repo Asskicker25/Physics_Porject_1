@@ -74,7 +74,7 @@ namespace Verlet
 		{
 
 			Node* node = new Node(mesh.mListOfVertices,
-				transformMat, IsNodeLocked(i));
+				transformMat, mNodeRadius, IsNodeLocked(i));
 
 			mListOfNodes.push_back(node);
 			i++;

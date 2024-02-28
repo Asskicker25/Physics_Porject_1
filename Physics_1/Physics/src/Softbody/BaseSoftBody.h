@@ -71,10 +71,11 @@ public:
 
 	public:
 
-		Node(std::vector<PointerToVertex>& vertex, glm::mat4& transformMat,
+		Node(std::vector<PointerToVertex>& vertex, glm::mat4& transformMat, float radius,
 			bool isLocked = false)
 		{
 			mIsLocked = isLocked;
+			mRadius = radius;
 
 			mCurrentPosition = CalculatePosition(vertex);
 			InitializeVertexPointer(vertex, mCurrentPosition);
@@ -84,6 +85,8 @@ public:
 		}
 
 		bool mIsLocked = false;
+		float mRadius = 0;
+
 		glm::vec3 mCurrentPosition = glm::vec3(0);
 		glm::vec3 mOldPositionm = glm::vec3(0);
 		glm::vec3 velocity = glm::vec3(0);
@@ -126,19 +129,27 @@ public:
 	virtual void OnPropertyDraw();
 	virtual void Render();
 
+	virtual void AddCollidersToCheck(PhysicsObject* phyObj);
+	virtual void SetNodeRadius(int index, float radius);
+
 	bool showDebugModels = true;
 	glm::vec3 mGravity = glm::vec3(0);
 	unsigned int mNumOfIterations = 10;
 
 	float mNodeRadius = 0.1f;
 	float mTightness = 1.0f;
+	float mBounceFactor = 1.0f;
 
 	std::vector<PhysicsObject*> mListOfCollidersToCheck;
 
-protected:
-	void CleanZeros(glm::vec3& value);
 	std::vector<Node*> mListOfNodes;
 	std::vector<Stick*> mListOfSticks;
+
+	CollisionMode collisionMode = CollisionMode::SOLID;
+
+protected:
+	void CleanZeros(glm::vec3& value);
+	
 
 	const glm::vec4 nodeColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	const glm::vec4 stickColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);

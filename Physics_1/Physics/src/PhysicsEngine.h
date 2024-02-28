@@ -31,7 +31,8 @@ public:
 		std::vector<glm::vec3>& collisionPoint,
 		std::vector<glm::vec3>& collisionNormal);
 
-	bool HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj);
+	bool HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj,
+		std::vector<glm::vec3> collisionPt, std::vector<glm::vec3> collisionNormals);
 
 	void AddSoftBodyObject(BaseSoftBody* softBody);
 	void RemoveSoftBodyObject(BaseSoftBody* softBody);

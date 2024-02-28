@@ -98,7 +98,7 @@ void PhysicsObject::DrawPhysicsShape()
 		Renderer::GetInstance().DrawSphere(((Sphere*)GetTransformedPhysicsShape())->position,
 			((Sphere*)GetTransformedPhysicsShape())->radius, shapeColor);
 
-		Renderer::GetInstance().DrawAABB(GetGraphicsAabb(GetModelAABB()), shapeColor);
+		//Renderer::GetInstance().DrawAABB(GetGraphicsAabb(GetModelAABB()), shapeColor);
 
 		break;
 	case PLANE:

@@ -54,29 +54,39 @@ void PhysicsApplication::SetUp()
 	planePhy->transform.SetScale(glm::vec3(5.5));*/
 
 	PhysicsEngine::GetInstance().gravity.y = -9.8f / 3.0f;
-	PhysicsEngine::GetInstance().fixedStepTime = 1.0f;
+	PhysicsEngine::GetInstance().fixedStepTime = 0.01f;
 
 	EditorLayout::GetInstance().SetMaximizeState(false);
-	
-	
-	//softbody = new SoftBodyForVertex();
-	//softbody->LoadModel("Assets/Models/Plane/Plane.ply");
-	////softbody->LoadModel("Assets/Models/Wheel_15.ply");
-	////softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
-	////softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
-	////softbody->transform.SetScale(glm::vec3(0.01f));
-	//softbody->transform.SetScale(glm::vec3(60.0f));
-	////softbody->transform.SetScale(glm::vec3(5));
-	//softbody->mGravity = glm::vec3(0, -1, 0);
-	//softbody->mTightness = 1.0f;
-	////softbody->showDebugModels = false;
-	//softbody->mNumOfIterations = 10;
 
-	////softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
-	////softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
-	//softbody->AddLockNode(glm::vec3(6,0,0), 2);
+	spherePhy = new PhysicsObject();
+	spherePhy->name = "Sphere";
+	spherePhy->LoadModel("res/Models/DefaultSphere.fbx");
+	spherePhy->InitializePhysics(SPHERE, STATIC);
+	spherePhy->transform.SetPosition(glm::vec3(10, 5, 0));
+	spherePhy->transform.SetScale(glm::vec3(2));
+	spherePhy->transform.SetPosition(glm::vec3(0, -5, -5));
 
-	//softbody->InitializeSoftBody();
+	
+	softbody = new SoftBodyForVertex();
+	softbody->LoadModel("Assets/Models/Plane/Plane.ply");
+	//softbody->LoadModel("Assets/Models/Wheel_15.ply");
+	//softbody->LoadModel("Assets/Models/Plane/Flat_Grid_100x100.ply");
+	//softbody->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	//softbody->transform.SetScale(glm::vec3(0.01f));
+	softbody->transform.SetScale(glm::vec3(60.0f));
+	//softbody->transform.SetScale(glm::vec3(5));
+	softbody->mGravity = glm::vec3(0, -1, 0);
+	softbody->mTightness = 1.0f;
+	//softbody->showDebugModels = false;
+	softbody->mNumOfIterations = 10;
+	softbody->mBounceFactor = 4;
+
+	//softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
+	//softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
+	softbody->AddLockNode(glm::vec3(6,0,0), 2);
+
+	softbody->InitializeSoftBody();
+	softbody->AddCollidersToCheck(spherePhy);
 	
 	
 
@@ -99,17 +109,23 @@ void PhysicsApplication::SetUp()
 	softbody->showDebugModels = false;
 	softbody->InitializeSoftBody(); */
 
-	softbodyMesh = new SoftBodyForMeshes();
-	softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
+
+
+
+	//softbodyMesh = new SoftBodyForMeshes();
+	//softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
 	//softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 90));
-	softbodyMesh->transform.SetScale(glm::vec3(1.0f));
-	softbodyMesh->mGravity = glm::vec3(0, -30, 0);
-	softbodyMesh->showDebugModels = false;
-	//softbodyMesh->InitializeLockNodes({0});
-	softbodyMesh->InitializeSoftBody();
-	softbodyMesh->LockNodeAtIndex(0);
+	//softbodyMesh->transform.SetScale(glm::vec3(1.0f));
+	//softbodyMesh->mGravity = glm::vec3(0, -30, 0);
+	//softbodyMesh->showDebugModels = false;
+	//softbodyMesh->mNodeRadius = 1.5;
+	////softbodyMesh->InitializeLockNodes({0});
+	//softbodyMesh->InitializeSoftBody();
+	//softbodyMesh->LockNodeAtIndex(0);
+	//softbodyMesh->AddCollidersToCheck(spherePhy);
+	//softbodyMesh->mBounceFactor = 1.0f;
 
-
+	
 	//SoftBody* softbody2 = new SoftBody();
 	//softbody2->isActive = false;
 	//softbody2->LoadModel("Assets/Models/Plane/PlaneWithTex.fbx");

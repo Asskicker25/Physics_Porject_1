@@ -84,7 +84,7 @@ namespace Verlet
 			std::vector<PointerToVertex> posVector;
 			posVector.push_back(pos);
 
-			Node* node = new Node(posVector, transformMat);
+			Node* node = new Node(posVector, transformMat, mNodeRadius);
 
 
 			if (IsNodeLocked(node))

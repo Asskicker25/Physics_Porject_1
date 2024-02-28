@@ -26,7 +26,7 @@ void BaseSoftBody::Render()
 
 	for (Node* node : mListOfNodes)
 	{
-		Renderer::GetInstance().DrawSphere(node->mCurrentPosition, mNodeRadius, nodeColor);
+		Renderer::GetInstance().DrawSphere(node->mCurrentPosition, node->mRadius, nodeColor);
 	}
 
 
@@ -34,6 +34,16 @@ void BaseSoftBody::Render()
 	{
 		Renderer::GetInstance().DrawLine(stick->mNodeA->mCurrentPosition, stick->mNodeB->mCurrentPosition, stickColor);
 	}
+}
+
+void BaseSoftBody::AddCollidersToCheck(PhysicsObject* phyObj)
+{
+	mListOfCollidersToCheck.push_back(phyObj);
+}
+
+void BaseSoftBody::SetNodeRadius(int index, float radius)
+{
+	mListOfNodes[index]->mRadius = radius;
 }
 
 void BaseSoftBody::OnPropertyDraw()
@@ -46,6 +56,7 @@ void BaseSoftBody::OnPropertyDraw()
 	}
 
 	ImGuiUtils::DrawBool("ShowDebug", showDebugModels);
+	ImGuiUtils::DrawFloat("BounceFactor", mBounceFactor);
 
 	ImGui::TreePop();
 

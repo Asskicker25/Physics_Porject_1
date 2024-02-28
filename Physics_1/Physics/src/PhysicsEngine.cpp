@@ -1,5 +1,6 @@
 #include "PhysicsEngine.h"
 #include <Graphics/Debugger.h>
+#include "PhysicsShapeAndCollision.h"
 
 
 bool PhysicsEngine::PhysicsObjectExists(PhysicsObject* physicsObject)
@@ -138,8 +139,8 @@ void PhysicsEngine::UpdatePhysics(float deltaTime)
 
 			if (iteratorObject == otherObject)
 				continue;
-			
-			if (iteratorObject->CheckIfExcluding(otherObject)) 
+
+			if (iteratorObject->CheckIfExcluding(otherObject))
 				continue;
 
 
@@ -242,7 +243,9 @@ void PhysicsEngine::UpdateSoftBodyPhysics(float deltaTime)
 	{
 		for (PhysicsObject* phyObj : softBody->mListOfCollidersToCheck)
 		{
-			if (HandleSoftBodyCollision(softBody, phyObj))
+			std::vector<glm::vec3> collisionPts, collisionNormals;
+
+			if (HandleSoftBodyCollision(softBody, phyObj, collisionPts, collisionNormals))
 			{
 				Debugger::Print("Colliding");
 			}
@@ -252,8 +255,46 @@ void PhysicsEngine::UpdateSoftBodyPhysics(float deltaTime)
 }
 
 
-bool PhysicsEngine::HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj)
+bool PhysicsEngine::HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj,
+	std::vector<glm::vec3> collisionPt, std::vector<glm::vec3> collisionNormals)
 {
+	//glm::mat4 transformMat = softBody->transform.GetTransformMatrix();
 
-	return false;
+	int numOfCollisions = 0;
+
+	for (BaseSoftBody::Node* node : softBody->mListOfNodes)
+	{
+		Sphere nodeSphere(node->mCurrentPosition, node->mRadius);
+
+		if (CollisionSphereVSSphere(&nodeSphere, (Sphere*)phyObj->transformedPhysicsShape, collisionPt, collisionNormals))
+		{
+			numOfCollisions++;
+
+			if (softBody->collisionMode == TRIGGER) continue;
+
+			glm::vec3 normal = glm::vec3(0.0f);
+			glm::vec3 collisionPt = glm::vec3(0.0f);
+
+			for (size_t i = 0; i < collisionNormals.size(); i++)
+			{
+				normal += glm::normalize(collisionNormals[i]);
+			}
+
+			for (size_t i = 0; i < collisionPoints.size(); i++)
+			{
+				collisionPt += glm::normalize(collisionPoints[i]);
+			}
+
+			normal = normal / (float)collisionNormals.size();
+			collisionPt = collisionPt / (float)collisionPoints.size();
+
+			glm::vec3 reflected = glm::reflect(glm::normalize(node->velocity), normal);
+			node->velocity = reflected * (/*iteratorObject->properties.bounciness **/ glm::length(node->velocity)) ;
+			node->velocity *= softBody->mBounceFactor;
+		}
+
+		
+	}
+
+	return numOfCollisions != 0;
 }
