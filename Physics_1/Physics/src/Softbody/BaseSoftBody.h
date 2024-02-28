@@ -101,6 +101,7 @@ public:
 
 		std::vector<PointerToVertex> mPointerToVertices;
 		std::vector<Stick*> mListOfConnectedSticks;
+		std::vector<PointerToIndex> mListOfIndexes;
 	};
 
 
