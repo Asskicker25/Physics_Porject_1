@@ -57,11 +57,7 @@ namespace Verlet
 
 	void SoftBodyForMeshes::UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection)
 	{
-		mCriticalSection = &criticalSection;
-
-		UpdateNodePosition(deltaTime);
-		SatisfyConstraints(deltaTime);
-		UpdateModelData(deltaTime);
+		BaseSoftBody::UpdateSoftBody(deltaTime,criticalSection);
 	}
 
 	void SoftBodyForMeshes::SetupNodes()
@@ -120,74 +116,6 @@ namespace Verlet
 		mListOfSticks.push_back(new Stick(nodeA, nodeB));
 	}
 
-	void SoftBodyForMeshes::UpdateNodePosition(float deltaTime)
-	{
-		for (Node* node : mListOfNodes)
-		{
-			if (node->mIsLocked) continue;
-
-			node->velocity += mGravity * deltaTime;
-
-			UpdatePositionByVerlet(node, deltaTime);
-		}
-	}
-
-	void SoftBodyForMeshes::UpdatePositionByVerlet(Node* node, float deltaTime)
-	{
-		glm::vec3 posBeforUpdate = node->mCurrentPosition;
-
-		node->mCurrentPosition += (posBeforUpdate - node->mOldPositionm) + (node->velocity * (deltaTime * deltaTime));
-		node->mOldPositionm = posBeforUpdate;
-
-		CleanZeros(node->mCurrentPosition);
-		CleanZeros(node->mOldPositionm);
-	}
-
-	void SoftBodyForMeshes::SatisfyConstraints(float deltaTime)
-	{
-		for (unsigned int i = 0; i < mNumOfIterations; i++)
-		{
-			for (Stick* stick : mListOfSticks)
-			{
-				if (!stick->isConnected) continue;
-
-				Node* nodeA = stick->mNodeA;
-				Node* nodeB = stick->mNodeB;
-
-				glm::vec3 delta = nodeB->mCurrentPosition - nodeA->mCurrentPosition;
-				float length = glm::length(delta);
-
-				float diff = (length - stick->mRestLength) / length;
-
-				if (!nodeA->mIsLocked)
-				{
-					nodeA->mCurrentPosition += delta * 0.5f * diff * mTightness;
-				}
-
-				if (!nodeB->mIsLocked)
-				{
-					nodeB->mCurrentPosition -= delta * 0.5f * diff * mTightness;
-				}
-
-				CleanZeros(nodeA->mCurrentPosition);
-				CleanZeros(nodeB->mCurrentPosition);
-			}
-		}
-	}
-
-	void SoftBodyForMeshes::UpdateModelData(float deltaTime)
-	{
-		UpdateModelVertices();
-		UpdateModelVertices();
-	}
-
-	void SoftBodyForMeshes::UpdateBufferData()
-	{
-		for (MeshAndMaterial* mesh : meshes)
-		{
-			mesh->mesh->UpdateVertices();
-		}
-	}
 
 	void SoftBodyForMeshes::UpdateModelVertices()
 	{

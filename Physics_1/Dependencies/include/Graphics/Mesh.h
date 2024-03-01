@@ -20,6 +20,7 @@ public:
 	std::vector< Triangles > triangles;
 	std::vector< BaseTexture* > textures;
 
+	Mesh() = default;
 	Mesh(std::vector<Vertex>& vertices, std::vector< unsigned int>& indices, std::string name = "NoName");
 
 	void DrawShadedMesh(Shader* shader, BaseMaterial* material,  bool isWireFrame = false);

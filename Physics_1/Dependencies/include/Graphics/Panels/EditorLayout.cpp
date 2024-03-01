@@ -52,7 +52,7 @@ std::vector<Object*>& EditorLayout::GetSelectedObject()
 
 bool EditorLayout::IsViewportHovered()
 {
-	return sceneViewportPanel->isHovered;
+	return hoveredPanelViewport ? sceneViewportPanel->isHovered : gameViewportPanel->isHovered;
 }
 
 bool EditorLayout::IsApplicationPlaying()
@@ -73,6 +73,11 @@ void EditorLayout::SetMaximizeState(bool state)
 void EditorLayout::SetApplicationPlayState(bool state)
 {
 	application->applicationPlay = state;
+}
+
+void EditorLayout::SetHoveredPanel(bool viewport)
+{
+	hoveredPanelViewport = viewport;
 }
 
 void EditorLayout::SetSelectedObjectsState(bool state)

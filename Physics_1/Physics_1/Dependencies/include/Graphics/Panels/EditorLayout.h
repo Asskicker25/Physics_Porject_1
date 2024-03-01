@@ -28,9 +28,12 @@ public:
 	void SetMaximizeState(bool state);
 	void SetApplicationPlayState(bool state);
 
+	void SetHoveredPanel(bool viewport = true);
+
 	ApplicationWindow* application;
 
 private:
+	bool hoveredPanelViewport = true;
 
 	WindowDockPanel* windowDockPanel;
 	SceneHierarchyPanel* scenePanel;

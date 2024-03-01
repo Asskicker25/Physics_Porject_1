@@ -136,6 +136,8 @@ void Mesh::SetupMesh()
 
 	layout.AddLayout<float>(4);
 
+	layout.AddLayout<float>(1);
+
 	VAO.AddBuffer(VBO, layout);
 
 	VAO.UnBind();

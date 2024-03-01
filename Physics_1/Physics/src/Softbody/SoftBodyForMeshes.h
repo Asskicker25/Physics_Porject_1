@@ -15,10 +15,10 @@ namespace Verlet
 		virtual void Render();
 		virtual void OnPropertyDraw();
 
-		void AddForceToRandomNode(glm::vec3 velocity);
+		virtual void UpdateModelVertices();
+		virtual void UpdateModelNormals();
 
-		void UpdateModelData(float deltaTime);
-		void UpdateBufferData() override;
+		void AddForceToRandomNode(glm::vec3 velocity);
 
 		void AddStickBetweenNodeIndex(unsigned int nodeA, unsigned int nodeB);
 	
@@ -31,13 +31,6 @@ namespace Verlet
 	private:
 		void SetupNodes();
 		void SetupSticks();
-
-		void UpdateNodePosition(float deltaTime);
-		void UpdatePositionByVerlet(Node*, float deltaTime);
-		void SatisfyConstraints(float deltaTime);
-
-		void UpdateModelVertices();
-		void UpdateModelNormals();
 
 		bool IsNodeLocked(unsigned int& currentIndex);
 

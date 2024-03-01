@@ -58,13 +58,22 @@ void PhysicsApplication::SetUp()
 
 	EditorLayout::GetInstance().SetMaximizeState(false);
 
-	spherePhy = new PhysicsObject();
+	/*spherePhy = new PhysicsObject();
 	spherePhy->name = "Sphere";
 	spherePhy->LoadModel("res/Models/DefaultSphere.fbx");
 	spherePhy->InitializePhysics(SPHERE, STATIC);
 	spherePhy->transform.SetPosition(glm::vec3(10, 5, 0));
 	spherePhy->transform.SetScale(glm::vec3(2));
-	spherePhy->transform.SetPosition(glm::vec3(0, -5, -5));
+	spherePhy->transform.SetPosition(glm::vec3(0, -5, -5));*/
+
+	planePhy = new PhysicsObject();
+	planePhy->name = "Plane";
+	//planePhy->LoadModel("Assets/Models/Plane/Plane.fbx");
+	planePhy->LoadModel("res/Models/DefaultCube.fbx");
+	planePhy->InitializePhysics(AABB, STATIC);
+	planePhy->transform.SetPosition(glm::vec3(0, -12.5, 0));
+	planePhy->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
+	planePhy->transform.SetScale(glm::vec3(20,20,2));
 
 	
 	softbody = new SoftBodyForVertex();
@@ -79,14 +88,16 @@ void PhysicsApplication::SetUp()
 	softbody->mTightness = 1.0f;
 	//softbody->showDebugModels = false;
 	softbody->mNumOfIterations = 10;
-	softbody->mBounceFactor = 4;
+	softbody->mBounceFactor = 1.0f;
+	softbody->mNodeMaxVelocity = glm::vec3(1);
 
 	//softbody->transform.SetPosition(glm::vec3(1.0f, 4.0f, 0));
 	//softbody->AddLockNode(glm::vec3(1,2.5,1), 0.5f);
-	softbody->AddLockNode(glm::vec3(6,0,0), 2);
+	//softbody->AddLockNode(glm::vec3(6,0,0), 2);
 
 	softbody->InitializeSoftBody();
-	softbody->AddCollidersToCheck(spherePhy);
+	softbody->clampVelocity = true;
+	softbody->AddCollidersToCheck(planePhy);
 	
 	
 
@@ -180,7 +191,7 @@ void PhysicsApplication::Shutdown()
 		CloseHandle(physicsThread->threadHandle);
 		DeleteCriticalSection(&physicsThread->softBodyUpdateModelData);
 	}
-
+	PhysicsEngine::GetInstance().Shutdown();
 }
 
 

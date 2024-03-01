@@ -29,35 +29,27 @@ namespace Verlet
 		virtual void Render();
 		virtual void OnPropertyDraw();
 
+
+		virtual void UpdatModelVertices();
+		virtual void UpdateModelNormals();
+
 		void AddForceToRandomNode(glm::vec3 velocity);
 
 		void DisconnectRandomStick();
 		void DisconnectRandomNode();
 
 		void AddLockNode(glm::vec3 posOffset, float radius);
-		void UpdateModelData(float deltaTime);
-		void UpdateBufferData() override;
-		
+
 		bool IsNodeLocked(Node* node);
 
 		float mLockAffectDisatance = 0.0f;
-
-		CRITICAL_SECTION* mCriticalSection;
-
 
 
 	private:
 		void SetupNodes();
 		void SetupSticks();
 
-		void UpdateNodePosition(float deltaTime);
-		void UpdatePositionByVerlet(Node* node, float deltaTime);
-		void SatisfyConstraints(float deltaTime);
-
-		void UpdatModelVertices();
-		void UpdateModelNormals();
-
-		bool ShouldApplyGravity(Node* node);
+		
 
 		const glm::vec4 lockNodeColor = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -68,7 +60,6 @@ namespace Verlet
 
 protected:
 		std::vector<Node*> mListOfLockedNodes;
-		std::vector<Node*> mListOfNonGravityNodes;
 
 	};
 

@@ -93,6 +93,7 @@ public:
 		}
 
 		bool mIsLocked = false;
+		bool mEnabled = true;
 		float mRadius = 0;
 
 		glm::vec3 mCurrentPosition = glm::vec3(0);
@@ -101,6 +102,7 @@ public:
 
 		std::vector<PointerToVertex> mPointerToVertices;
 		std::vector<Stick*> mListOfConnectedSticks;
+		std::vector<unsigned int> mListOfIndexs;
 	};
 
 
@@ -142,9 +144,20 @@ public:
 		std::vector<PointerToIndex> mListOfIndices;
 	};
 
-	virtual void UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection) = 0;
-	virtual void UpdateBufferData() = 0;
 	virtual void InitializeSoftBody() = 0;
+
+	virtual void UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection);
+	virtual void UpdateNodePosition(float deltaTime);
+	virtual void SatisfyConstraints(float deltaTime);
+	virtual void UpdateModelData(float deltaTime);
+
+	virtual void ApplyCollision(float deltaTime);
+	virtual void UpdateBufferData();
+
+	virtual void UpdatModelVertices() = 0;
+	virtual void UpdateModelNormals() = 0;
+
+	virtual void UpdatePositionByVerlet(float deltaTime);
 
 	virtual void OnPropertyDraw();
 	virtual void Render();
@@ -153,8 +166,11 @@ public:
 	virtual void SetNodeRadius(int index, float radius);
 
 	virtual void DisconnectStick(Stick* stick);
+	bool ShouldApplyGravity(Node* node);
 
 	bool showDebugModels = true;
+	bool clampVelocity = false;
+
 	glm::vec3 mGravity = glm::vec3(0);
 	unsigned int mNumOfIterations = 10;
 
@@ -168,8 +184,12 @@ public:
 
 	std::vector<Node*> mListOfNodes;
 	std::vector<Stick*> mListOfSticks;
+	std::vector<Node*> mListOfNonGravityNodes;
 
 	CollisionMode collisionMode = CollisionMode::SOLID;
+
+	CRITICAL_SECTION* mCriticalSection;
+
 
 protected:
 	void CleanZeros(glm::vec3& value);

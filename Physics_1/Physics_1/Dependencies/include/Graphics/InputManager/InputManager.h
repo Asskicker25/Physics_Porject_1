@@ -40,6 +40,10 @@ public:
 	void OnKeyReleased(const int& key);
 	void OnKeyHeld();
 
+	void OnMouseButtonPressed(const int& key);
+	void OnMouseButtonReleased(const int& key);
+
+
 	float GetMouseX();
 	float GetMouseY();
 	float GetAxisX();

@@ -18,7 +18,6 @@ private:
 	CRITICAL_SECTION* softBody_CritSection = nullptr;
 
 	void UpdatePhysics(float deltaTime);
-	void UpdateSoftBodyPhysics(float deltaTime);
  	
 public:
 	float fixedStepTime = 0.01f;
@@ -33,9 +32,6 @@ public:
 		std::vector<glm::vec3>& collisionPoint,
 		std::vector<glm::vec3>& collisionNormal);
 
-	bool HandleSoftBodyCollision(BaseSoftBody* softBody, PhysicsObject* phyObj,
-		std::vector<glm::vec3> collisionPt, std::vector<glm::vec3> collisionNormals);
-
 	void AddSoftBodyObject(BaseSoftBody* softBody);
 	void RemoveSoftBodyObject(BaseSoftBody* softBody);
 
@@ -43,6 +39,9 @@ public:
 	void UpdateSoftBodies(float deltaTime, CRITICAL_SECTION& criticalSection);
 	void UpdateSoftBodyBufferData();
 	void SetDebugSpheres(Model* model, int count);
+
+
+	void Shutdown();
 };
 
 

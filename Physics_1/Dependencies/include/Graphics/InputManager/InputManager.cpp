@@ -112,6 +112,22 @@ void InputManager::OnKeyHeld()
 	}
 }
 
+void InputManager::OnMouseButtonPressed(const int& key)
+{
+	for (iInputListener* listener : inputListeners)
+	{
+		listener->OnMouseButtonPressed(key);
+	}
+}
+
+void InputManager::OnMouseButtonReleased(const int& key)
+{
+	for (iInputListener* listener : inputListeners)
+	{
+		listener->OnMouseButtonReleased(key);
+	}
+}
+
 float InputManager::GetMouseX()
 {
 	return mMouseX;
