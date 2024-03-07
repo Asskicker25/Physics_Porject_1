@@ -1,5 +1,5 @@
 #include "PhysicsObject.h"
-#include <Graphics/Triangle.h>
+#include <Graphics/Buffer/Triangle.h>
 #include <Graphics/Panels/ImguiDrawUtils.h>
 #include "PhysicsEngine.h"
 
@@ -150,7 +150,7 @@ void PhysicsObject::OnPropertyDraw()
 	Model::OnPropertyDraw();
 
 
-	ImGui::Checkbox("###PhyObjEnabled", &isEnabled);
+	ImGui::Checkbox("###PhyObjEnabled", &isPhysicsEnabled);
 	ImGui::SameLine();
 	if (!ImGui::TreeNodeEx("Physics Object", ImGuiTreeNodeFlags_DefaultOpen))
 	{

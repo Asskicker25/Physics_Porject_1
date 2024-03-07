@@ -2,8 +2,8 @@
 #include "SceneHierarchyPanel.h"
 #include "EditorLayout.h"
 #include "../EntityManager/EntityManager.h"
-#include "../LightManager.h"
-#include "../CameraSystem.h"
+#include "../Light/LightManager.h"
+#include "../Camera/CameraSystem.h"
 
 
 SceneHierarchyPanel::SceneHierarchyPanel()

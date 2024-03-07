@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Debugger.h"
-#include "../FrameBuffer.h"
+#include "../Buffer/FrameBuffer.h"
 #include "BaseTexture.h"
 
 class RenderTexture : public BaseTexture

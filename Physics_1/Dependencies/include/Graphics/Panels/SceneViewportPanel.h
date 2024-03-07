@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BasePanel.h"
-#include "../FrameBuffer.h"
-#include "../Camera.h"
+#include "../Buffer/FrameBuffer.h"
+#include "../Camera/Camera.h"
 #include "../InputManager/InputManager.h"
 #include <imgui/ImGuizmo.h>
 

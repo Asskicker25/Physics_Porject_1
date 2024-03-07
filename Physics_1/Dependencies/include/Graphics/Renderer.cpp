@@ -1,7 +1,7 @@
 #include "Renderer.h"
-#include "UnlitColorMaterial.h"
-#include "DebugLineData.h"
-#include "CameraSystem.h"
+#include "Material/UnlitColorMaterial.h"
+#include "Mesh/DebugLineData.h"
+#include "Camera/CameraSystem.h"
 
 Renderer& Renderer::GetInstance()
 {

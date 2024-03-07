@@ -1,5 +1,5 @@
 #pragma once
-#include <Graphics/Model.h>
+#include <Graphics/Mesh/Model.h>
 #include "../PhysicsObject.h"
 
 #define NOMINMAX
@@ -78,6 +78,7 @@ public:
 		{
 			mIsLocked = isLocked;
 			mRadius = radius;
+			mIsColliding = false;
 
 			mCurrentPosition = CalculatePosition(vertex);
 			InitializeVertexPointer(vertex, mCurrentPosition);
@@ -94,6 +95,7 @@ public:
 
 		bool mIsLocked = false;
 		bool mEnabled = true;
+		bool mIsColliding = false;
 		float mRadius = 0;
 
 		glm::vec3 mCurrentPosition = glm::vec3(0);
@@ -154,7 +156,7 @@ public:
 	virtual void ApplyCollision(float deltaTime);
 	virtual void UpdateBufferData();
 
-	virtual void UpdatModelVertices() = 0;
+	virtual void UpdateModelVertices() = 0;
 	virtual void UpdateModelNormals() = 0;
 
 	virtual void UpdatePositionByVerlet(float deltaTime);

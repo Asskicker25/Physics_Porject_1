@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Model.h"
+#include "../Mesh/Model.h"
 #include "../EntityManager/Entity.h"
 #include "Property/Emission.h"
 #include "Property/ParticleRenderer.h"

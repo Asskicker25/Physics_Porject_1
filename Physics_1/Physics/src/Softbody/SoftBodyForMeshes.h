@@ -15,6 +15,7 @@ namespace Verlet
 		virtual void Render();
 		virtual void OnPropertyDraw();
 
+
 		virtual void UpdateModelVertices();
 		virtual void UpdateModelNormals();
 
@@ -25,8 +26,6 @@ namespace Verlet
 		//After Initialized
 		void LockNodeAtIndex(int index);
 		void InitializeLockNodes(std::vector<unsigned int> indexToLock);
-
-		CRITICAL_SECTION* mCriticalSection;
 
 	private:
 		void SetupNodes();

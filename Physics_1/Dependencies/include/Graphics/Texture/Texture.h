@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stbi/stb_image.h>
-#include "../Image.h"
+#include "../Texture/Image.h"
 #include "../Object.h"
 #include "BaseTexture.h"
 

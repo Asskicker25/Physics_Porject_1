@@ -31,5 +31,9 @@ public:
 	virtual void Render();
 	virtual void Shutdown();
 
+
+	// Inherited via ApplicationWindow
+	void OnPlayStateChanged(bool state) override;
+
 };
 

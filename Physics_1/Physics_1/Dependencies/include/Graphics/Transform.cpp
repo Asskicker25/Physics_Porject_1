@@ -1,5 +1,5 @@
 #include "Transform.h"
-#include <glm/gtx/euler_angles.hpp>
+//#include <glm/gtx/euler_angles.hpp>
 #include "Panels/ImguiDrawUtils.h"
 
 Transform::Transform() : position{ glm::vec3(0) }, rotation{ glm::vec3(0) }, scale{ glm::vec3(1.0f) }
@@ -45,25 +45,15 @@ void Transform::SetScale(glm::vec3 _scale)
 
 glm::mat4 Transform::GetTransformMatrix()
 {
-	//glm::mat4 trans = glm::mat4(1.0f);
 
 	glm::mat4 rotation = glm::toMat4(quaternionRotation);
 
-	return glm::translate(glm::mat4(1.0f), position)
+	glm::mat4 localTransformMat = glm::translate(glm::mat4(1.0f), position)
 		* rotation
 		* glm::scale(glm::mat4(1.0f), scale);
 
-	//trans = glm::translate(trans, position);
-
-	///*glm::quat q = glm::quat(glm::eulerAngleX(glm::radians(90.0f)) *
-	//	glm::eulerAngleY(glm::radians(90.0f)) *
-	//	glm::eulerAngleZ(glm::radians(90.0f)));*/
-
-	//trans *= 
-
-	//trans = glm::scale(trans, scale);
-
-	//return trans;
+	return parentTransform == nullptr ? localTransformMat : 
+		parentTransform->GetTransformMatrix() * localTransformMat;
 }
 
 glm::mat4 Transform::GetInverseMatrix()
@@ -139,8 +129,7 @@ void Transform::UpdateQuaternionFromEuler()
 {
 	glm::vec3 eulerAnglesRadians = glm::radians(rotation);
 
-	quaternionRotation =  glm::quat(
-	glm::eulerAngleYXZ(eulerAnglesRadians.y, eulerAnglesRadians.x, eulerAnglesRadians.z));
+	quaternionRotation = glm::quat(eulerAnglesRadians);
 }
 
 void Transform::UpdateEulerFromQuaternion()
@@ -155,9 +144,9 @@ void Transform::OnPropertyDraw()
 		return;
 	}
 
-	ImGuiUtils::DrawVector3ImGui("Position", position,0, posXColumnWidth);
-	ImGuiUtils::DrawVector3ImGui("Rotation", rotation,0, rotXColumnWidth);
-	ImGuiUtils::DrawVector3ImGui("Scale", scale, 1 , scaleXColumnWidth);
+	ImGuiUtils::DrawVector3ImGui("Position", position, 0, posXColumnWidth);
+	ImGuiUtils::DrawVector3ImGui("Rotation", rotation, 0, rotXColumnWidth);
+	ImGuiUtils::DrawVector3ImGui("Scale", scale, 1, scaleXColumnWidth);
 
 	SetRotation(rotation);
 

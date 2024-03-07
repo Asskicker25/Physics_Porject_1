@@ -4,9 +4,9 @@
 #include "../Object.h"
 
 #include "../Shaders/Shader.h"
-#include "../FrameBuffer.h"
+#include "../Buffer/FrameBuffer.h"
 
-#include "../RenderQuad.h"
+#include "../Mesh/RenderQuad.h"
 
 namespace PostProcessing_v1
 {

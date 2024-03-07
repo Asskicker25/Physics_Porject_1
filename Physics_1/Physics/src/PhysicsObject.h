@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Graphics/Model.h>
+#include <Graphics/Mesh/Model.h>
 #include <functional>
 
 #include "PhysicsShapeAndCollision.h"
@@ -44,6 +44,7 @@ private:
 public:
 
 	bool initialized = false;
+	bool isPhysicsEnabled = true;
 	bool isCollisionInvoke = false;
 	bool useBvh = true;
 	float maxDepth = 10;

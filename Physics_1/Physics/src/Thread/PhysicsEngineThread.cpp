@@ -29,9 +29,9 @@ DWORD UpdatePhysicsEngine(LPVOID lpParameter)
 
 				threadInfo->physicsEngine->UpdateSoftBodies(deltaTime, threadInfo->softBodyUpdateModelData);
 			}
-
-			Sleep(threadInfo->sleepTime);
 		}
+
+		Sleep(threadInfo->sleepTime);
 		
 	}
 

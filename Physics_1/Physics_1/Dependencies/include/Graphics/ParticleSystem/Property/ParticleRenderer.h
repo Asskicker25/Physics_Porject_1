@@ -1,6 +1,6 @@
 #pragma once
 #include "ParticleSystemProperty.h"
-#include "../../Model.h"
+#include "../../Mesh/Model.h"
 
 namespace System_Particle
 {

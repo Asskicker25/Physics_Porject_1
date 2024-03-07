@@ -152,7 +152,7 @@ namespace Verlet
 
 	}
 
-	void SoftBodyForVertex::UpdatModelVertices()
+	void SoftBodyForVertex::UpdateModelVertices()
 	{
 		EnterCriticalSection(mCriticalSection);
 

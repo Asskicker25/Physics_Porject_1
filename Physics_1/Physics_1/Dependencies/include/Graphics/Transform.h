@@ -15,6 +15,8 @@ public:
 	glm::quat quaternionRotation;
 	glm::vec3 scale;
 
+	Transform* parentTransform = nullptr;
+
 	Transform();
 	Transform(const Transform& transform);
 

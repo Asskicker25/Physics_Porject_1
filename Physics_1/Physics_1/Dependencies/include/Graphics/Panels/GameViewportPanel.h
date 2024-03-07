@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BasePanel.h"
-#include "../FrameBuffer.h"
+#include "../Buffer/FrameBuffer.h"
 
 class GameViewportPanel : public BasePanel
 {

@@ -3,6 +3,8 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/vector_angle.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/euler_angles.hpp>
+
 
 bool MathUtilities::MathUtils::DecomposeTransform(const glm::mat4& transform, glm::vec3& pos, glm::vec3& rotation, glm::vec3& scale)
 {
@@ -72,6 +74,25 @@ bool MathUtilities::MathUtils::DecomposeTransform(const glm::mat4& transform, gl
 		rotation.z = 0;
 	}
 
+	return true;
+}
+
+bool MathUtilities::MathUtils::DecomposeTransform_Simple(const glm::mat4& transform, glm::vec3& pos, glm::vec3& rot, glm::vec3& scale)
+{
+	
+	pos = glm::vec3(transform[3]);
+
+	glm::mat3 rotationMatrix = glm::mat3(transform);
+
+
+	 // Extract euler angles from the rotation matrix in XYZ order
+    rot.x = glm::degrees(atan2(rotationMatrix[1][2], rotationMatrix[2][2])); // Pitch
+    rot.y = glm::degrees(glm::asin(-rotationMatrix[0][2])); // Yaw
+    rot.z = glm::degrees(atan2(rotationMatrix[0][1], rotationMatrix[0][0])); // Roll
+
+	scale.x = glm::length(glm::vec3(transform[0]));
+	scale.y = glm::length(glm::vec3(transform[1]));
+	scale.z = glm::length(glm::vec3(transform[2]));
 
 	return true;
 }
@@ -145,4 +166,17 @@ glm::vec3 MathUtilities::MathUtils::GetRandomDirOnUnitCircle(glm::vec3& up)
 	glm::vec3 random2D = GetRandomDirOnUnitCircle();
 
 	return glm::normalize(glm::rotate(random2D, glm::orientedAngle(glm::vec3(0, 0, 1), up, glm::vec3(1, 0, 0)), up));
+}
+
+unsigned int  MathUtilities::MathUtils::GetHash(const std::string string)
+{
+	const char* str = string.c_str();
+	unsigned int hash = 5381;
+	int c;
+
+	while ((c = *str++)) {
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+
+	return hash;
 }

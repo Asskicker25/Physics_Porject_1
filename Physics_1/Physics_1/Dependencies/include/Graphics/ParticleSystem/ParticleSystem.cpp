@@ -4,7 +4,7 @@
 #include "../MathUtils.h"
 #include "../Panels/EditorLayout.h"
 #include "../Renderer.h"
-#include "../UnlitColorMaterial.h"
+#include "../Material/UnlitColorMaterial.h"
 
 using namespace MathUtilities;
 

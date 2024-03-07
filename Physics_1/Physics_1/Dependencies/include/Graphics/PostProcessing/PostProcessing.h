@@ -1,11 +1,12 @@
 #pragma once
 
-#include "../FrameBuffer.h"
+#include "../Buffer/FrameBuffer.h"
 #include "../EntityManager/Entity.h"
 
 #include "Bloom.h"
 #include "ChromaticAberration.h"
 #include "HeatDistortion.h"
+#include "NightVision.h"
 
 namespace PostProcessing_v1
 {
@@ -30,6 +31,7 @@ namespace PostProcessing_v1
 		Bloom bloom;
 		ChromaticAberration chromaticAberration;
 		HeatDistortion heatDistortion;
+		NightVision nightVision;
 
 	private:
 

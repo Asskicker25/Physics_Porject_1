@@ -30,7 +30,7 @@ namespace Verlet
 		virtual void OnPropertyDraw();
 
 
-		virtual void UpdatModelVertices();
+		virtual void UpdateModelVertices();
 		virtual void UpdateModelNormals();
 
 		void AddForceToRandomNode(glm::vec3 velocity);

@@ -2,7 +2,7 @@
 #include "EntityManager/EntityManager.h"
 #include "InputManager/InputManager.h"
 #include "Shaders/ShaderSystem.h"
-#include "CameraSystem.h"
+#include "Camera/CameraSystem.h"
 
 using namespace System_Particle;
 
@@ -131,9 +131,15 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 	solidColorShader.LoadShader("res/Shader/SolidColorShader.shader", Shader::ALPHA_OPAQUE, false);
 	//Debugger::Print("SolidColorShader  Id : ", solidColorShader.GetShaderId());
 
+
 	defShader.LoadShader("res/Shader/Shader.shader");
 	//Debugger::Print("DefShader Shader Id : ", defShader.GetShaderId());
 	defShader.applyInverseModel = true;
+
+	skeletonAnimShader.LoadShader("res/Shader/BoneAnimation.shader");
+	skeletonAnimShader.applyInverseModel = true;
+
+	defInstanceShader.LoadShader("res/Shader/DefaultInstancing.shader", Shader::ALPHA_OPAQUE, false);
 
 	alphaBlendShader.LoadShader("res/Shader/Shader.shader");
 	//Debugger::Print("TranparentShader Shader Id : ", alphaBlendShader.GetShaderId());
@@ -149,6 +155,8 @@ void ApplicationWindow::InitializeWindow(int windowWidth, int windowHeight)
 	Renderer::GetInstance().defaultShader = &defShader;
 	Renderer::GetInstance().alphaBlendShader = &alphaBlendShader;
 	Renderer::GetInstance().alphaCutOutShader = &alphaCutOutShader;
+	Renderer::GetInstance().defInstanceShader = &defInstanceShader;
+	Renderer::GetInstance().skeletalAnimShader = &skeletonAnimShader;
 
 	Renderer::GetInstance().camera = viewportCamera;
 

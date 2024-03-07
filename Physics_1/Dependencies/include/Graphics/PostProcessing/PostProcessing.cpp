@@ -36,10 +36,15 @@ PostProcessing::PostProcessing(int width, int height)
 	heatDistortion.stackOrder = 2;
 	heatDistortion.combineShader = combineEffectsShader;
 
+	nightVision.InitializeEffect("Night Vision", "res/Shader/PostProcessing/NightVision.shader");
+	nightVision.stackOrder = 3;
+	nightVision.combineShader = combineEffectsShader;
+
 
 	mListOfEffects.push_back(&bloom);
 	mListOfEffects.push_back(&chromaticAberration);
 	mListOfEffects.push_back(&heatDistortion);
+	mListOfEffects.push_back(&nightVision);
 
 	SortEffectsByOrder();
 

@@ -10,6 +10,7 @@ namespace MathUtilities
 	public:
 
 		static bool DecomposeTransform(const glm::mat4& transform, glm::vec3& pos, glm::vec3& rot, glm::vec3& scale);
+		static bool DecomposeTransform_Simple(const glm::mat4& transform, glm::vec3& pos, glm::vec3& rot, glm::vec3& scale);
 		static float Remap(float value, float inputMin, float inputMax, float outputMin, float outputMax);
 		static const float GetRandomFloatNumber(float minValue, float maxValue);
 		static const int GetRandomIntNumber(int minValue, int maxValue);
@@ -19,6 +20,8 @@ namespace MathUtilities
 		static double CalculateTForSpeed(double currentT, double deltaTime, double lerpSpeed);
 		static glm::vec3 GetRandomDirOnUnitCircle();
 		static glm::vec3 GetRandomDirOnUnitCircle(glm::vec3& up);
+
+		static unsigned int GetHash(const std::string string);
 	};
 
 }

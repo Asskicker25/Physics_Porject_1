@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Debugger.h"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
-#include "Model.h"
-#include "Camera.h"
-#include "DebugModels.h"
+#include "Buffer/VertexArray.h"
+#include "Buffer/IndexBuffer.h"
+#include "Mesh/Model.h"
+#include "Camera/Camera.h"
+#include "Mesh/DebugModels.h"
 
 enum RenderMode
 {
@@ -63,6 +63,8 @@ public:
 	Shader* solidColorShader;
 	Shader* alphaBlendShader;
 	Shader* alphaCutOutShader;
+	Shader* defInstanceShader;
+	Shader* skeletalAnimShader;
 
 	Camera* camera = nullptr;
 

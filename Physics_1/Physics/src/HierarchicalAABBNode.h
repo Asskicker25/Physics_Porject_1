@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <Graphics/Model.h>
+#include <Graphics/Mesh/Model.h>
 #include "PhysicsShapeAndCollision.h"
 
 class HierarchicalAABBNode

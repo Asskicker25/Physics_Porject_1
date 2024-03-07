@@ -11,34 +11,34 @@
 #include <imgui/ImGuizmo.h>
 
 #include "Renderer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "VertexLayout.h"
-#include "IndexBuffer.h"
+#include "Buffer/VertexArray.h"
+#include "Buffer/VertexBuffer.h"
+#include "Buffer/VertexLayout.h"
+#include "Buffer/IndexBuffer.h"
 #include "Shaders/Shader.h"
 #include "Texture/Texture.h"
 #include "Texture/RenderTexture.h"
 #include "Transform.h"
-#include "Camera.h"
-#include "Model.h"
-#include "Light.h"
-#include "LightManager.h"
+#include "Camera/Camera.h"
+#include "Mesh/Model.h"
+#include "Light/Light.h"
+#include "Light/LightManager.h"
 
-#include "Material.h"
-#include "UnlitColorMaterial.h"
-#include "CubeMapTexture.h"
-#include "SkyBoxMaterial.h"
-#include "DebugCubeData.h"
-#include "DebugLineData.h"
+#include "Material/Material.h"
+#include "Material/UnlitColorMaterial.h"
+#include "Texture/CubeMapTexture.h"
+#include "Material/SkyBoxMaterial.h"
+#include "Mesh/DebugCubeData.h"
+#include "Mesh/DebugLineData.h"
 #include "Timer.h"
 #include "Panels/PanelManager.h"
 #include "Panels/EditorLayout.h"
-#include "FrameBuffer.h"
+#include "Buffer/FrameBuffer.h"
 #include "Shaders/UnlitColorShader.h"
 #include "Shaders/SkyBoxShader.h"
-#include "GameCamera.h"
+#include "Camera/GameCamera.h"
 #include "PostProcessing/PostProcessing.h"
-#include "RenderQuad.h"
+#include "Mesh/RenderQuad.h"
 #include "Scene/SceneManager.h"
 #include "ParticleSystem/ParticleSystemManager.h"
 
@@ -92,10 +92,12 @@ public:
 	DebugCubeData cubeData;
 	DebugLineData lineData;
 
-	UnlitColorShader solidColorShader;
 	Shader defShader;
 	Shader alphaBlendShader;
 	Shader alphaCutOutShader;
+	Shader skeletonAnimShader;
+	UnlitColorShader solidColorShader;
+	UnlitColorShader defInstanceShader;
 	SkyBoxShader skyboxShader;
 
 
@@ -120,6 +122,7 @@ public:
 	virtual void Update() = 0;
 	virtual void Render() = 0;
 	virtual void Shutdown() = 0;
+	virtual void OnPlayStateChanged(bool state) = 0;
 	virtual void ProcessInput(GLFWwindow* window) = 0;
 	virtual void KeyCallBack(GLFWwindow* window, int& key, int& scancode, int& action, int& mods) = 0;
 	virtual void MouseButtonCallback(GLFWwindow* window, int& button, int& action, int& mods) = 0;
