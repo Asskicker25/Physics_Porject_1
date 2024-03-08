@@ -123,14 +123,35 @@ void PhysicsApplication::SetUp()
 
 
 
+	//softbodyMesh = new SoftBodyForMeshes();
+	//softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
+	////softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 90));
+	//softbodyMesh->transform.SetScale(glm::vec3(1.0f));
+	////softbodyMesh->mGravity = glm::vec3(0, -1, 0);
+	//softbodyMesh->showDebugModels = false;
+	//softbodyMesh->mNodeRadius = 1.5;
+	////softbodyMesh->InitializeLockNodes({0});
+	//softbodyMesh->InitializeSoftBody();
+	//softbodyMesh->LockNodeAtIndex(0);
+	//softbodyMesh->AddCollidersToCheck(planePhy);
+	//softbodyMesh->mBounceFactor = 1.0f;
+
+	/*softbody = new SoftBodyForVertex();
+	softbody->LoadModel("Assets/Models/QuadSphere.fbx");
+	softbody->mGravity = glm::vec3(0, -1, 0);
+	softbody->transform.SetPosition(glm::vec3(0.0f, 4.0f, 0));
+	softbody->InitializeSoftBody();
+	softbody->AddCollidersToCheck(planePhy);
+	softbody->CreateRandomBracing(200, 2.2);*/
+
 	softbodyMesh = new SoftBodyForMeshes();
-	softbodyMesh->LoadModel("Assets/Models/Chain.fbx");
-	//softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 90));
-	softbodyMesh->transform.SetScale(glm::vec3(1.0f));
-	//softbodyMesh->mGravity = glm::vec3(0, -1, 0);
-	softbodyMesh->showDebugModels = false;
-	softbodyMesh->mNodeRadius = 1.5;
-	//softbodyMesh->InitializeLockNodes({0});
+	softbodyMesh->LoadModel("Assets/Models/Rope_2_Normals.fbx");
+	softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 0));
+	softbodyMesh->transform.SetScale(glm::vec3(0.5f));
+	softbodyMesh->mGravity = glm::vec3(0, -1, 0);
+	//softbodyMesh->showDebugModels = false;
+	softbodyMesh->mNodeRadius = 0.5f;
+	softbodyMesh->InitializeLockNodes({0});
 	softbodyMesh->InitializeSoftBody();
 	softbodyMesh->LockNodeAtIndex(0);
 	softbodyMesh->AddCollidersToCheck(planePhy);

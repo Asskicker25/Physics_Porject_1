@@ -152,6 +152,7 @@ public:
 	virtual void UpdateNodePosition(float deltaTime);
 	virtual void SatisfyConstraints(float deltaTime);
 	virtual void UpdateModelData(float deltaTime);
+	virtual void CreateRandomBracing(int numOfBraces, float distanceBetween);
 
 	virtual void ApplyCollision(float deltaTime);
 	virtual void UpdateBufferData();

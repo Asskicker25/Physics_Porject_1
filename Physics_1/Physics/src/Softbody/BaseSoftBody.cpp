@@ -1,6 +1,9 @@
 #include "BaseSoftBody.h"
 #include <Graphics/Renderer.h>
 #include <Graphics/Panels/ImguiDrawUtils.h>
+#include <Graphics/MathUtils.h>
+
+using namespace MathUtilities;
 
 void BaseSoftBody::CleanZeros(glm::vec3& value)
 {
@@ -200,6 +203,32 @@ void BaseSoftBody::UpdateModelData(float deltaTime)
 {
 	UpdateModelVertices();
 	UpdateModelNormals();
+}
+
+void BaseSoftBody::CreateRandomBracing(int numOfBraces, float distanceBetween)
+{
+	int size = mListOfNodes.size() - 1;
+
+	for (int i = 0; i < numOfBraces; i++)
+	{
+		float sqDist = 0;
+
+		Node* nodeA = nullptr;
+		Node* nodeB = nullptr;
+
+		do
+		{
+			nodeA = mListOfNodes[MathUtils::GetRandomIntNumber(0, size)];
+			nodeB = mListOfNodes[MathUtils::GetRandomIntNumber(0, size)];
+
+			glm::vec3 diff = nodeB->mCurrentPosition - nodeA->mCurrentPosition;
+			sqDist = glm::dot(diff, diff);
+
+		} while (sqDist < distanceBetween * distanceBetween);
+
+		Stick* newStick = new Stick(nodeA, nodeB);
+		mListOfSticks.push_back(newStick);
+	}
 }
 
 
