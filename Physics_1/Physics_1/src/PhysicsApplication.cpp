@@ -4,7 +4,7 @@
 #include <Softbody/SoftBodyForMeshes.h>
 #include <Thread/PhysicsEngineThread.h>
 
-#include "Player/Snake.h"
+#include "Player/Chain.h"
 
 using namespace Verlet;
 
@@ -30,8 +30,8 @@ void PhysicsApplication::SetUp()
 	GameCamera* mainCamera = new GameCamera();
 	mainCamera->name = "MainCamera";
 	mainCamera->InitializeCamera(PERSPECTIVE, gameResolutionWidth, gameResolutionHeight, 0.1f, 100.0f, 45.0f);
-	mainCamera->transform.SetPosition(glm::vec3(0, 10, 15));
-	mainCamera->transform.SetRotation(glm::vec3(-25, 0, 0));
+	mainCamera->transform.SetPosition(glm::vec3(0, 6, 22));
+	mainCamera->transform.SetRotation(glm::vec3(-5, 0, 0));
 
 	Light* dirLight = new Light();
 	dirLight->transform.SetScale(glm::vec3(0.1f));
@@ -70,7 +70,7 @@ void PhysicsApplication::SetUp()
 	listOfPhyObject.push_back(planePhy);
 	listOfPhyObject.push_back(cube);
 
-	Snake* snake = new Snake(listOfPhyObject);
+	Chain* chain = new Chain(listOfPhyObject);
 
 
 	physicsThread->isRunning = true;

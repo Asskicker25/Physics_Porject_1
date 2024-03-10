@@ -149,7 +149,7 @@
     <ClCompile Include="Dependencies\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="Dependencies\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Dependencies\include\imgui\ImSequencer.cpp" />
-    <ClCompile Include="src\Player\Snake.cpp" />
+    <ClCompile Include="src\Player\Chain.cpp" />
     <ClCompile Include="src\PhysicsApplication.cpp" />
     <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
@@ -168,7 +168,7 @@
     <ClInclude Include="Dependencies\include\imgui\imstb_textedit.h" />
     <ClInclude Include="Dependencies\include\imgui\imstb_truetype.h" />
     <ClInclude Include="Dependencies\include\imgui\ImZoomSlider.h" />
-    <ClInclude Include="src\Player\Snake.h" />
+    <ClInclude Include="src\Player\Chain.h" />
     <ClInclude Include="src\AppSettings.h" />
     <ClInclude Include="src\PhysicsApplication.h" />
     <ClInclude Include="src\Utilities\Random.h" />

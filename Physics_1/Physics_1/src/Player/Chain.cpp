@@ -1,7 +1,7 @@
-#include "Snake.h"
+#include "Chain.h"
 #include <Graphics/Camera/CameraSystem.h>
 
-Snake::Snake(std::vector<PhysicsObject*>& listOfPhysicsObject)
+Chain::Chain(std::vector<PhysicsObject*>& listOfPhysicsObject)
 {
 	LoadModel("Assets/Models/Chain.fbx");
 	transform.SetPosition(glm::vec3(0, 10, 0));
@@ -23,6 +23,8 @@ Snake::Snake(std::vector<PhysicsObject*>& listOfPhysicsObject)
 	mHead = mListOfNodes[0];
 
 	mMainCamera = CameraSystem::GetInstance().GetMainCamera();
+	mCamDistance = glm::length(mMainCamera->transform.position - transform.position);
+	mCamYOffset = mMainCamera->transform.position.y - transform.position.y;
 
 	for (MeshAndMaterial* mesh : meshes)
 	{
@@ -32,7 +34,7 @@ Snake::Snake(std::vector<PhysicsObject*>& listOfPhysicsObject)
 	InputManager::GetInstance().AddListener(this);
 }
 
-void Snake::OnKeyPressed(const int& key)
+void Chain::OnKeyPressed(const int& key)
 {
 	if (key == GLFW_KEY_Q)
 	{
@@ -44,7 +46,7 @@ void Snake::OnKeyPressed(const int& key)
 	}
 }
 
-void Snake::OnKeyReleased(const int& key)
+void Chain::OnKeyReleased(const int& key)
 {
 	if (key == GLFW_KEY_Q)
 	{
@@ -57,30 +59,16 @@ void Snake::OnKeyReleased(const int& key)
 	}
 }
 
-void Snake::Update(float deltaTime)
+void Chain::Update(float deltaTime)
 {
 	Model::Update(deltaTime);
 	SetInput();
 	HandleMove(deltaTime);
+	HandleCamera();
 
 }
 
-void Snake::HandleMove(float deltaTime)
-{
-	glm::vec3 cameraRight = mMainCamera->transform.GetRight();
-	glm::vec3 cameraForward = mMainCamera->transform.GetForward();
-
-	cameraRight.y = 0;
-	cameraForward.y = 0;
-	cameraRight = glm::normalize(cameraRight);
-	cameraForward = glm::normalize(cameraForward);
-	
-	mHead->mCurrentPosition += cameraForward * mMoveDir.y * deltaTime * mSpeed;
-	mHead->mCurrentPosition += cameraRight * mMoveDir.x * deltaTime * mSpeed;
-	mHead->mCurrentPosition.y += mUpAxis * deltaTime * mSpeed;
-}
-
-void Snake::SetInput()
+void Chain::SetInput()
 {
 	mUpAxis = 0;
 
@@ -95,4 +83,27 @@ void Snake::SetInput()
 	{
 		mMoveDir = glm::normalize(mMoveDir);
 	}
+}
+
+void Chain::HandleMove(float deltaTime)
+{
+	glm::vec3 cameraRight = mMainCamera->transform.GetRight();
+	glm::vec3 cameraForward = mMainCamera->transform.GetForward();
+
+	cameraRight.y = 0;
+	cameraForward.y = 0;
+	cameraRight = glm::normalize(cameraRight);
+	cameraForward = glm::normalize(cameraForward);
+	
+	mHead->mCurrentPosition += cameraForward * mMoveDir.y * deltaTime * mSpeed;
+	mHead->mCurrentPosition += cameraRight * mMoveDir.x * deltaTime * mSpeed;
+	mHead->mCurrentPosition.y += mUpAxis * deltaTime * mSpeed;
+}
+
+
+void Chain::HandleCamera()
+{
+	glm::vec3 pos = mHead->mCurrentPosition;
+	pos.y += mCamYOffset;
+	mMainCamera->transform.SetPosition(pos - transform.GetForward() * mCamDistance);
 }

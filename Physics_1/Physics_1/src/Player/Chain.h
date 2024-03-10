@@ -9,11 +9,11 @@
 using namespace Verlet;
 
 
-class Snake : public SoftBodyForMeshes, public iInputListener
+class Chain : public SoftBodyForMeshes, public iInputListener
 {
 public:
 
-	Snake(std::vector<PhysicsObject*>& listOfPhysicsObject);
+	Chain(std::vector<PhysicsObject*>& listOfPhysicsObject);
 
 	virtual void OnKeyPressed(const int& key);
 	virtual void OnKeyReleased(const int& key);
@@ -22,12 +22,15 @@ public:
 
 
 private:
+
 	void HandleMove(float deltaTime);
 	void HandleCamera();
 	void SetInput();
 	
 	float mSpeed = 5;
 	float mUpAxis = 0;
+	float mCamDistance = 0;
+	float mCamYOffset = 0;
 
 	bool mUpHeld = false;
 	bool mDownHeld = false;

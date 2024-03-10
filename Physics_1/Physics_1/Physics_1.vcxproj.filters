@@ -54,7 +54,7 @@
     <ClCompile Include="Dependencies\include\imgui\ImSequencer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Player\Snake.cpp">
+    <ClCompile Include="src\Player\Chain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,7 +113,7 @@
     <ClInclude Include="src\AppSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Player\Snake.h">
+    <ClInclude Include="src\Player\Chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
