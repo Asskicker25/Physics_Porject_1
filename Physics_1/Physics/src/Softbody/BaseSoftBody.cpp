@@ -142,6 +142,7 @@ void BaseSoftBody::UpdatePositionByVerlet(float deltaTime)
 		{
 			node->mCurrentPosition += (posBeforUpdate - node->mOldPositionm) + (node->velocity * (deltaTime * deltaTime));
 		}
+
 		node->mOldPositionm = posBeforUpdate;
 
 		CleanZeros(node->mCurrentPosition);

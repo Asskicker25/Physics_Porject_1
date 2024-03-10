@@ -5,6 +5,7 @@
 #include <Thread/PhysicsEngineThread.h>
 
 #include "Player/Chain.h"
+#include "Flag/Flag.h"
 
 using namespace Verlet;
 
@@ -71,7 +72,8 @@ void PhysicsApplication::SetUp()
 	listOfPhyObject.push_back(cube);
 
 	Chain* chain = new Chain(listOfPhyObject);
-
+	Flag* flag = new Flag();
+	flag->mChain = chain;
 
 	physicsThread->isRunning = true;
 }

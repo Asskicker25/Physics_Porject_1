@@ -96,6 +96,7 @@ public:
 		bool mIsLocked = false;
 		bool mEnabled = true;
 		bool mIsColliding = false;
+		bool mIsConnected = true;
 		float mRadius = 0;
 
 		glm::vec3 mCurrentPosition = glm::vec3(0);

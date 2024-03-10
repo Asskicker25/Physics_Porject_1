@@ -57,6 +57,15 @@
     <ClCompile Include="src\Player\Chain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Flag\Flag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader\FlagShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material\FlagMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\PhysicsApplication.h">
@@ -114,6 +123,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Player\Chain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flag\Flag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader\FlagShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material\FlagMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

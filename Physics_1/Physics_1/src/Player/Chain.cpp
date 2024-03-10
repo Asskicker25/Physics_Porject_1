@@ -11,16 +11,14 @@ Chain::Chain(std::vector<PhysicsObject*>& listOfPhysicsObject)
 	//softbodyMesh->showDebugModels = false;
 	mNodeRadius = 0.5f;
 	InitializeLockNodes({ 0 });
-	InitializeSoftBody();
 	LockNodeAtIndex(0);
-	mBounceFactor = 2.0f;
+	mBounceFactor = 1.5f;
 
 	for (PhysicsObject* phy : listOfPhysicsObject)
 	{
 		AddCollidersToCheck(phy);
 	}
 
-	mHead = mListOfNodes[0];
 
 	mMainCamera = CameraSystem::GetInstance().GetMainCamera();
 	mCamDistance = glm::length(mMainCamera->transform.position - transform.position);
@@ -68,6 +66,14 @@ void Chain::Update(float deltaTime)
 
 }
 
+void Chain::Start()
+{
+	InitializeSoftBody();
+	mHead = mListOfNodes[0];
+	mTail = mListOfNodes[mListOfNodes.size() - 1];
+
+}
+
 void Chain::SetInput()
 {
 	mUpAxis = 0;
@@ -88,14 +94,14 @@ void Chain::SetInput()
 void Chain::HandleMove(float deltaTime)
 {
 	glm::vec3 cameraRight = mMainCamera->transform.GetRight();
-	glm::vec3 cameraForward = mMainCamera->transform.GetForward();
+	glm::vec3 cameraUp = mMainCamera->transform.GetUp();
 
 	cameraRight.y = 0;
-	cameraForward.y = 0;
+	cameraUp.y = 0;
 	cameraRight = glm::normalize(cameraRight);
-	cameraForward = glm::normalize(cameraForward);
+	cameraUp = glm::normalize(cameraUp);
 	
-	mHead->mCurrentPosition += cameraForward * mMoveDir.y * deltaTime * mSpeed;
+	mHead->mCurrentPosition += cameraUp * mMoveDir.y * deltaTime * mSpeed;
 	mHead->mCurrentPosition += cameraRight * mMoveDir.x * deltaTime * mSpeed;
 	mHead->mCurrentPosition.y += mUpAxis * deltaTime * mSpeed;
 }

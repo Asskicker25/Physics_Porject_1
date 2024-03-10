@@ -149,9 +149,12 @@
     <ClCompile Include="Dependencies\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="Dependencies\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Dependencies\include\imgui\ImSequencer.cpp" />
+    <ClCompile Include="src\Flag\Flag.cpp" />
+    <ClCompile Include="src\Material\FlagMaterial.cpp" />
     <ClCompile Include="src\Player\Chain.cpp" />
     <ClCompile Include="src\PhysicsApplication.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Shader\FlagShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\include\imgui\imconfig.h" />
@@ -168,9 +171,12 @@
     <ClInclude Include="Dependencies\include\imgui\imstb_textedit.h" />
     <ClInclude Include="Dependencies\include\imgui\imstb_truetype.h" />
     <ClInclude Include="Dependencies\include\imgui\ImZoomSlider.h" />
+    <ClInclude Include="src\Flag\Flag.h" />
+    <ClInclude Include="src\Material\FlagMaterial.h" />
     <ClInclude Include="src\Player\Chain.h" />
     <ClInclude Include="src\AppSettings.h" />
     <ClInclude Include="src\PhysicsApplication.h" />
+    <ClInclude Include="src\Shader\FlagShader.h" />
     <ClInclude Include="src\Utilities\Random.h" />
     <ClInclude Include="src\Utilities\Remap.h" />
   </ItemGroup>

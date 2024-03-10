@@ -19,6 +19,8 @@ namespace Verlet
 		virtual void UpdateModelVertices();
 		virtual void UpdateModelNormals();
 
+		virtual void ApplyCollision(float deltaTime);
+
 		void AddForceToRandomNode(glm::vec3 velocity);
 
 		void AddStickBetweenNodeIndex(unsigned int nodeA, unsigned int nodeB);

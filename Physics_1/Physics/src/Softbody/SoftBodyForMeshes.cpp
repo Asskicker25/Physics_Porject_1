@@ -196,6 +196,101 @@ namespace Verlet
 		LeaveCriticalSection(mCriticalSection);
 	}
 
+	void SoftBodyForMeshes::ApplyCollision(float deltaTime)
+	{
+
+		std::vector<glm::vec3> collisionPts, collisionNr;
+
+		for (Node* node : mListOfNodes)
+		{
+			node->mIsColliding = false;
+		}
+
+		
+
+		for (PhysicsObject* phyObj : mListOfCollidersToCheck)
+		{
+			int numOfCollisions = 0;
+
+			for (Node* node : mListOfNodes)
+			{
+				if (node->mIsLocked) continue;
+
+				bool nodeCollided = false;
+
+				Sphere nodeSphere(node->mCurrentPosition, node->mRadius);
+
+				if (collisionMode == TRIGGER) continue;
+
+				collisionPts.clear();
+				collisionNr.clear();
+
+				switch (phyObj->shape)
+				{
+				case SPHERE:
+
+					if (CollisionSphereVSSphere(&nodeSphere, (Sphere*)phyObj->transformedPhysicsShape, collisionPts, collisionNr))
+					{
+						numOfCollisions++;
+						nodeCollided = true;
+					}
+					break;
+
+				case AABB:
+
+					if (CollisionSpherevsAABB(&nodeSphere, phyObj->GetModelAABB(), true, collisionPts, collisionNr))
+					{
+						numOfCollisions++;
+						nodeCollided = true;
+					}
+
+					break;
+
+				}
+
+				if (!nodeCollided) continue;
+
+				EnterCriticalSection(mCriticalSection);
+
+				glm::vec3 normal = glm::vec3(0.0f);
+				glm::vec3 collisionPt = glm::vec3(0.0f);
+
+				for (size_t i = 0; i < collisionNr.size(); i++)
+				{
+					if (glm::length(collisionNr[i]) == 0)
+					{
+						normal += (collisionNr[i]);
+					}
+					else
+					{
+						normal += glm::normalize(collisionNr[i]);
+					}
+				}
+
+				for (size_t i = 0; i < collisionPts.size(); i++)
+				{
+
+					collisionPt += (collisionPts[i]);
+				}
+
+				normal = normal / (float)collisionNr.size();
+				collisionPt = collisionPt / (float)collisionPts.size();
+
+				glm::vec3 reflected = glm::reflect(glm::normalize(node->velocity), normal);
+				node->velocity = reflected * glm::length(node->velocity) * 0.5f;
+				node->velocity *= mBounceFactor;
+				//node->velocity = glm::vec3(0);
+
+				node->mCurrentPosition = collisionPt + ( reflected * node->mRadius);
+				//node->mIsColliding = true;
+				//node->mOldPositionm = node->mCurrentPosition;
+
+				LeaveCriticalSection(mCriticalSection);
+			}
+
+		}
+	}
+
 	void SoftBodyForMeshes::AddForceToRandomNode(glm::vec3 velocity)
 	{
 		int index = MathUtils::GetRandomIntNumber(0, mListOfNodes.size() - 1);

@@ -19,7 +19,10 @@ public:
 	virtual void OnKeyReleased(const int& key);
 
 	virtual void Update(float deltaTime) override;
+	virtual void Start() override;
 
+	Node* mHead = nullptr;
+	Node* mTail = nullptr;
 
 private:
 
@@ -36,7 +39,6 @@ private:
 	bool mDownHeld = false;
 
 	glm::vec2 mMoveDir = glm::vec2(0);
-	Node* mHead = nullptr;
 
 	Camera* mMainCamera = nullptr;
 };
