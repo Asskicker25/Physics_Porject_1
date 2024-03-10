@@ -148,7 +148,7 @@ public:
 
 	virtual void InitializeSoftBody() = 0;
 
-	virtual void UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection);
+	virtual void UpdateSoftBody(float deltaTime);
 	virtual void UpdateNodePosition(float deltaTime);
 	virtual void SatisfyConstraints(float deltaTime);
 	virtual void UpdateModelData(float deltaTime);

@@ -25,7 +25,7 @@ namespace Verlet
 
 		virtual void InitializeSoftBody();
 
-		virtual void UpdateSoftBody(float deltaTine, CRITICAL_SECTION& criticalSection);
+		virtual void UpdateSoftBody(float deltaTine);
 		virtual void Render();
 		virtual void OnPropertyDraw();
 

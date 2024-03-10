@@ -15,13 +15,14 @@ private:
 
 	std::vector<BaseSoftBody*> listOfSoftBodies;
 
-	CRITICAL_SECTION* softBody_CritSection = nullptr;
 
 	void UpdatePhysics(float deltaTime);
  	
 public:
 	float fixedStepTime = 0.01f;
 	glm::vec3 gravity = glm::vec3(0, -9.8f / 3.0f, 0);
+
+	CRITICAL_SECTION* softBody_CritSection = nullptr;
 
 	static PhysicsEngine& GetInstance();
 
@@ -36,7 +37,7 @@ public:
 	void RemoveSoftBodyObject(BaseSoftBody* softBody);
 
 	void Update(float deltaTime);
-	void UpdateSoftBodies(float deltaTime, CRITICAL_SECTION& criticalSection);
+	void UpdateSoftBodies(float deltaTime);
 	void UpdateSoftBodyBufferData();
 	void SetDebugSpheres(Model* model, int count);
 

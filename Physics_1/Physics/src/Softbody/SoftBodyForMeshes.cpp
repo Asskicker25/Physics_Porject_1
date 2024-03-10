@@ -55,9 +55,9 @@ namespace Verlet
 		SetupSticks();
 	}
 
-	void SoftBodyForMeshes::UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection)
+	void SoftBodyForMeshes::UpdateSoftBody(float deltaTime)
 	{
-		BaseSoftBody::UpdateSoftBody(deltaTime,criticalSection);
+		BaseSoftBody::UpdateSoftBody(deltaTime);
 	}
 
 	void SoftBodyForMeshes::SetupNodes()
@@ -149,6 +149,8 @@ namespace Verlet
 			}
 		}
 
+		LeaveCriticalSection(mCriticalSection);
+
 		for (MeshAndMaterial* meshAndMat : meshes)
 		{
 			std::shared_ptr<Mesh>& mesh = meshAndMat->mesh;
@@ -180,6 +182,7 @@ namespace Verlet
 			}
 		}
 
+		EnterCriticalSection(mCriticalSection);
 
 		for (MeshHolder& mesh : mListOfMeshes)
 		{

@@ -72,9 +72,9 @@ namespace Verlet
 
 	}
 
-	void SoftBodyForVertex::UpdateSoftBody(float deltaTine, CRITICAL_SECTION& criticalSection)
+	void SoftBodyForVertex::UpdateSoftBody(float deltaTine)
 	{
-		BaseSoftBody::UpdateSoftBody(deltaTine,criticalSection);
+		BaseSoftBody::UpdateSoftBody(deltaTine);
 	}
 
 	void SoftBodyForVertex::SetupNodes()
@@ -176,7 +176,7 @@ namespace Verlet
 			vertex.mPointerToVertex->normals = glm::vec3(0);
 		}
 
-		//LeaveCriticalSection(mCriticalSection);
+		LeaveCriticalSection(mCriticalSection);
 
 		for (MeshAndMaterial* meshAndMat : meshes)
 		{
@@ -210,7 +210,7 @@ namespace Verlet
 		}
 
 
-		//EnterCriticalSection(mCriticalSection);
+		EnterCriticalSection(mCriticalSection);
 
 		for (PointerToVertex& vertex : mListOfVertices)
 		{

@@ -85,10 +85,8 @@ bool BaseSoftBody::ShouldApplyGravity(Node* node)
 	return true;
 }
 
-void BaseSoftBody::UpdateSoftBody(float deltaTime, CRITICAL_SECTION& criticalSection)
+void BaseSoftBody::UpdateSoftBody(float deltaTime)
 {
-	mCriticalSection = &criticalSection;
-
 	UpdateNodePosition(deltaTime);
 	UpdatePositionByVerlet(deltaTime);
 	ApplyCollision(deltaTime);

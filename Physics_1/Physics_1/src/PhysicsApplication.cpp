@@ -30,7 +30,8 @@ void PhysicsApplication::SetUp()
 	GameCamera* mainCamera = new GameCamera();
 	mainCamera->name = "MainCamera";
 	mainCamera->InitializeCamera(PERSPECTIVE, gameResolutionWidth, gameResolutionHeight, 0.1f, 100.0f, 45.0f);
-	mainCamera->transform.SetPosition(glm::vec3(0, 0, 10));
+	mainCamera->transform.SetPosition(glm::vec3(0, 10, 15));
+	mainCamera->transform.SetRotation(glm::vec3(-25, 0, 0));
 
 	Light* dirLight = new Light();
 	dirLight->transform.SetScale(glm::vec3(0.1f));
@@ -46,34 +47,30 @@ void PhysicsApplication::SetUp()
 	EditorLayout::GetInstance().SetMaximizeState(false);
 
 
-	//std::vector<PhysicsObject*> listOfPhyObject;
+	std::vector<PhysicsObject*> listOfPhyObject;
 
 	planePhy = new PhysicsObject();
 	planePhy->name = "Plane";
 	//planePhy->LoadModel("Assets/Models/Plane/Plane.fbx");
 	planePhy->LoadModel("res/Models/DefaultCube.fbx");
 	planePhy->InitializePhysics(AABB, STATIC);
-	planePhy->transform.SetPosition(glm::vec3(0, -12.5, 0));
+	planePhy->transform.SetPosition(glm::vec3(0, -1, 0));
 	planePhy->transform.SetRotation(glm::vec3(-90.0f, 0, 0));
-	planePhy->transform.SetScale(glm::vec3(20,20,2));
+	planePhy->transform.SetScale(glm::vec3(20,20,0.2));
+	planePhy->meshes[0]->material->AsMaterial()->diffuseTexture = new Texture("Assets/Textures/Floor.jpg");
+	planePhy->meshes[0]->material->AsMaterial()->textureTiling = glm::vec2(15, 15);
 
 
-	//listOfPhyObject.push_back(planePhy);
+	PhysicsObject* cube = new PhysicsObject();
+	cube->LoadModel("res/Models/DefaultCube.fbx");
+	cube->InitializePhysics(AABB, STATIC);
+	cube->transform.SetPosition(glm::vec3(5, 10, 0));
 
-	softbodyMesh = new SoftBodyForMeshes();
-	softbodyMesh->LoadModel("Assets/Models/Rope_2_Normals.fbx");
-	softbodyMesh->transform.SetRotation(glm::vec3(0, 0, 0));
-	softbodyMesh->transform.SetScale(glm::vec3(0.5f));
-	softbodyMesh->mGravity = glm::vec3(0, -1, 0);
-	//softbodyMesh->showDebugModels = false;
-	softbodyMesh->mNodeRadius = 0.5f;
-	softbodyMesh->InitializeLockNodes({ 0 });
-	softbodyMesh->InitializeSoftBody();
-	softbodyMesh->LockNodeAtIndex(0);
-	softbodyMesh->AddCollidersToCheck(planePhy);
-	softbodyMesh->mBounceFactor = 1.0f;
 
-	//Snake* snake = new Snake(listOfPhyObject);
+	listOfPhyObject.push_back(planePhy);
+	listOfPhyObject.push_back(cube);
+
+	Snake* snake = new Snake(listOfPhyObject);
 
 
 	physicsThread->isRunning = true;

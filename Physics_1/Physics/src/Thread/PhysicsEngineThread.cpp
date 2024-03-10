@@ -27,7 +27,7 @@ DWORD UpdatePhysicsEngine(LPVOID lpParameter)
 			{
 				timeStep = 0;
 
-				threadInfo->physicsEngine->UpdateSoftBodies(deltaTime, threadInfo->softBodyUpdateModelData);
+				threadInfo->physicsEngine->UpdateSoftBodies(deltaTime);
 			}
 		}
 
@@ -46,6 +46,8 @@ PhysicsEngineThreadInfo* InitializePhysicsThread(float fixedStepTime)
 	threadInfo->physicsEngine = &PhysicsEngine::GetInstance();
 	threadInfo->isAlive = true;
 	threadInfo->sleepTime = 1;
+
+	PhysicsEngine::GetInstance().softBody_CritSection = &threadInfo->softBodyUpdateModelData;
 
 	InitializeCriticalSection(&threadInfo->softBodyUpdateModelData);
 	
