@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-void Texture::LoadImage(const char* path, Image& image)
+void Texture::LoadTextureImage(const char* path, Image& image)
 {
 	int width, height, channels;
 	if (!fileExists(path))
@@ -36,10 +36,10 @@ void Texture::LoadImage(const char* path, Image& image)
 
 }
 
-void Texture::LoadImage(const char* path, GLFWimage& image)
+void Texture::LoadTextureImage(const char* path, GLFWimage& image)
 {
 	Image _image;
-	LoadImage(path, _image);
+	LoadTextureImage(path, _image);
 
 	image.height = _image.height;
 	image.width = _image.width;
@@ -55,6 +55,22 @@ void Texture::OnSceneDraw()
 }
 
 
+Texture::Texture(Image& image,  std::string& path, std::string& type)
+{
+	this->texture = image;
+	this->path = path;
+	this->type = type;
+
+	GLCALL(glGenTextures(1, &renderedID));
+	GLCALL(glBindTexture(GL_TEXTURE_2D, renderedID));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST));
+	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, texture.format, GL_UNSIGNED_BYTE, texture.pixelData));
+	GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
+}
+
 Texture::Texture(const std::string& path)
 {
 	this->path = path;
@@ -62,7 +78,7 @@ Texture::Texture(const std::string& path)
 	GLCALL(glGenTextures(1, &renderedID));
 	GLCALL(glBindTexture(GL_TEXTURE_2D, renderedID));
 
-	LoadImage(path.c_str(), texture);
+	LoadTextureImage(path.c_str(), texture);
 
 	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
 	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
@@ -99,7 +115,7 @@ void Texture::LoadTexture(const std::string& path)
 	GLCALL(glGenTextures(1, &renderedID));
 	GLCALL(glBindTexture(GL_TEXTURE_2D, renderedID));
 
-	LoadImage(path.c_str(), texture);
+	LoadTextureImage(path.c_str(), texture);
 
 	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));
 	GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture.format == GL_RGBA ? GL_REPEAT : GL_REPEAT));

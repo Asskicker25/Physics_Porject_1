@@ -3,6 +3,7 @@
 #include "../Material/UnlitColorMaterial.h"
 #include "../Material/Material.h"
 #include "../Panels/EditorLayout.h"
+#include "ModelAsyncManager.h"
 
 Model::Model()
 {
@@ -23,15 +24,6 @@ Model::Model(const Model& model)
 
 Model::~Model()
 {
-	//std::cout << "Model ID : " << modelId <<std::endl;
-	/*while (meshes.size() > 0)
-	{
-		if (meshes[0] != nullptr)
-		{
-			delete meshes[0];
-		}
-		meshes.erase(std::remove(meshes.begin(), meshes.end(), meshes[0]), meshes.end());
-	}*/
 	meshes.clear();
 }
 
@@ -44,6 +36,20 @@ Model::Model(const std::string& path, bool debugModel)
 
 void Model::Draw(Shader* shader)
 {
+	if (modelThreadInfo != nullptr)
+	{
+		EnterCriticalSection(modelThreadInfo->mCriticalSection);
+
+		if (!isMeshDataReceived) 
+		{
+			LeaveCriticalSection(modelThreadInfo->mCriticalSection);
+			return;
+		}
+		LeaveCriticalSection(modelThreadInfo->mCriticalSection);
+	}
+
+	HandleMeshDataLoading();
+
 	if (!isActive) return;
 
 	for (unsigned int i = 0; i < meshes.size(); i++)
@@ -115,6 +121,14 @@ void Model::DrawShaded(MeshAndMaterial* mesh, Shader* shader)
 
 }
 
+void Model::HandleMeshDataLoading()
+{
+	if (isLoaded) return;
+	if (!isMeshDataReceived) return;
+
+	LoadFromMeshDataHolders();
+}
+
 void Model::DrawWireframe(MeshAndMaterial* mesh, Shader* shader)
 {
 	shader->Bind();
@@ -176,6 +190,7 @@ void Model::DrawWireframe(const glm::vec3& color)
 
 }
 
+
 Model* Model::CopyFromModel(const Model& model, bool initialize)
 {
 	isActive = model.isActive;
@@ -201,7 +216,8 @@ Model* Model::CopyFromModel(const Model& model, bool initialize)
 		InitializeEntity(this);
 		Renderer::GetInstance().AddModel(this);
 	}
-	
+
+	isLoaded = true;
 
 	return this;
 }
@@ -209,17 +225,96 @@ Model* Model::CopyFromModel(const Model& model, bool initialize)
 
 void Model::LoadModel(MeshDataHolder& meshData, bool debugModel)
 {
+	isDebugModel = debugModel;
+
 	UnlitColorMaterial* meshMat = new UnlitColorMaterial();
 
 	meshes.push_back(new MeshAndMaterial
 		{ std::make_shared<Mesh>(meshData.vertices, meshData.indices), meshMat });
 
+	isLoaded = true;
 
 	if (debugModel) return;
 
 	InitializeEntity(this);
 
 }
+
+void Model::LoadModelAsync(const std::string& path, bool debugModel)
+{
+	isDebugModel = debugModel;
+
+	modelThreadInfo = new ModelThreadInfo();
+	modelThreadInfo->mModelPath = path;
+	modelThreadInfo->mDebugModel = debugModel;
+	modelThreadInfo->mModel = this;
+	isLoaded = false;
+
+	ModelAsyncManager::GetInstance().AddModel(this);
+
+	modelThreadInfo->mThreadHandle = CreateThread(
+		NULL,							// lpThreadAttributes,
+		0,								// dwStackSize,
+		LoadModelInThread,				// lpStartAddress,
+		(void*)modelThreadInfo,			//  lpParameter,
+		0,								// dwCreationFlags (0 or CREATE_SUSPENDED)
+		&modelThreadInfo->mThreadId		// lpThreadId
+	);
+
+	if (!debugModel)
+	{
+		Renderer::GetInstance().AddModel(this);
+	}
+}
+
+
+DWORD LoadModelInThread(LPVOID lpParameter)
+{
+	ModelThreadInfo* threadInfo = (ModelThreadInfo*)lpParameter;
+
+	while (!threadInfo->mModel->isMeshDataReceived)
+	{
+
+		//EnterCriticalSection(threadInfo->mCriticalSection);
+
+		if (threadInfo->mIsRunning)
+		{
+			std::ifstream file(threadInfo->mModelPath);
+
+			if (!file.good()) { Debugger::Print("File Path Not Found : ", threadInfo->mModelPath); }
+
+			Assimp::Importer import;
+
+			const aiScene * scene = import.ReadFile(threadInfo->mModelPath, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+			{
+				std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+
+				threadInfo->mModelAsyncManager->OnModelLoadDone();
+
+				return 0;
+			}
+
+			threadInfo->mModel->directory = threadInfo->mModelPath.substr(0, threadInfo->mModelPath.find_last_of('/'));
+
+			threadInfo->mModel->ProcessNode(scene->mRootNode, scene);
+
+			Sleep(threadInfo->mSleepTime);
+
+			threadInfo->mModelAsyncManager->OnModelLoadDone();
+
+		}
+
+		//LeaveCriticalSection(threadInfo->mCriticalSection);
+
+		Sleep(threadInfo->mSleepTime);
+	}
+
+
+	return 0;
+}
+
 
 Transform* Model::GetTransform()
 {
@@ -229,16 +324,11 @@ Transform* Model::GetTransform()
 
 void Model::LoadModel(const std::string& path, bool debugModel)
 {
+	isDebugModel = debugModel;
+
 	std::ifstream file(path);
 
-	if (file.good())
-	{
-		//Debugger::Print("File exits");
-	}
-	else
-	{
-		//Debugger::Print("File doesn't exits");
-	}
+	if (!file.good()) { Debugger::Print("File Path Not Found : ", path); }
 
 	Assimp::Importer import;
 	const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -252,6 +342,9 @@ void Model::LoadModel(const std::string& path, bool debugModel)
 	directory = path.substr(0, path.find_last_of('/'));
 
 	ProcessNode(scene->mRootNode, scene);
+	LoadFromMeshDataHolders();
+
+	isLoaded = true;
 
 
 	if (debugModel) return;
@@ -261,13 +354,15 @@ void Model::LoadModel(const std::string& path, bool debugModel)
 
 }
 
+
+
 void Model::ProcessNode(aiNode* node, const aiScene* scene)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		//Mesh* myMesh = new Mesh(ProcessMesh(mesh, scene));
-		meshes.push_back(ProcessMesh(mesh, scene));
+		mListOfMeshDataHolders.push_back(ProcessMesh(mesh, scene));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -276,10 +371,11 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-MeshAndMaterial* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+
+MeshDataHolder* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
+	MeshDataHolder* meshDataHolder = new MeshDataHolder();
+
 	//std::vector<Texture> textures;
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -302,16 +398,6 @@ MeshAndMaterial* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			vertex.normals = temp;
 		}
 
-		/*if (mesh->mColors[0])
-		{
-			aiColor4D color = mesh->mColors[0][i];
-			vertex.color = glm::vec4(color.r, color.g, color.b, color.a);
-		}
-		else
-		{
-			vertex.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		}*/
-
 		if (mesh->HasVertexColors(0))
 		{
 			aiColor4D color = mesh->mColors[0][i];
@@ -330,26 +416,12 @@ MeshAndMaterial* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			vec.y = mesh->mTextureCoords[0][i].y;
 			vertex.texCoords = vec;
 
-			/*temp.x = mesh->mTangents[i].x;
-			temp.y = mesh->mTangents[i].y;
-			temp.z = mesh->mTangents[i].z;
-
-			vertex.tangents = temp;
-
-			temp.x = mesh->mBitangents[i].x;
-			temp.y = mesh->mBitangents[i].y;
-			temp.z = mesh->mBitangents[i].z;*/
-
-			//vertex.bitTangents = temp;
-
 		}
 		else
 			vertex.texCoords = glm::vec2(0.0f, 0.0f);
 
-		vertices.push_back(vertex);
+		meshDataHolder->vertices.push_back(vertex);
 	}
-
-
 
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -358,61 +430,43 @@ MeshAndMaterial* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 		{
-			indices.push_back(face.mIndices[j]);
+			meshDataHolder->indices.push_back(face.mIndices[j]);
 		}
 	}
-
-	BaseMaterial* meshMat;
-	aiColor4D baseColor(1.0f, 1.0f, 1.0f, 1.0f);
-
 
 	if (mesh->mMaterialIndex >= 0)
 	{
+		meshDataHolder->hasMaterials = true;
 
-		//aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &baseColor);
-
-		meshMat = new Material();
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		meshMat->AsMaterial()->diffuseTexture = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-		meshMat->AsMaterial()->specularTexture = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		meshMat->AsMaterial()->alphaMask = LoadMaterialTextures(material, aiTextureType_OPACITY, "texture_opacity");
+		meshDataHolder->diffuseTexture = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		meshDataHolder->specularTexture = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		meshDataHolder->alphaTexture = LoadMaterialTextures(material, aiTextureType_OPACITY, "texture_opacity");
 
-		if (((Texture*)meshMat->AsMaterial()->alphaMask)->path != "res/Textures/DefaultTextures/Opacity_Default.png")
+		if (material->GetTextureCount(aiTextureType_OPACITY) != 0)
 		{
-			meshMat->AsMaterial()->useMaskTexture = true;
+			meshDataHolder->useMaskTexture = true;
 		}
-
-		meshMat->AsMaterial()->SetBaseColor(glm::vec4(baseColor.r, baseColor.g, baseColor.b, baseColor.a));
-
-		/*meshMat = new UnlitColorMaterial();
-		meshMat->AsUnlitMaterial()->SetBaseColor(glm::vec4(baseColor.r, baseColor.g, baseColor.b, baseColor.a));*/
-
 	}
 	else
 	{
-		meshMat = new UnlitColorMaterial();
-		meshMat->AsUnlitMaterial()->SetBaseColor(glm::vec4(baseColor.r, baseColor.g, baseColor.b, baseColor.a));
+		meshDataHolder->hasMaterials = false;
 	}
 
 	std::string meshName = mesh->mName.C_Str();
 
 	if (meshName == "")
 	{
-		meshName = "Mesh " + std::to_string(meshes.size());
+		meshDataHolder->meshName = "Mesh " + std::to_string(meshes.size());
 	}
 
-	return new MeshAndMaterial{ std::make_shared<Mesh>(vertices, indices, meshName) , meshMat };
+	return meshDataHolder;
 }
 
 
-Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+ImageHolder* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
-	//std::vector<Texture> textures;
-
-	//Debugger::Print(typeName + " count : ", mat->GetTextureCount(type));
-
-	//std::cout << mat->GetTextureCount(type) << std::endl;
 
 	if (mat->GetTextureCount(type) == 0)
 	{
@@ -426,10 +480,6 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 
 		mat->GetTexture(type, i, &texString);
 
-		//Debugger::Print("Tex path ", texString.C_Str());
-
-		//std::cout << "Tex path " << texString.C_Str() << std::endl;
-
 		for (unsigned int i = 0; i < texturesLoaded.size(); i++)
 		{
 			if (std::strcmp(texturesLoaded[i]->path.data(), texString.C_Str()) == 0)
@@ -442,12 +492,15 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 
 		if (fileExists(filename))
 		{
-			Texture* texture = new Texture(filename);
-			texture->path = texString.C_Str();
-			texture->type = typeName;
-			texturesLoaded.push_back(texture);
+			ImageHolder* imageHolder = new ImageHolder();
 
-			return texture;
+			Texture::LoadTextureImage(filename.c_str(), imageHolder->image);
+
+			imageHolder->type = typeName;
+			imageHolder->path = filename;
+			texturesLoaded.push_back(imageHolder);
+
+			return imageHolder;
 		}
 		else
 		{
@@ -457,7 +510,7 @@ Texture* Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::s
 }
 
 
-Texture* Model::LoadDefaultMaterialTextures(aiTextureType type, std::string typeName)
+ImageHolder* Model::LoadDefaultMaterialTextures(aiTextureType type, std::string typeName)
 {
 	std::string path = "";
 	switch (type)
@@ -472,13 +525,63 @@ Texture* Model::LoadDefaultMaterialTextures(aiTextureType type, std::string type
 		path = "res/Textures/DefaultTextures/Opacity_Default.png";
 		break;
 	}
-	Texture* texture = new Texture(path);
 
-	texture->type = typeName;
-	texture->path = path;
-	texturesLoaded.push_back(texture);
+	ImageHolder* imageHolder = new ImageHolder();
+	Texture::LoadTextureImage(path.c_str(), imageHolder->image);
 
-	return texture;
+	imageHolder->type = typeName;
+	imageHolder->path = path;
+	texturesLoaded.push_back(imageHolder);
+
+	return imageHolder;
+}
+
+
+void Model::LoadFromMeshDataHolders()
+{
+	for (MeshDataHolder* meshData : mListOfMeshDataHolders)
+	{
+		if (meshData->hasMaterials)
+		{
+			Material* mat = new Material();
+			mat->diffuseTexture = new Texture(meshData->diffuseTexture->image, meshData->diffuseTexture->path, meshData->diffuseTexture->type);
+			mat->specularTexture = new Texture(meshData->specularTexture->image, meshData->specularTexture->path, meshData->specularTexture->type);
+			mat->alphaMask = new Texture(meshData->alphaTexture->image, meshData->alphaTexture->path, meshData->alphaTexture->type);
+			mat->useMaskTexture = meshData->useMaskTexture;
+
+			mat->SetBaseColor(glm::vec4(1));
+
+			meshes.push_back(new MeshAndMaterial
+				{ std::make_shared<Mesh>(meshData->vertices, meshData->indices, meshData->meshName), mat });
+		}
+		else
+		{
+			UnlitColorMaterial* mat = new UnlitColorMaterial();
+			mat->SetBaseColor(glm::vec4(1));
+
+			meshes.push_back(new MeshAndMaterial
+				{ std::make_shared<Mesh>(meshData->vertices, meshData->indices, meshData->meshName), mat });
+		}
+
+	}
+
+	/*while (mListOfMeshDataHolders.size() != 0)
+	{
+		delete mListOfMeshDataHolders[0];
+	}*/
+	mListOfMeshDataHolders.clear();
+
+	isLoaded = true;
+
+	if (OnModelLoaded != nullptr)
+	{
+		OnModelLoaded(this);
+	}
+
+	if (isDebugModel) return;
+
+	InitializeEntity(this);
+	//Renderer::GetInstance().AddModel(this);
 }
 
 
@@ -488,6 +591,8 @@ void Model::Start()
 
 void Model::Update(float deltaTime)
 {
+	
+	
 }
 
 void Model::OnDestroy()
@@ -505,7 +610,7 @@ void Model::OnSceneDraw()
 		node_flags |= ImGuiTreeNodeFlags_Selected;
 	}
 
-	ImGui::PushStyleColor(ImGuiCol_Text, isActive ? ImVec4(1,1,1,1) : ImVec4(0.4f,0.4,0.4,1));
+	ImGui::PushStyleColor(ImGuiCol_Text, isActive ? ImVec4(1, 1, 1, 1) : ImVec4(0.4f, 0.4, 0.4, 1));
 
 	bool node_open = ImGui::TreeNodeEx(name.c_str(), node_flags);
 
@@ -558,3 +663,4 @@ void Model::OnModelSelected()
 void Model::Render()
 {
 }
+

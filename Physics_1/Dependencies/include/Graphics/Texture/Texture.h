@@ -17,6 +17,7 @@ public:
 	std::string path;
 	
 	Texture();
+	Texture(Image& image, std::string& path, std::string& type);
 	Texture(const std::string& path);
 	~Texture();
 
@@ -25,8 +26,8 @@ public:
 	void SetTextureSlot(int slot = 0) override;
 	void LoadTexture(const std::string& path);
 
-	static void LoadImage(const char* path, Image& image);
-	static void LoadImage(const char* path, GLFWimage& image);
+	static void LoadTextureImage(const char* path, Image& image);
+	static void LoadTextureImage(const char* path, GLFWimage& image);
 
 
 	// Inherited via Object

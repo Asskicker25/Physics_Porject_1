@@ -112,6 +112,7 @@ public:
 
 	void EngineUpdate();
 	void EngineRender();
+	void EngineShutDown();
 	
 	void InitializeWindow(int windowWidth, int windowHeight);
 	void SetWindowIcon(const std::string& path);

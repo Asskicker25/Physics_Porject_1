@@ -251,6 +251,7 @@ void ApplicationWindow::EngineRender()
 	debugLines->Clear();
 }
 
+
 void ApplicationWindow::MainLoop()
 {
 	if (imGuiPanelEnable)
@@ -276,7 +277,7 @@ void ApplicationWindow::MainLoop()
 		glfwPollEvents();
 	}
 
-	Shutdown();
+	EngineShutDown();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -285,6 +286,13 @@ void ApplicationWindow::MainLoop()
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
+
+void ApplicationWindow::EngineShutDown()
+{
+
+	Shutdown();
+}
+
 
 void ApplicationWindow::RenderForCamera(Camera* camera, FrameBuffer* frameBuffer, bool viewport)
 {
@@ -333,7 +341,7 @@ void ApplicationWindow::SetWindowIcon(const std::string& path)
 {
 	GLFWimage images[1];
 
-	Texture::LoadImage(path.c_str(), images[0]);
+	Texture::LoadTextureImage(path.c_str(), images[0]);
 
 	glfwSetWindowIcon(window, 1, images);
 }
